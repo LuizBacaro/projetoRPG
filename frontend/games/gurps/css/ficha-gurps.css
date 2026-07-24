@@ -647,6 +647,32 @@ body.ficha-gurps-body {
     max-width: min(18rem, 52%);
 }
 
+/* Opções discretas (Pacifismo, Hierarquia, Voto…): o rótulo pode ser longo.
+   Dá mais espaço ao select e permite quebrar em 2 linhas se necessário para
+   não truncar "Não-Violência Total" no meio da palavra. */
+.ficha-linha.fg-row-vant:has(.fg-cost-controle--opcoes),
+.ficha-linha.fg-row-desv:has(.fg-cost-controle--opcoes),
+.fg-trait-row:has(.fg-cost-controle--opcoes) {
+    flex-wrap: wrap;
+    row-gap: 0.3rem;
+}
+
+.fg-trait-row--custo-derivado .fg-cost-controle--opcoes {
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.fg-cost-controle--opcoes .fg-cost-opcao {
+    flex: 1 1 auto;
+    min-width: 8rem;
+    max-width: 100%;
+}
+
+.fg-cost-pts--opcao {
+    margin-left: auto;
+}
+
 .fg-trait-label--opcao {
     flex: 0 0 auto;
 }
@@ -784,9 +810,17 @@ body.ficha-gurps-body {
         max-width: min(14rem, 58%);
     }
 
+    .fg-trait-row--custo-derivado .fg-cost-controle--opcoes {
+        max-width: 100%;
+    }
+
     .fg-cost-opcao {
         max-width: 100%;
         font-size: 0.72rem;
+    }
+
+    .fg-cost-controle--opcoes .fg-cost-opcao {
+        min-width: 6rem;
     }
 
     .fg-cost-hint {
@@ -808,6 +842,13 @@ body.ficha-gurps-body {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: thin;
+    }
+
+    /* Nas linhas de opções discretas, mantém wrap para não cortar o rótulo. */
+    .ficha-linha.fg-row-vant:has(.fg-cost-controle--opcoes),
+    .ficha-linha.fg-row-desv:has(.fg-cost-controle--opcoes),
+    .fg-trait-row:has(.fg-cost-controle--opcoes) {
+        overflow-x: visible;
     }
 
     .fg-trait-nome,

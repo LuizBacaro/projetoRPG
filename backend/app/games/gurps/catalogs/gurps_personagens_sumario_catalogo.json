@@ -10,10 +10,10 @@
       300
     ],
     "paginas_pericias": [
-      301,
-      305
+      174,
+      228
     ],
-    "nota": "Catalogo enriquecido (2026-07-24) — tabelas rapidas do Modulo Basico Personagens pags. 298-301, com cost_model e opcoes discretas quando aplicavel. Autocontrole (*) preservado; texto original em custo_texto.",
+    "nota": "Catalogo enriquecido (2026-07-24) — vantagens/desvantagens das tabelas rapidas do Modulo Basico Personagens pags. 297-300, com cost_model e opcoes discretas quando aplicavel. Pericias (2026-07-24 rev.): capitulo Lista de Pericias pags. 174-228 (livro), extracao via pdftotext -raw + normalizacao de OCR + metadata reconciliada com o Basic Set. Autocontrole (*) preservado; texto original em custo_texto.",
     "cost_model_versao": 1,
     "cost_model_valores": [
       "fixo",
@@ -22,7 +22,9 @@
       "opcoes_discretas",
       "faixa",
       "variavel"
-    ]
+    ],
+    "pericias_fonte": "capitulo 174-228 (Lista de Pericias) — Modulo Basico Personagens",
+    "pericias_count": 258
   },
   "vantagens": [
     {
@@ -5375,20 +5377,8 @@
       "nt": false
     },
     {
-      "nome": "Acrobacia Aérea",
-      "atributo_base": "dx",
-      "dificuldade": "D",
-      "nt": false
-    },
-    {
-      "nome": "Acrobacia Aquática",
-      "atributo_base": "dx",
-      "dificuldade": "D",
-      "nt": false
-    },
-    {
       "nome": "Adaga de Esgrima",
-      "atributo_base": "dx",
+      "atributo_base": "iq",
       "dificuldade": "M",
       "nt": false
     },
@@ -5417,10 +5407,16 @@
       "nt": true
     },
     {
-      "nome": "Análise da Informação",
+      "nome": "Alvenaria",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Análise da Informação/NT",
       "atributo_base": "iq",
       "dificuldade": "D",
-      "nt": false
+      "nt": true
     },
     {
       "nome": "Análise de Mercado",
@@ -5435,9 +5431,15 @@
       "nt": false
     },
     {
-      "nome": "Aparar Armas",
+      "nome": "Aparar Armas de Projétil",
       "atributo_base": "dx",
       "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Arco",
+      "atributo_base": "dx",
+      "dificuldade": "M",
       "nt": false
     },
     {
@@ -5453,38 +5455,224 @@
       "nt": true
     },
     {
-      "nome": "Armas de Combate",
-      "atributo_base": "dx",
-      "dificuldade": "M",
-      "nt": false
-    },
-    {
-      "nome": "Armas de Feixe/NTf",
+      "nome": "Armas de Feixe/NT",
       "atributo_base": "dx",
       "dificuldade": "F",
       "nt": true
     },
     {
-      "nome": "Armas de Fogo/NTf",
+      "nome": "Armas de Fogo/NT",
       "atributo_base": "dx",
       "dificuldade": "F",
       "nt": true
     },
     {
       "nome": "Armas de Haste",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Armeiro/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Arqueiro Zen",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Arqueologia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Arquitetura/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Arremedo",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Arremessador de Lança",
       "atributo_base": "dx",
       "dificuldade": "M",
       "nt": false
     },
     {
-      "nome": "Canhoneiro/NTf",
+      "nome": "Arremesso",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Arrombamento/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Arte da Invisibilidade",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Arte do Arremesso",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Arte Erótica",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Arte ou Esporte de Combate",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Artilharia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Artista",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Assuntos Atuais/NT",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Astronomia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Ataque Inato",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Atuação",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Auto-Hipnose",
+      "atributo_base": "vontade",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Bastão",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Besta",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Bioengenharia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Biologia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": true
+    },
+    {
+      "nome": "Bloqueio Mental",
+      "atributo_base": "vontade",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Boémia",
+      "atributo_base": "ht",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Boleadeira",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Boxe",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Briga",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Caminhada",
+      "atributo_base": "ht",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Camuflagem",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Canhoneiro/NT",
       "atributo_base": "dx",
       "dificuldade": "F",
       "nt": true
     },
     {
+      "nome": "Canto",
+      "atributo_base": "ht",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Capa",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
       "nome": "Captação",
-      "atributo_base": "iq",
+      "atributo_base": "per",
       "dificuldade": "F",
       "nt": false
     },
@@ -5521,7 +5709,7 @@
     {
       "nome": "Cativar",
       "atributo_base": "iq",
-      "dificuldade": "D",
+      "dificuldade": "M",
       "nt": false
     },
     {
@@ -5532,20 +5720,20 @@
     },
     {
       "nome": "Chicote",
-      "atributo_base": "dx",
+      "atributo_base": "iq",
       "dificuldade": "M",
       "nt": false
     },
     {
       "nome": "Chicote de Energia",
-      "atributo_base": "dx",
+      "atributo_base": "iq",
       "dificuldade": "M",
       "nt": false
     },
     {
       "nome": "Chicote Monofio",
-      "atributo_base": "dx",
-      "dificuldade": "D",
+      "atributo_base": "iq",
+      "dificuldade": "M",
       "nt": false
     },
     {
@@ -5579,10 +5767,28 @@
       "nt": false
     },
     {
-      "nome": "Condução/NTf",
+      "nome": "Condução/NT",
       "atributo_base": "dx",
       "dificuldade": "M",
       "nt": true
+    },
+    {
+      "nome": "Conhecimento das Ervas/NT",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": true
+    },
+    {
+      "nome": "Conhecimento do Terreno",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Conhecimento Oculto",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
     },
     {
       "nome": "Connoisseur",
@@ -5591,10 +5797,10 @@
       "nt": false
     },
     {
-      "nome": "Conserto de Equipamento",
+      "nome": "Conserto de Equipamento Eletrônico/NT",
       "atributo_base": "iq",
       "dificuldade": "M",
-      "nt": false
+      "nt": true
     },
     {
       "nome": "Contabilidade",
@@ -5609,10 +5815,22 @@
       "nt": false
     },
     {
-      "nome": "Controle das Funções",
+      "nome": "Controle da Respiração",
+      "atributo_base": "ht",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Controle das Funções Involuntárias",
       "atributo_base": "ht",
       "dificuldade": "VD",
       "nt": false
+    },
+    {
+      "nome": "Controle de Carregamento/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
     },
     {
       "nome": "Corrida",
@@ -5657,20 +5875,26 @@
       "nt": true
     },
     {
-      "nome": "Desenho dc Símbolos",
+      "nome": "Dança",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Desenho de Símbolos",
       "atributo_base": "iq",
       "dificuldade": "D",
       "nt": false
     },
     {
       "nome": "Deslumbrar",
-      "atributo_base": "iq",
+      "atributo_base": "vontade",
       "dificuldade": "D",
       "nt": false
     },
     {
       "nome": "Despertar Emoção",
-      "atributo_base": "iq",
+      "atributo_base": "vontade",
       "dificuldade": "D",
       "nt": false
     },
@@ -5682,7 +5906,7 @@
     },
     {
       "nome": "Detecção de Mentiras",
-      "atributo_base": "iq",
+      "atributo_base": "per",
       "dificuldade": "D",
       "nt": false
     },
@@ -5693,7 +5917,241 @@
       "nt": true
     },
     {
-      "nome": "Geologia/NTf",
+      "nome": "Digitação",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Diplomacia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Disfarce/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Dissimulação",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Economia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Eletricista/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Encenação de Combate",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Engenharia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Engolidor de Fogo",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Entrada Forçada",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Escalada",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Escrita",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Escudo",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Espada de Duas Mãos",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Espada de Energia",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Espadas Curtas",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Espadas de Lâmina Larga",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Esportes",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Esqui",
+      "atributo_base": "ht",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Estratégia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Exorcismo",
+      "atributo_base": "vontade",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Explosivos/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Faca",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Falcoaria",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Falsificação de Dinheiro/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Falsificação/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Farmácia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Ferreiro/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Filosofia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Finanças",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Física/NT",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": true
+    },
+    {
+      "nome": "Fisiologia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Força Mental",
+      "atributo_base": "vontade",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Fotografia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Fuga",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Funda",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Furtividade",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Garrote",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Geografia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Geologia/NT",
       "atributo_base": "iq",
       "dificuldade": "D",
       "nt": true
@@ -5706,7 +6164,7 @@
     },
     {
       "nome": "Golpe Poderoso",
-      "atributo_base": "iq",
+      "atributo_base": "vontade",
       "dificuldade": "D",
       "nt": false
     },
@@ -5717,6 +6175,12 @@
       "nt": false
     },
     {
+      "nome": "Hacking de Computador/NT",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": true
+    },
+    {
       "nome": "Heráldica",
       "atributo_base": "iq",
       "dificuldade": "M",
@@ -5724,6 +6188,12 @@
     },
     {
       "nome": "Hipnotismo",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "História",
       "atributo_base": "iq",
       "dificuldade": "D",
       "nt": false
@@ -5748,15 +6218,9 @@
     },
     {
       "nome": "Intimidação",
-      "atributo_base": "iq",
+      "atributo_base": "vontade",
       "dificuldade": "M",
       "nt": false
-    },
-    {
-      "nome": "Invasão Cerebral/NT",
-      "atributo_base": "iq",
-      "dificuldade": "D",
-      "nt": true
     },
     {
       "nome": "Jardinagem",
@@ -5766,7 +6230,7 @@
     },
     {
       "nome": "Jitte/Sai",
-      "atributo_base": "dx",
+      "atributo_base": "iq",
       "dificuldade": "M",
       "nt": false
     },
@@ -5778,6 +6242,48 @@
     },
     {
       "nome": "Jogos de Azar",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Jogos de Entretenimento",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Judô",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Jurisprudência",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Kiai",
+      "atributo_base": "ht",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Kusari",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Lábia",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Lança",
       "atributo_base": "iq",
       "dificuldade": "M",
       "nt": false
@@ -5802,7 +6308,7 @@
     },
     {
       "nome": "Leitura Labial",
-      "atributo_base": "iq",
+      "atributo_base": "per",
       "dificuldade": "M",
       "nt": false
     },
@@ -5820,14 +6326,8 @@
     },
     {
       "nome": "Linguagem Corporal",
-      "atributo_base": "iq",
+      "atributo_base": "per",
       "dificuldade": "M",
-      "nt": false
-    },
-    {
-      "nome": "Linguística",
-      "atributo_base": "iq",
-      "dificuldade": "D",
       "nt": false
     },
     {
@@ -5844,13 +6344,49 @@
     },
     {
       "nome": "Lutar às Cegas",
-      "atributo_base": "iq",
+      "atributo_base": "per",
       "dificuldade": "VD",
       "nt": false
     },
     {
       "nome": "Maça/Machado",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Maça/Machado de Duas Mãos",
       "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Magia Ritualística",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Manejo de Barcos/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Mangual",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Mangual de Duas Mãos",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Manha",
+      "atributo_base": "iq",
       "dificuldade": "M",
       "nt": false
     },
@@ -5861,40 +6397,16 @@
       "nt": true
     },
     {
-      "nome": "Magia Ritualística",
-      "atributo_base": "iq",
-      "dificuldade": "VD",
-      "nt": false
-    },
-    {
-      "nome": "Manejo de Barcos/NTf",
-      "atributo_base": "iq",
-      "dificuldade": "D",
-      "nt": true
-    },
-    {
-      "nome": "Mangual",
-      "atributo_base": "dx",
-      "dificuldade": "D",
-      "nt": false
-    },
-    {
-      "nome": "Mangual de Duas Mãos",
-      "atributo_base": "dx",
-      "dificuldade": "D",
-      "nt": false
-    },
-    {
       "nome": "Maquinista/NT",
       "atributo_base": "iq",
       "dificuldade": "M",
       "nt": true
     },
     {
-      "nome": "Marinhagem",
+      "nome": "Marinhagem/NT",
       "atributo_base": "iq",
       "dificuldade": "F",
-      "nt": false
+      "nt": true
     },
     {
       "nome": "Matemática/NT",
@@ -5903,10 +6415,304 @@
       "nt": true
     },
     {
-      "nome": "Materiais Perigosos/NTf",
+      "nome": "Materiais Perigosos/NT",
       "atributo_base": "iq",
       "dificuldade": "M",
       "nt": true
+    },
+    {
+      "nome": "Medicina Alternativa",
+      "atributo_base": "per",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Medicina/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Meditação",
+      "atributo_base": "vontade",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Mendicância",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Mergulho/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Metalurgia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Meteorologia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Mímica/Pantomima",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Montaria",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Natação",
+      "atributo_base": "ht",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Naturalista",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Navegação/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Observação",
+      "atributo_base": "per",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Observador Avançado",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Ocultamento",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Ocultismo",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Operação de Aparelhos Eletrônicos/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Operação de Computadores/NT",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Oratória",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Paleontologia/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Paraquedismo/NT",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Passos Leves",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Patinação",
+      "atributo_base": "ht",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Pedagogia",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Percepção do Corpo",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Performance em Grupo",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Perícia Abrangente",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Perícia Forense/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Perícia Profissional",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Perícias de Passatempo",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Perseguição",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Persuadir",
+      "atributo_base": "vontade",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Pescaria",
+      "atributo_base": "per",
+      "dificuldade": "F",
+      "nt": false
+    },
+    {
+      "nome": "Pesquisa/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Pilotagem/NT",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Poesia",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Política",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
+      "nome": "Pontos de Pressão",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Pontos Secretos",
+      "atributo_base": "iq",
+      "dificuldade": "VD",
+      "nt": false
+    },
+    {
+      "nome": "Postura Imóvel",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Prestidigitação",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Primeiros Socorros/NT",
+      "atributo_base": "iq",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Programação de Computadores/NT",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": true
+    },
+    {
+      "nome": "Projetor de Líquidos/NT",
+      "atributo_base": "dx",
+      "dificuldade": "F",
+      "nt": true
+    },
+    {
+      "nome": "Propaganda/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Prospecção/NT",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": true
+    },
+    {
+      "nome": "Psicologia",
+      "atributo_base": "iq",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Punga",
+      "atributo_base": "dx",
+      "dificuldade": "D",
+      "nt": false
+    },
+    {
+      "nome": "Queda Livre",
+      "atributo_base": "dx",
+      "dificuldade": "M",
+      "nt": false
     },
     {
       "nome": "Química/NT",
@@ -5916,13 +6722,13 @@
     },
     {
       "nome": "Rapieira",
-      "atributo_base": "dx",
+      "atributo_base": "iq",
       "dificuldade": "M",
       "nt": false
     },
     {
       "nome": "Rastreamento",
-      "atributo_base": "iq",
+      "atributo_base": "per",
       "dificuldade": "M",
       "nt": false
     },
@@ -5933,14 +6739,14 @@
       "nt": false
     },
     {
-      "nome": "Remo/Vela/NTf",
+      "nome": "Remo/Vela/NT",
       "atributo_base": "dx",
       "dificuldade": "M",
       "nt": true
     },
     {
       "nome": "Revistar",
-      "atributo_base": "iq",
+      "atributo_base": "per",
       "dificuldade": "M",
       "nt": false
     },
@@ -5952,7 +6758,7 @@
     },
     {
       "nome": "Sabre",
-      "atributo_base": "dx",
+      "atributo_base": "iq",
       "dificuldade": "M",
       "nt": false
     },
@@ -5982,13 +6788,13 @@
     },
     {
       "nome": "Sobrevivência",
-      "atributo_base": "iq",
+      "atributo_base": "per",
       "dificuldade": "M",
       "nt": false
     },
     {
       "nome": "Sobrevivência Urbana",
-      "atributo_base": "iq",
+      "atributo_base": "per",
       "dificuldade": "M",
       "nt": false
     },
@@ -6012,30 +6818,24 @@
     },
     {
       "nome": "Sonhos",
-      "atributo_base": "iq",
+      "atributo_base": "vontade",
       "dificuldade": "D",
       "nt": false
     },
     {
       "nome": "Submarino/NT",
-      "atributo_base": "dx",
+      "atributo_base": "iq",
       "dificuldade": "M",
       "nt": true
     },
     {
       "nome": "Sugerir",
-      "atributo_base": "iq",
+      "atributo_base": "vontade",
       "dificuldade": "D",
       "nt": false
     },
     {
-      "nome": "Sumô",
-      "atributo_base": "dx",
-      "dificuldade": "M",
-      "nt": false
-    },
-    {
-      "nome": "Surrupiar",
+      "nome": "Sumo",
       "atributo_base": "dx",
       "dificuldade": "M",
       "nt": false
@@ -6059,8 +6859,14 @@
       "nt": false
     },
     {
+      "nome": "Terçado",
+      "atributo_base": "iq",
+      "dificuldade": "M",
+      "nt": false
+    },
+    {
       "nome": "Tonfa",
-      "atributo_base": "dx",
+      "atributo_base": "iq",
       "dificuldade": "M",
       "nt": false
     },
@@ -6077,34 +6883,10 @@
       "nt": false
     },
     {
-      "nome": "Tripulante Aéreo/NT",
-      "atributo_base": "iq",
-      "dificuldade": "F",
-      "nt": true
-    },
-    {
-      "nome": "Tripulante de Navio/NT",
-      "atributo_base": "iq",
-      "dificuldade": "F",
-      "nt": true
-    },
-    {
-      "nome": "Tripulante de Submarino/NT",
-      "atributo_base": "iq",
-      "dificuldade": "F",
-      "nt": true
-    },
-    {
-      "nome": "Tripulante Espacial/NT",
-      "atributo_base": "iq",
-      "dificuldade": "F",
-      "nt": true
-    },
-    {
-      "nome": "Utilização de Traje Especial",
+      "nome": "Utilização de Traje Especial/NT",
       "atributo_base": "dx",
       "dificuldade": "M",
-      "nt": false
+      "nt": true
     },
     {
       "nome": "Venefício/NT",
