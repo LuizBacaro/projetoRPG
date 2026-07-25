@@ -1,0 +1,571 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 Edição Jogo do Ano v1.3 — Cap. 3 Tabelas 3-7, 3-8 e 3-9 (itens superiores / materiais)",
+    "nota": "Metadados e efeitos mecânicos curtos; sem texto editorial longo. RF-T07i.",
+    "paginas_referencia": "impresso ~164–167 (PDF ~170–173)"
+  },
+  "precos_melhoria": [
+    300,
+    3000,
+    9000,
+    18000
+  ],
+  "precos_melhoria_detalhe": [
+    {
+      "n": 1,
+      "aumento_preco_ts": 300,
+      "aumento_cd": 5
+    },
+    {
+      "n": 2,
+      "aumento_preco_ts": 3000,
+      "aumento_cd": 10
+    },
+    {
+      "n": 3,
+      "aumento_preco_ts": 9000,
+      "aumento_cd": 15
+    },
+    {
+      "n": 4,
+      "aumento_preco_ts": 18000,
+      "aumento_cd": 20
+    }
+  ],
+  "melhorias": [
+    {
+      "slug": "certeira",
+      "nome": "Certeira",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "+1 nos testes de ataque.",
+      "mods": {
+        "ataque": 1
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "pungente",
+      "nome": "Pungente",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "+2 nos testes de ataque (pré-requisito: Certeira).",
+      "mods": {
+        "ataque": 2
+      },
+      "pre_requisito": "certeira",
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "cruel",
+      "nome": "Cruel",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "+1 nas rolagens de dano.",
+      "mods": {
+        "dano": 1
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "atroz",
+      "nome": "Atroz",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "+2 nas rolagens de dano (pré-requisito: Cruel).",
+      "mods": {
+        "dano": 2
+      },
+      "pre_requisito": "cruel",
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "equilibrada",
+      "nome": "Equilibrada",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "+2 em testes de manobras (desarmar, quebrar etc.).",
+      "mods": {
+        "manobras": 2
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "harmonizada",
+      "nome": "Harmonizada",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "Habilidade de ataque/agredir escolhida custa –1 PM (pré-requisito: outra melhoria).",
+      "mods": {
+        "custo_pm_habilidade_ataque": -1
+      },
+      "pre_requisito": "qualquer_outra_melhoria",
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "injecao_alquimica",
+      "nome": "Injeção alquímica",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "Acerto libera preparado/água benta no alvo (2 doses; recarregar ação completa).",
+      "mods": {},
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "macica",
+      "nome": "Maciça",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "+1 no multiplicador de crítico (incompatível com Precisa).",
+      "mods": {
+        "critico_multiplicador": 1
+      },
+      "incompativel_com": [
+        "precisa"
+      ],
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "precisa",
+      "nome": "Precisa",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "+1 na margem de ameaça (incompatível com Maciça).",
+      "mods": {
+        "critico_margem": 1
+      },
+      "incompativel_com": [
+        "macica"
+      ],
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "mira_telescopica",
+      "nome": "Mira telescópica",
+      "aplica_em": [
+        "arma"
+      ],
+      "efeito_resumo": "Aumenta alcance em 1 categoria; só armas de disparo (exceto fundas); Ataque Furtivo → médio.",
+      "mods": {},
+      "restricao": "armas_de_disparo_exceto_funda",
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "ajustada",
+      "nome": "Ajustada",
+      "aplica_em": [
+        "armadura",
+        "escudo"
+      ],
+      "efeito_resumo": "–1 na penalidade de armadura.",
+      "mods": {
+        "penalidade_armadura": -1
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "sob_medida",
+      "nome": "Sob medida",
+      "aplica_em": [
+        "armadura",
+        "escudo"
+      ],
+      "efeito_resumo": "–2 na penalidade de armadura só para o usuário (pré-requisito: Ajustada).",
+      "mods": {
+        "penalidade_armadura": -2
+      },
+      "pre_requisito": "ajustada",
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "delicada",
+      "nome": "Delicada",
+      "aplica_em": [
+        "armadura"
+      ],
+      "efeito_resumo": "Armadura pesada: aplica 1 ponto de Des (ou atributo de Defesa) na Defesa; incompatível com Reforçada.",
+      "mods": {
+        "destreza_defesa": 1
+      },
+      "restricao": "armadura_pesada",
+      "incompativel_com": [
+        "reforcada"
+      ],
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "espinhosa",
+      "nome": "Espinhosa",
+      "aplica_em": [
+        "armadura"
+      ],
+      "efeito_resumo": "Ao agarrar/ser agarrado, causa dano de perfuração = Força (início de cada turno enquanto mantido).",
+      "mods": {},
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "espinhoso",
+      "nome": "Espinhoso",
+      "aplica_em": [
+        "escudo"
+      ],
+      "efeito_resumo": "Aumenta o dano de ataque com escudo em um passo.",
+      "mods": {
+        "dano_passo": 1
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "polida",
+      "nome": "Polida",
+      "aplica_em": [
+        "armadura",
+        "escudo"
+      ],
+      "efeito_resumo": "+5 na Defesa do item só na 1ª rodada (ambiente iluminado).",
+      "mods": {
+        "defesa_primeira_rodada": 5
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "reforcada",
+      "nome": "Reforçada",
+      "aplica_em": [
+        "armadura",
+        "escudo"
+      ],
+      "efeito_resumo": "+1 na Defesa e +1 na penalidade de armadura; incompatível com Delicada.",
+      "mods": {
+        "defesa": 1,
+        "penalidade_armadura": 1
+      },
+      "incompativel_com": [
+        "delicada"
+      ],
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "selada",
+      "nome": "Selada",
+      "aplica_em": [
+        "armadura"
+      ],
+      "efeito_resumo": "+1 em testes de resistência; só armaduras pesadas.",
+      "mods": {
+        "resistencia": 1
+      },
+      "restricao": "armadura_pesada",
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "canalizador",
+      "nome": "Canalizador",
+      "aplica_em": [
+        "esoterico"
+      ],
+      "efeito_resumo": "Máximo de PM gastos em magias +1.",
+      "mods": {
+        "limite_pm": 1
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "energetico",
+      "nome": "Energético",
+      "aplica_em": [
+        "esoterico"
+      ],
+      "efeito_resumo": "Magias que causam dano causam +1d6 do mesmo tipo.",
+      "mods": {
+        "dano_magia": "1d6"
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "harmonizado",
+      "nome": "Harmonizado",
+      "aplica_em": [
+        "esoterico"
+      ],
+      "efeito_resumo": "Custo de uma magia escolhida –1 PM (trocável com ritual 1 dia + T$ 100).",
+      "mods": {
+        "custo_pm_magia": -1
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "poderoso",
+      "nome": "Poderoso",
+      "aplica_em": [
+        "esoterico"
+      ],
+      "efeito_resumo": "+1 na CD das suas magias.",
+      "mods": {
+        "cd_magia": 1
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "vigilante",
+      "nome": "Vigilante",
+      "aplica_em": [
+        "esoterico"
+      ],
+      "efeito_resumo": "+2 na Defesa.",
+      "mods": {
+        "defesa": 2
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "aprimorado",
+      "nome": "Aprimorado",
+      "aplica_em": [
+        "ferramenta",
+        "vestuario"
+      ],
+      "efeito_resumo": "+1 na perícia que o item modifica (só itens que já afetam perícia).",
+      "mods": {
+        "pericia": 1
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "banhado_a_ouro",
+      "nome": "Banhado a ouro",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico",
+        "ferramenta",
+        "vestuario"
+      ],
+      "efeito_resumo": "+2 em Diplomacia (mestre pode inverter vs. quem odeia ostentação).",
+      "mods": {
+        "diplomacia": 2
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "cravejado_de_gemas",
+      "nome": "Cravejado de gemas",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico",
+        "ferramenta",
+        "vestuario"
+      ],
+      "efeito_resumo": "+2 em Enganação.",
+      "mods": {
+        "enganacao": 2
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "discreto",
+      "nome": "Discreto",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico",
+        "ferramenta",
+        "vestuario"
+      ],
+      "efeito_resumo": "–1 espaço (mín. 1) e +5 em Ladinagem para ocultar.",
+      "mods": {
+        "espacos": -1,
+        "ocultar": 5
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "macabro",
+      "nome": "Macabro",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico",
+        "ferramenta",
+        "vestuario"
+      ],
+      "efeito_resumo": "+2 em Intimidação e –2 em Diplomacia.",
+      "mods": {
+        "intimidacao": 2,
+        "diplomacia": -2
+      },
+      "pagina_referencia": 164
+    },
+    {
+      "slug": "material_especial",
+      "nome": "Material especial",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico"
+      ],
+      "efeito_resumo": "Item feito/banhado de material especial; efeito e preço extra conforme o material (Tabela 3-9).",
+      "mods": {},
+      "pagina_referencia": 164
+    }
+  ],
+  "materiais": [
+    {
+      "slug": "aco_rubi",
+      "nome": "Aço-Rubi",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico"
+      ],
+      "efeito_resumo": "Arma/esotérico: ignora RD 10 e imunidade a crítico/dano de lefeu; armadura/escudo: chance de ignorar crítico/furtivo (leve/escudo 25%, pesada 50%, cumulativas).",
+      "mods": {
+        "ignora_rd": 10
+      },
+      "custo_ts": {
+        "arma": 6000,
+        "armadura_leve": 3000,
+        "armadura_pesada": 6000,
+        "escudo": 3000,
+        "esoterico": 6000
+      },
+      "pagina_referencia": 166
+    },
+    {
+      "slug": "adamante",
+      "nome": "Adamante",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico"
+      ],
+      "efeito_resumo": "Arma: +1 passo de dano; armadura/escudo: RD 2 (leve/escudo) ou RD 5 (pesada); esotérico: +1 PM para rerrolar 1s no dano de magia.",
+      "mods": {
+        "dano_passo_arma": 1,
+        "rd_leve_escudo": 2,
+        "rd_pesada": 5
+      },
+      "custo_ts": {
+        "arma": 3000,
+        "armadura_leve": 6000,
+        "armadura_pesada": 18000,
+        "escudo": 6000,
+        "esoterico": 3000
+      },
+      "pagina_referencia": 166
+    },
+    {
+      "slug": "gelo_eterno",
+      "nome": "Gelo eterno",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico"
+      ],
+      "efeito_resumo": "Arma: +2 dano de frio; armadura/escudo: redução de fogo 5 (leve/escudo) ou 10 (pesada); esotérico: rerrola 1s no dano de magias de frio.",
+      "mods": {
+        "dano_frio_arma": 2,
+        "reducao_fogo_leve_escudo": 5,
+        "reducao_fogo_pesada": 10
+      },
+      "custo_ts": {
+        "arma": 600,
+        "armadura_leve": 1500,
+        "armadura_pesada": 3000,
+        "escudo": 1500,
+        "esoterico": 3000
+      },
+      "pagina_referencia": 166
+    },
+    {
+      "slug": "madeira_tollon",
+      "nome": "Madeira Tollon",
+      "aplica_em": [
+        "arma",
+        "escudo",
+        "esoterico"
+      ],
+      "efeito_resumo": "Só armas de madeira listadas, escudos leves e esotéricos; arma: conta como mágica vs RD e –1 PM em habilidades de ataque; escudo/esotérico: resistência a magia +2.",
+      "mods": {
+        "custo_pm_habilidade_ataque": -1,
+        "resistencia_magia": 2
+      },
+      "restricao": "armas_madeira_arcos_bordoes_clavas_lancas_piques_tacapes; escudo_leve; esoterico",
+      "custo_ts": {
+        "arma": 1500,
+        "armadura_leve": null,
+        "armadura_pesada": null,
+        "escudo": 1500,
+        "esoterico": 1500
+      },
+      "pagina_referencia": 166
+    },
+    {
+      "slug": "materia_vermelha",
+      "nome": "Matéria Vermelha",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico"
+      ],
+      "efeito_resumo": "–2 em perícias de Carisma (exceto Intimidação); arma +1d6 dano e –1 PV ao acertar (lefou/lefeu imunes); armadura/escudo chance de falha 10%/25%; esotérico –2 resistência mágica em você e inimigos curtos.",
+      "mods": {
+        "dano_extra_arma": "1d6",
+        "perda_pv_ao_acertar": 1,
+        "falha_leve_escudo": 0.1,
+        "falha_pesada": 0.25
+      },
+      "custo_ts": {
+        "arma": 1500,
+        "armadura_leve": 6000,
+        "armadura_pesada": 18000,
+        "escudo": 6000,
+        "esoterico": 3000
+      },
+      "pagina_referencia": 166
+    },
+    {
+      "slug": "mitral",
+      "nome": "Mitral",
+      "aplica_em": [
+        "arma",
+        "armadura",
+        "escudo",
+        "esoterico"
+      ],
+      "efeito_resumo": "–1 espaço (mín. 1); arma +1 margem de ameaça; armadura/escudo –2 penalidade (pesada: até 2 Des na Defesa); esotérico: +2 PM → +2 CD da magia.",
+      "mods": {
+        "espacos": -1,
+        "critico_margem_arma": 1,
+        "penalidade_armadura": -2
+      },
+      "custo_ts": {
+        "arma": 1500,
+        "armadura_leve": 1500,
+        "armadura_pesada": 12000,
+        "escudo": 1500,
+        "esoterico": 3000
+      },
+      "pagina_referencia": 166
+    }
+  ]
+}

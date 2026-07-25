@@ -16,94 +16,471 @@
       "alcance": "Curto",
       "peso": "0,5 kg"
     },
-    { "nome": "Aljava", "categoria": "Equipamento" },
-    { "nome": "Arco composto", "categoria": "Arma à distância" },
-    { "nome": "Arco curto", "categoria": "Arma à distância" },
-    { "nome": "Arco longo", "categoria": "Arma à distância" },
-    { "nome": "Armadura de couro batido", "categoria": "Armadura leve" },
-    { "nome": "Armadura de couro", "categoria": "Armadura leve" },
-    { "nome": "Armadura de couro reforçado", "categoria": "Armadura leve" },
-    { "nome": "Armadura de gibão de peles", "categoria": "Armadura leve" },
-    { "nome": "Armadura de cota de malha", "categoria": "Armadura média" },
-    { "nome": "Armadura de escamas", "categoria": "Armadura média" },
-    { "nome": "Armadura de peitoral", "categoria": "Armadura pesada" },
-    { "nome": "Armadura de placas", "categoria": "Armadura pesada" },
-    { "nome": "Brunea", "categoria": "Armadura pesada" },
-    { "nome": "Azagaia", "categoria": "Arma arremessável" },
-    { "nome": "Bordão", "categoria": "Arma corpo a corpo" },
-    { "nome": "Broquel", "categoria": "Escudo" },
-    { "nome": "Cajado", "categoria": "Arma corpo a corpo" },
-    { "nome": "Cimitarra", "categoria": "Arma corpo a corpo" },
-    { "nome": "Clava", "categoria": "Arma corpo a corpo" },
-    { "nome": "Corda (15 m)", "categoria": "Equipamento" },
-    { "nome": "Dardo", "categoria": "Arma arremessável" },
-    { "nome": "Elmo", "categoria": "Proteção" },
-    { "nome": "Escudo leve de madeira", "categoria": "Escudo" },
-    { "nome": "Escudo pesado de aço", "categoria": "Escudo" },
-    { "nome": "Espada bastarda", "categoria": "Arma corpo a corpo" },
-    { "nome": "Espada curta", "categoria": "Arma corpo a corpo" },
-    { "nome": "Espada longa", "categoria": "Arma corpo a corpo" },
-    { "nome": "Estilingue", "categoria": "Arma à distância" },
-    { "nome": "Flechas (20)", "categoria": "Munição" },
-    { "nome": "Florete", "categoria": "Arma corpo a corpo" },
-    { "nome": "Funda", "categoria": "Arma à distância" },
-    { "nome": "Gancho de escalada", "categoria": "Equipamento" },
-    { "nome": "Grimório (em branco)", "categoria": "Equipamento" },
-    { "nome": "Kit de disfarce", "categoria": "Equipamento" },
-    { "nome": "Kit de primeiros socorros", "categoria": "Equipamento" },
-    { "nome": "Lanterna coberta", "categoria": "Equipamento" },
-    { "nome": "Lanterna", "categoria": "Equipamento" },
-    { "nome": "Lança", "categoria": "Arma corpo a corpo" },
-    { "nome": "Machadinha", "categoria": "Arma corpo a corpo" },
-    { "nome": "Maça", "categoria": "Arma corpo a corpo" },
-    { "nome": "Machado de batalha", "categoria": "Arma corpo a corpo" },
-    { "nome": "Mangual leve", "categoria": "Arma corpo a corpo" },
-    { "nome": "Mangual pesado", "categoria": "Arma corpo a corpo" },
-    { "nome": "Martelo leve", "categoria": "Arma corpo a corpo" },
-    { "nome": "Martelo de guerra", "categoria": "Arma corpo a corpo" },
-    { "nome": "Mochila", "categoria": "Equipamento" },
-    { "nome": "Óleo (frasco)", "categoria": "Consumível" },
-    { "nome": "Pé de cabra", "categoria": "Equipamento" },
-    { "nome": "Picareta", "categoria": "Equipamento" },
-    { "nome": "Pederneira e isca", "categoria": "Equipamento" },
-    { "nome": "Poção de cura (frasco)", "categoria": "Consumível" },
-    { "nome": "Rações (1 dia)", "categoria": "Equipamento" },
-    { "nome": "Rede", "categoria": "Arma especial" },
-    { "nome": "Roupas de viajante", "categoria": "Equipamento" },
-    { "nome": "Saco de estopa", "categoria": "Equipamento" },
-    { "nome": "Saco de seda", "categoria": "Equipamento" },
-    { "nome": "Tocha", "categoria": "Equipamento" },
-    { "nome": "Tridente", "categoria": "Arma corpo a corpo" },
-    { "nome": "Tacape", "categoria": "Arma corpo a corpo" },
-    { "nome": "Vara (3 m)", "categoria": "Equipamento" },
-    { "nome": "Virotes (10)", "categoria": "Munição" },
-    { "nome": "Corda de prumo", "categoria": "Equipamento" },
-    { "nome": "Carrilhão", "categoria": "Equipamento" },
-    { "nome": "Pergaminho (em branco)", "categoria": "Equipamento" },
-    { "nome": "Bolsa de componentes", "categoria": "Equipamento" },
-    { "nome": "Símbolo sagrado de madeira", "categoria": "Equipamento" },
-    { "nome": "Símbolo sagrado de prata", "categoria": "Equipamento" },
-    { "nome": "Instrumento musical (comum)", "categoria": "Equipamento" },
-    { "nome": "Livro de orações", "categoria": "Equipamento" },
-    { "nome": "Óculos", "categoria": "Equipamento" },
-    { "nome": "Lupa", "categoria": "Equipamento" },
-    { "nome": "Mapa da região", "categoria": "Equipamento" },
-    { "nome": "Cavalo de carga", "categoria": "Montaria" },
-    { "nome": "Cavalo de guerra", "categoria": "Montaria" },
-    { "nome": "Burro", "categoria": "Montaria" },
-    { "nome": "Selas e arreios", "categoria": "Montaria" },
-    { "nome": "Carroça", "categoria": "Transporte" },
-    { "nome": "Barco a remo", "categoria": "Transporte" },
-    { "nome": "Âncora pequena", "categoria": "Equipamento" },
-    { "nome": "Corda grossa (15 m)", "categoria": "Equipamento" },
-    { "nome": "Espelho de metal pequeno", "categoria": "Equipamento" },
-    { "nome": "Cadeados (simples)", "categoria": "Equipamento" },
-    { "nome": "Chaves de ladrão", "categoria": "Equipamento" },
-    { "nome": "Tenda para 2 pessoas", "categoria": "Equipamento" },
-    { "nome": "Saco de dormir", "categoria": "Equipamento" },
-    { "nome": "Cantil", "categoria": "Equipamento" },
-    { "nome": "Bastão de ferro", "categoria": "Equipamento" },
-    { "nome": "Espada samurai (katana)", "categoria": "Arma corpo a corpo" },
-    { "nome": "Wakizashi", "categoria": "Arma corpo a corpo" }
+    {
+      "nome": "Alabarda",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas marciais · Corpo a corpo"
+    },
+    {
+      "nome": "Alfange",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas marciais · Corpo a corpo"
+    },
+    {
+      "nome": "Aljava",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Arco composto",
+      "categoria": "Arma à distância"
+    },
+    {
+      "nome": "Arco curto",
+      "categoria": "Arma à distância"
+    },
+    {
+      "nome": "Arco longo",
+      "categoria": "Arma à distância"
+    },
+    {
+      "nome": "Armadura de cota de malha",
+      "categoria": "Armadura média"
+    },
+    {
+      "nome": "Armadura de couro",
+      "categoria": "Armadura leve"
+    },
+    {
+      "nome": "Armadura de couro batido",
+      "categoria": "Armadura leve"
+    },
+    {
+      "nome": "Armadura de couro reforçado",
+      "categoria": "Armadura leve"
+    },
+    {
+      "nome": "Armadura de escamas",
+      "categoria": "Armadura média"
+    },
+    {
+      "nome": "Armadura de gibão de peles",
+      "categoria": "Armadura leve"
+    },
+    {
+      "nome": "Armadura de peitoral",
+      "categoria": "Armadura pesada"
+    },
+    {
+      "nome": "Armadura de placas",
+      "categoria": "Armadura pesada"
+    },
+    {
+      "nome": "Ataque desarmado",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas simples · Corpo a corpo"
+    },
+    {
+      "nome": "Azagaia",
+      "categoria": "Arma arremessável"
+    },
+    {
+      "nome": "Balas (10)",
+      "categoria": "Munição",
+      "secao": "Munições · Funda"
+    },
+    {
+      "nome": "Barco a remo",
+      "categoria": "Transporte"
+    },
+    {
+      "nome": "Bastão de ferro",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Besta leve",
+      "categoria": "Arma à distância",
+      "secao": "Armas simples · À distância"
+    },
+    {
+      "nome": "Besta pesada",
+      "categoria": "Arma à distância",
+      "secao": "Armas marciais · À distância"
+    },
+    {
+      "nome": "Bolsa de componentes",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Bordão",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Broquel",
+      "categoria": "Escudo"
+    },
+    {
+      "nome": "Brunea",
+      "categoria": "Armadura pesada"
+    },
+    {
+      "nome": "Burro",
+      "categoria": "Montaria"
+    },
+    {
+      "nome": "Cadeados (simples)",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Cajado",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Cantil",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Carrilhão",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Carroça",
+      "categoria": "Transporte"
+    },
+    {
+      "nome": "Cavalo de carga",
+      "categoria": "Montaria"
+    },
+    {
+      "nome": "Cavalo de guerra",
+      "categoria": "Montaria"
+    },
+    {
+      "nome": "Chaves de ladrão",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Chicote",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas exóticas · Corpo a corpo"
+    },
+    {
+      "nome": "Cimitarra",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Clava",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Corda (15 m)",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Corda de prumo",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Corda grossa (15 m)",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Corrente de espinhos",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas exóticas · Corpo a corpo"
+    },
+    {
+      "nome": "Dardo",
+      "categoria": "Arma arremessável"
+    },
+    {
+      "nome": "Elmo",
+      "categoria": "Proteção"
+    },
+    {
+      "nome": "Escudo leve de madeira",
+      "categoria": "Escudo"
+    },
+    {
+      "nome": "Escudo pesado de aço",
+      "categoria": "Escudo"
+    },
+    {
+      "nome": "Espada bastarda",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Espada curta",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Espada longa",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Espada samurai (katana)",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Espelho de metal pequeno",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Estilingue",
+      "categoria": "Arma à distância"
+    },
+    {
+      "nome": "Flechas (20)",
+      "categoria": "Munição"
+    },
+    {
+      "nome": "Florete",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Foice",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas simples · Corpo a corpo"
+    },
+    {
+      "nome": "Funda",
+      "categoria": "Arma à distância"
+    },
+    {
+      "nome": "Gadanho",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas marciais · Corpo a corpo"
+    },
+    {
+      "nome": "Gancho de escalada",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Grimório (em branco)",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Instrumento musical (comum)",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Kit de disfarce",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Kit de primeiros socorros",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Lanterna",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Lanterna coberta",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Lança",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Lança montada",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas marciais · Corpo a corpo"
+    },
+    {
+      "nome": "Livro de orações",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Lupa",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Machadinha",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Machado anão",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas exóticas · Corpo a corpo"
+    },
+    {
+      "nome": "Machado de batalha",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Machado de guerra",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas marciais · Corpo a corpo"
+    },
+    {
+      "nome": "Machado táurico",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas exóticas · Corpo a corpo"
+    },
+    {
+      "nome": "Mangual",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas marciais · Corpo a corpo"
+    },
+    {
+      "nome": "Mangual leve",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Mangual pesado",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Manopla",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas simples · Corpo a corpo"
+    },
+    {
+      "nome": "Mapa da região",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Marreta",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas marciais · Corpo a corpo"
+    },
+    {
+      "nome": "Martelo de guerra",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Martelo leve",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Maça",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Mochila",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Montante",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas marciais · Corpo a corpo"
+    },
+    {
+      "nome": "Mosquete",
+      "categoria": "Arma à distância",
+      "secao": "Armas de fogo · À distância"
+    },
+    {
+      "nome": "Munição (20)",
+      "categoria": "Arma à distância",
+      "secao": "Munições · Armas de fogo"
+    },
+    {
+      "nome": "Pederneira e isca",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Pergaminho (em branco)",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Picareta",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Pique",
+      "categoria": "Arma corpo a corpo",
+      "secao": "Armas simples · Corpo a corpo"
+    },
+    {
+      "nome": "Pistola",
+      "categoria": "Arma à distância",
+      "secao": "Armas de fogo · À distância"
+    },
+    {
+      "nome": "Poção de cura (frasco)",
+      "categoria": "Consumível"
+    },
+    {
+      "nome": "Pé de cabra",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Rações (1 dia)",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Rede",
+      "categoria": "Arma especial"
+    },
+    {
+      "nome": "Roupas de viajante",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Saco de dormir",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Saco de estopa",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Saco de seda",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Selas e arreios",
+      "categoria": "Montaria"
+    },
+    {
+      "nome": "Símbolo sagrado de madeira",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Símbolo sagrado de prata",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Tacape",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Tenda para 2 pessoas",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Tocha",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Tridente",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Vara (3 m)",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Virotes (10)",
+      "categoria": "Munição"
+    },
+    {
+      "nome": "Wakizashi",
+      "categoria": "Arma corpo a corpo"
+    },
+    {
+      "nome": "Âncora pequena",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Óculos",
+      "categoria": "Equipamento"
+    },
+    {
+      "nome": "Óleo (frasco)",
+      "categoria": "Consumível"
+    }
   ]
 }

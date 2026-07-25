@@ -62,6 +62,9 @@ from app.games.tormenta.rules.duende_t20 import (
     rolar_duende_aleatorio,
 )
 from app.games.tormenta.rules.escolhas_raciais_t20 import escolhas_por_raca
+from app.games.tormenta.rules.itens_superiores_v13_t20 import (
+    resumo_itens_superiores_v13,
+)
 from app.games.tormenta.rules.kit_inicial_v13_t20 import opcoes_kit_inicial_v13
 from app.games.tormenta.rules.magias_progressao_mb_t20 import (
     circulo_maximo_magias_lancaveis_mb,
@@ -155,6 +158,7 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaIdiomaTabelaItem,
     TormentaIniciativaRolarRequest,
     TormentaIniciativaRolarResponse,
+    TormentaItensSuperioresV13Response,
     TormentaKitInicialV13Opcoes,
     TormentaMagiaMbCatalogoItem,
     TormentaMagiaMbCatalogoPaginaResponse,
@@ -687,6 +691,22 @@ def listar_catalogo_armaduras_protecao(
         response.headers["X-Limit"] = str(limit)
     itens = [TormentaArmaduraCatalogoItem.model_validate(r) for r in slice_rows]
     return TormentaArmaduraCatalogoPaginaResponse(itens=itens, total=total)
+
+
+@router.get(
+    "/itens-superiores",
+    response_model=TormentaItensSuperioresV13Response,
+    summary="Itens superiores v1.3 — melhorias (T3-7/3-8) e materiais especiais (T3-9)",
+)
+def listar_itens_superiores_v13(
+    aplica_em: Optional[str] = Query(
+        None,
+        description="Filtra por categoria: arma, armadura, escudo, esoterico, …",
+    ),
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaItensSuperioresV13Response:
+    data = resumo_itens_superiores_v13(aplica_em=aplica_em)
+    return TormentaItensSuperioresV13Response.model_validate(data)
 
 
 @router.get(
