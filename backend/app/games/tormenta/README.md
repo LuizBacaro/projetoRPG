@@ -1,6 +1,12 @@
 # `backend/app/games/tormenta/` — Tormenta 20
 
-Stack vertical da ficha do **Módulo Básico** (cadastro digital, CRUD).
+Stack vertical da ficha **Tormenta 20 Edição Jogo do Ano v1.3** (cadastro digital, CRUD).
+O Módulo Básico (MB) permanece só como legado de compatibilidade em alguns JSON/`regra_versao=mb`.
+
+**Fonte canónica de magias e poderes:** `livros/Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf`
+(metadados em `data/magias_mb_catalogo.json` e `data/talentos_mb_catalogo.json`).
+Ver `data/README.md`. Pipelines: `backend/scripts/build_magias_t20_v13_from_pdf.py`,
+`backend/scripts/build_poderes_t20_v13_overlay.py`.
 
 ## Regras de atributos (T20)
 
@@ -25,8 +31,8 @@ Stack vertical da ficha do **Módulo Básico** (cadastro digital, CRUD).
   - `POST /api/v1/tormenta/personagens/{id}/talentos/migrar-do-json` — importa `ficha_json.talentos_mb_lista` para as tabelas (idempotente para duplicados).
 - `GET /api/v1/tormenta/regras/racas` — raças MB com `ajustes`, `escolhe_duas_mais2`, `mod_car_fixo` (Lefou), `tracos_resumo`, `idioma_racial_mb`; inclui `idiomas_geral_mb` e `idiomas_tabela_mb` (Cap. 2 MB).
 - `GET /api/v1/tormenta/regras/identidade-mb` — tendências (alinhamento, MB p.116–119) e divindades com **`slug` + `rotulo`** (Os Vinte, MB p.120–126); o personagem guarda só o `rotulo` em `divindade` (`tendencias_divindades_mb.json`).
-- `GET /api/v1/tormenta/regras/magias` — catálogo de magias MB (**metadados**: `slug`, `circulo`, `tipo` arcana/divina, `escola`, etc.); dados em `data/magias_mb_catalogo.json` (stubs de CI substituíveis por seed privado).
-- `GET /api/v1/tormenta/regras/conjuracao-mb` — **habilidade-chave** e progressão de **PM** por classe (`data/conjuracao_classe_mb.json`); tabela **custo PM por círculo** (truque 0; C≥1 = C PM); motor em `rules/conjuracao_t20.py`.
+- `GET /api/v1/tormenta/regras/magias` — catálogo **v1.3** (**metadados**: `slug`, `circulo` 1–5, `tipo` arcana/divina, `escola`, etc.); dados em `data/magias_mb_catalogo.json` (legado MB em `magias_mb_catalogo.legacy_mb.json`).
+- `GET /api/v1/tormenta/regras/conjuracao-mb?regra_versao=v13` — **habilidade-chave** e **PM**; custo por círculo **Tabela 4-1** (1/3/6/10/15); motor em `rules/conjuracao_t20.py`.
 - `GET /api/v1/tormenta/regras/tracos-raciais-preview?slug=` — bônus mecânicos raciais (`tracos_mecanicos_mb.json`).
 - `GET /api/v1/tormenta/regras/pericias` — DCs padrão; `POST .../pericias/calcular-bonus` e `POST .../pericias/rolar`.
 - `POST /api/v1/tormenta/personagens/{id}/magias/lancar` — debita PM (`pa_atual`) ao lançar magia MB; regista concentração em `ficha_json.tormenta_grimorio_sessao_mb` quando a duração MB exige.

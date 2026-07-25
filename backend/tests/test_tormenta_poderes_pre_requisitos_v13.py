@@ -65,18 +65,19 @@ def test_validar_ataque_preciso_ok_com_cadeia():
     assert res["valido"] is True
 
 
-def test_conjuracao_acelerada_exige_conjurador():
+def test_magia_acelerada_exige_conjurador():
+    """v1.3 renomeou 'Conjuração Acelerada' → 'Magia Acelerada' (aprimoramento p.131)."""
     ctx = PersonagemPoderContext(
         nivel=5,
         ficha_json={"tormenta_classe_mb_slug": "guerreiro", "regra_versao": "v13"},
         regra_versao="v13",
     )
-    res = validar_pre_requisitos_poder("Conjuração Acelerada", ctx)
+    res = validar_pre_requisitos_poder("Magia Acelerada", ctx)
     assert res["valido"] is False
     assert any("conjurar" in f["descricao"].lower() for f in res["faltando"])
 
 
-def test_conjuracao_acelerada_ok_arcanista():
+def test_magia_acelerada_ok_arcanista():
     ctx = PersonagemPoderContext(
         nivel=3,
         ficha_json={
@@ -86,7 +87,7 @@ def test_conjuracao_acelerada_ok_arcanista():
         },
         regra_versao="v13",
     )
-    res = validar_pre_requisitos_poder("Conjuração Acelerada", ctx)
+    res = validar_pre_requisitos_poder("Magia Acelerada", ctx)
     assert res["valido"] is True
 
 

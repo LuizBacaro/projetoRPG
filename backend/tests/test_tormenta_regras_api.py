@@ -344,46 +344,45 @@ def test_get_regras_equipamentos_armadura_v13(client_regras_tormenta):
 
 
 def test_get_regras_talentos_pagina(client_regras_tormenta):
+    """Catálogo de poderes v1.3: busca básica (Cap.2 p.124–128)."""
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/talentos",
-        params={"q": "usar", "skip": 0, "limit": 10},
+        params={"q": "arma", "skip": 0, "limit": 10},
     )
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["total"] >= 1
     assert len(body["itens"]) >= 1
-    assert any("usar" in x["nome"].lower() for x in body["itens"])
+    assert any("arma" in x["nome"].lower() for x in body["itens"])
 
 
 def test_get_regras_talentos_busca_por_prerequisito_e_enriquecimento(
     client_regras_tormenta,
 ):
+    """Busca por poderes v1.3 encontra o pré-requisito de atributo (v1.3 usa "For 1"/"Des 1")."""
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/talentos",
-        params={"q": "sab 13", "skip": 0, "limit": 20},
+        params={"q": "des 1", "skip": 0, "limit": 40},
     )
     assert r.status_code == 200, r.text
     body = r.json()
     assert body["total"] >= 1
     nomes = {x["nome"] for x in body["itens"]}
-    assert "Acuidade com Armas" in nomes
-    acu = next(x for x in body["itens"] if x["nome"] == "Acuidade com Armas")
+    assert "Acuidade com Arma" in nomes
+    acu = next(x for x in body["itens"] if x["nome"] == "Acuidade com Arma")
     assert acu.get("prerequisitos")
     assert acu.get("descricao_resumo")
 
     r2 = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/talentos",
-        params={"q": "fortitude maior", "skip": 0, "limit": 5},
+        params={"q": "surto heroico", "skip": 0, "limit": 5},
     )
     assert r2.status_code == 200, r2.text
     body2 = r2.json()
     assert body2["total"] >= 1
-    fort = next(
-        x
-        for x in body2["itens"]
-        if str(x.get("nome", "")).startswith("Fortitude Maior")
-    )
-    assert fort.get("pagina_referencia")
+    surto = next(x for x in body2["itens"] if x.get("nome") == "Surto Heroico")
+    assert surto.get("pagina_referencia")
+    assert surto.get("categoria_v13") == "destino"
 
 
 def test_get_regras_identidade_mb(client_regras_tormenta):
@@ -800,38 +799,52 @@ def test_post_pericias_validar_criacao_ok(client_regras_tormenta):
 
 
 def test_get_regras_magias_pagina_e_filtros(client_regras_tormenta):
+    """Catálogo Tormenta 20 v1.3 (círculos 1–5)."""
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/magias", params={"skip": 0, "limit": 20}
     )
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["total"] >= 700
+    assert 150 <= body["total"] <= 260
     assert len(body["itens"]) == 20
     assert r.headers.get("X-Total-Count") == str(body["total"])
-    assert all("slug" in x and x["circulo"] >= 0 for x in body["itens"])
+    for x in body["itens"]:
+        assert "slug" in x
+        assert 1 <= x["circulo"] <= 5
 
+    # v1.3 não tem truques 0 nem círculos 6–9 (rejeição pela API)
     r0 = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/magias", params={"circulo": 0}
     )
-    assert r0.status_code == 200
-    b0 = r0.json()
-    assert b0["total"] >= 65
-
-    r_stub = client_regras_tormenta.get(
-        "/api/v1/tormenta/regras/magias", params={"q": "stub_truque_arc"}
+    assert r0.status_code == 422
+    r9 = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/magias", params={"circulo": 9}
     )
-    assert r_stub.status_code == 200
-    assert any(x.get("slug") == "stub_truque_arc" for x in r_stub.json()["itens"])
+    assert r9.status_code == 422
+
+    # amostras conhecidas v1.3
+    r_abenc = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/magias", params={"q": "abençoar alimentos"}
+    )
+    assert any(x.get("nome") == "Abençoar Alimentos" for x in r_abenc.json()["itens"])
+
+    r_bola = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/magias", params={"q": "bola de fogo"}
+    )
+    itens = r_bola.json()["itens"]
+    assert any(
+        x.get("nome") == "Bola de Fogo" and x.get("circulo") == 2 for x in itens
+    ), f"Bola de Fogo (2º círculo v1.3) ausente: {itens}"
 
     r1 = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/magias", params={"circulo": 1}
     )
-    assert r1.json()["total"] >= 20
+    assert 30 <= r1.json()["total"] <= 80
 
     rdiv = client_regras_tormenta.get(
-        "/api/v1/tormenta/regras/magias", params={"tipo": "divina"}
+        "/api/v1/tormenta/regras/magias", params={"tipo": "divina", "limit": 200}
     )
-    assert rdiv.json()["total"] >= 300
+    assert 70 <= rdiv.json()["total"] <= 130
     assert rdiv.json()["itens"][0]["tipo"] == "divina"
 
     r_esc = client_regras_tormenta.get(
@@ -840,17 +853,11 @@ def test_get_regras_magias_pagina_e_filtros(client_regras_tormenta):
     assert r_esc.json()["total"] >= 1
     assert "Abjuração" in (r_esc.json()["itens"][0].get("escola") or "")
 
-    r_page = client_regras_tormenta.get(
-        "/api/v1/tormenta/regras/magias",
-        params={"q": "[stub]", "skip": 2, "limit": 2},
-    )
-    assert r_page.json()["total"] == 5
-    assert len(r_page.json()["itens"]) == 2
-
 
 def test_get_regras_magias_catalogo_por_classe_mb_clerigo_nivel_3(
     client_regras_tormenta,
 ):
+    """Clérigo nível 3 v1.3 → círculo máximo 2 (motor) — filtra lista divina."""
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/magias",
         params={
@@ -862,7 +869,6 @@ def test_get_regras_magias_catalogo_por_classe_mb_clerigo_nivel_3(
     )
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["total"] < 400
     for it in body["itens"]:
         assert it["tipo"] == "divina"
         assert it["circulo"] <= 2
@@ -872,14 +878,15 @@ def test_get_regras_magias_catalogo_por_classe_mb_clerigo_nivel_3(
     assert r2.json()["total"] > body["total"]
 
 
-def test_get_regras_magias_catalogo_g5_volume_listagem_mb(client_regras_tormenta):
-    """G5: listagem pp.307–317 no JSON (≈700 magias arcana+divina)."""
+def test_get_regras_magias_catalogo_v13_totais(client_regras_tormenta):
+    """Volume esperado do catálogo v1.3 (arcana + divina, círculos 1–5)."""
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/magias", params={"limit": 1}
     )
     assert r.status_code == 200, r.text
     total = int(r.json().get("total") or 0)
-    assert total >= 700
+    assert 150 <= total <= 260, total
+
     r_arc = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/magias",
         params={"tipo": "arcana", "limit": 1},
@@ -888,12 +895,12 @@ def test_get_regras_magias_catalogo_g5_volume_listagem_mb(client_regras_tormenta
         "/api/v1/tormenta/regras/magias",
         params={"tipo": "divina", "limit": 1},
     )
-    assert int(r_arc.json()["total"]) >= 350
-    assert int(r_div.json()["total"]) >= 250
+    assert 90 <= int(r_arc.json()["total"]) <= 160
+    assert 70 <= int(r_div.json()["total"]) <= 130
 
 
-def test_magias_mb_catalogo_g5_escola_completa():
-    """G5: enriquecimento MB (pp.150–209) com escola em 100% dos itens reais."""
+def test_magias_v13_catalogo_estrutura():
+    """Catálogo v1.3: sem stubs, sem círculo 0/6–9, escola presente."""
     catalogo_path = (
         Path(__file__).resolve().parents[1]
         / "app"
@@ -904,30 +911,32 @@ def test_magias_mb_catalogo_g5_escola_completa():
     )
     data = json.loads(catalogo_path.read_text(encoding="utf-8"))
     itens = data.get("itens") or []
-    stubs = sum(
-        1
+    assert 150 <= len(itens) <= 260, len(itens)
+    stubs = [
+        row
         for row in itens
         if isinstance(row, dict)
         and (
             str(row.get("nome") or "").startswith("[Stub]")
             or str(row.get("slug") or "").startswith("stub_")
         )
-    )
-    sem_escola = [
-        row
-        for row in itens
-        if isinstance(row, dict)
-        and not row.get("escola")
-        and not str(row.get("nome") or "").startswith("[Stub]")
     ]
-    meta = data.get("meta") or {}
-    assert len(itens) >= 700
-    assert stubs == 5
-    assert (
-        not sem_escola
-    ), f"magias sem escola: {[r.get('nome') for r in sem_escola[:10]]}"
-    assert meta.get("g5_estado") == "enriquecimento_completo"
-    assert float(meta.get("g5_escola_cobertura") or 0) >= 1.0
+    assert stubs == [], f"stubs remanescentes: {stubs}"
+    for row in itens:
+        assert 1 <= int(row.get("circulo", -1)) <= 5, row
+        assert row.get("tipo") in ("arcana", "divina"), row
+        assert row.get("escola"), row.get("nome")
+    # amostragem
+    nomes = {row["nome"] for row in itens}
+    for esperado in (
+        "Abençoar Alimentos",
+        "Adaga Mental",
+        "Bola de Fogo",
+        "Curar Ferimentos",
+        "Bênção",
+        "Refúgio",
+    ):
+        assert esperado in nomes, esperado
 
 
 def test_get_regras_magias_item_tem_descricao_longa_reservada(client_regras_tormenta):

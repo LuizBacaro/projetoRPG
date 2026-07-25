@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import json
+from collections import Counter
+from pathlib import Path
+
 import pytest
 
 from app.games.tormenta.rules.poderes_catalogo_v13_t20 import (
@@ -14,6 +18,37 @@ from app.games.tormenta.services.personagem_talentos_service import (
     TormentaPersonagemTalentosService,
 )
 from app.shared.exceptions.custom_exceptions import DadosInvalidos
+
+
+def test_catalogo_poderes_v13_volume_e_amostras():
+    """Cap. 2 v1.3 — ~162 poderes nas 5 categorias de catálogo (+ concedidos/tormenta)."""
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "games"
+        / "tormenta"
+        / "data"
+        / "talentos_mb_catalogo.json"
+    )
+    data = json.loads(path.read_text(encoding="utf-8"))
+    itens = data.get("itens") or []
+    assert 150 <= len(itens) <= 180, len(itens)
+    cats = Counter(
+        str(r.get("categoria_v13") or "") for r in itens if isinstance(r, dict)
+    )
+    assert cats.get("combate", 0) >= 40
+    assert cats.get("destino", 0) >= 20
+    assert cats.get("magia", 0) >= 8
+    assert cats.get("concedido", 0) >= 70
+    assert cats.get("tormenta", 0) >= 20
+    nomes = {str(r.get("nome") or "") for r in itens if isinstance(r, dict)}
+    for amostra in (
+        "Acuidade com Arma",
+        "Surto Heroico",
+        "Sortudo",
+        "Êxtase da Loucura",
+    ):
+        assert amostra in nomes, amostra
 
 
 def test_categoria_v13_combate():
@@ -39,10 +74,11 @@ def test_custo_pm_parse_descricao():
     assert custo_pm_de_item(row) == 2
 
 
-def test_metadados_conjuracao_acelerada():
-    meta = metadados_poder_por_nome("Conjuração Acelerada")
+def test_metadados_magia_acelerada_v13():
+    """v1.3 renomeou 'Conjuração Acelerada' → 'Magia Acelerada' (aprimoramento, +4 PM)."""
+    meta = metadados_poder_por_nome("Magia Acelerada")
     assert meta["categoria_v13"] == "magia"
-    assert meta["custo_pm"] == 2
+    assert meta["custo_pm"] == 4
 
 
 def test_ativar_poder_debita_pm(test_db):
@@ -68,7 +104,7 @@ def test_ativar_poder_debita_pm(test_db):
     ent = TormentaPersonagem(
         dono_id=u1.id,
         tipo="jogador",
-        nome="Conj Acel",
+        nome="Magia Acel",
         raca="Humano",
         classe_nivel="Arcanista 5",
         for_valor=0,
@@ -90,7 +126,7 @@ def test_ativar_poder_debita_pm(test_db):
     test_db.refresh(ent)
 
     tal = TormentaTalento(
-        nome="Conjuração Acelerada",
+        nome="Magia Acelerada",
         origem_catalogo_mb=True,
     )
     test_db.add(tal)
@@ -107,12 +143,12 @@ def test_ativar_poder_debita_pm(test_db):
 
     svc = TormentaPersonagemTalentosService(test_db)
     res = svc.ativar_poder_com_pm(ent.id, vinc.id)
-    assert res.custo_pm == 2
+    assert res.custo_pm == 4
     assert res.pa_atual_antes == 10
-    assert res.pa_atual_depois == 8
+    assert res.pa_atual_depois == 6
 
     test_db.refresh(ent)
-    assert ent.pa_atual == 8
+    assert ent.pa_atual == 6
 
 
 def test_ativar_poder_sem_pm_rejeita(test_db):

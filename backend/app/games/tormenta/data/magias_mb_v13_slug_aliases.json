@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "fonte": "Mapeamento MB→v1.3 gerado a partir de nomes idênticos (case-insensitive, sem acentos) + curadoria.",
+    "nota": "Chave = slug MB antigo. Valor = slug v1.3. Órfãos (0 e 6–9) sem mapa.",
+    "gerado_em": "2026-07-25",
+    "total": 27
+  },
+  "aliases": {
+    "ancora_dimensional_div": "ancora_dimensional",
+    "animar_objetos_div": "animar_objetos",
+    "arma_magica_div": "arma_magica",
+    "banimento_div": "banimento",
+    "campo_antimagia_div": "campo_antimagia",
+    "controlar_agua_div": "controlar_agua",
+    "controlar_o_clima_div": "controlar_o_clima",
+    "curar_ferimentos_criticos": "curar_ferimentos",
+    "curar_ferimentos_leves": "curar_ferimentos",
+    "curar_ferimentos_moderados": "curar_ferimentos",
+    "despedacar_div": "despedacar",
+    "dissipar_magia_div": "dissipar_magia",
+    "escuridao_div": "escuridao",
+    "forma_eterea_div": "forma_eterea",
+    "infligir_ferimentos_criticos": "infligir_ferimentos",
+    "infligir_ferimentos_leves": "infligir_ferimentos",
+    "infligir_ferimentos_moderados": "infligir_ferimentos",
+    "lagrimas_de_wynna_div": "lagrimas_de_wynna",
+    "luz_div": "luz",
+    "raio_de_sol": "raio_solar",
+    "refugio_div": "refugio",
+    "resistencia_a_energia_div": "resistencia_a_energia",
+    "rogar_maldicao_div": "rogar_maldicao",
+    "soco_de_arsenal_div": "soco_de_arsenal",
+    "viagem_planar_div": "viagem_planar",
+    "videncia_div": "videncia",
+    "visao_da_verdade_div": "visao_da_verdade"
+  }
+}

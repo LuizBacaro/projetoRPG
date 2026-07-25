@@ -62,6 +62,7 @@ from app.games.tormenta.rules.magias_repertorio_aprendido_t20 import (
 from app.games.tormenta.rules.magias_repertorio_aprendido_t20 import (
     validar_adicionar_repertorio_mb,
 )
+from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
 from app.games.tormenta.schemas.magia_personagem import (
     TormentaEncerrarConcentracaoResponse,
     TormentaMagiaPersonagemItem,
@@ -84,6 +85,11 @@ class TormentaPersonagemMagiasService:
 
     @staticmethod
     def _to_item(row: TormentaMagiaPersonagem) -> TormentaMagiaPersonagemItem:
+        from app.games.tormenta.rules.catalogo_t20 import (
+            magia_mb_slug_no_catalogo,
+            resolver_slug_mb_para_v13,
+        )
+
         meta = metadados_magia_mb_por_slug(row.magia_slug)
         nome = str(meta["nome"]) if meta and meta.get("nome") else None
         circulo = None
@@ -98,6 +104,9 @@ class TormentaPersonagemMagiasService:
         escola = None
         if meta and meta.get("escola"):
             escola = str(meta["escola"])[:80]
+        slug_raw = str(row.magia_slug or "").strip().lower()
+        slug_resolvido = resolver_slug_mb_para_v13(slug_raw) if slug_raw else slug_raw
+        no_catalogo = magia_mb_slug_no_catalogo(slug_raw)
         return TormentaMagiaPersonagemItem(
             id=row.id,
             magia_slug=row.magia_slug,
@@ -108,6 +117,9 @@ class TormentaPersonagemMagiasService:
             escola=escola,
             notas=row.notas,
             adicionado_em=row.adicionado_em,
+            no_catalogo_v13=no_catalogo,
+            slug_catalogo_v13=slug_resolvido if no_catalogo else None,
+            orfao_catalogo_v13=not no_catalogo,
         )
 
     def listar_por_personagem(
@@ -353,6 +365,8 @@ class TormentaPersonagemMagiasService:
             and magia_e_truque_devocao_mb(div_slug_lanc, slug)
         )
 
+        rv = regra_versao_de_ficha(fj)
+        cam_arc = str(fj.get("arcanista_caminho") or "").strip().lower() or None
         sim = simular_gasto_pm(
             classe_slug=classe_slug or "mago",
             nivel=int(p.nivel or 1),
@@ -365,6 +379,8 @@ class TormentaPersonagemMagiasService:
             pa_atual=int(p.pa_atual or 0),
             magia_slug=slug,
             custo_pm_override=0 if truque_devocao else None,
+            regra_versao=rv,
+            arcanista_caminho=cam_arc,
         )
         if not sim["permitido"]:
             raise DadosInvalidos(str(sim.get("motivo") or "PM insuficientes"))

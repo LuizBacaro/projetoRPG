@@ -1,42 +1,399 @@
 {
   "_meta": {
-    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Cap. 2 p.124–128 (poderes de combate e magia)",
-    "nota": "Overlay por nome normalizado; complementa prerequisitos em texto do catálogo MB."
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Cap. 2 p.124–131",
+    "nota": "Overlay por nome normalizado; gerado por backend/scripts/build_poderes_t20_v13_overlay.py a partir do catálogo.",
+    "total": 54
   },
   "overlay_por_nome": {
+    "acrobatico": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "des",
+        "valor": 2
+      }
+    ],
+    "acuidade com arma": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "des",
+        "valor": 1
+      }
+    ],
+    "ao sabor do destino": [
+      {
+        "tipo": "nivel_min",
+        "valor": 6
+      }
+    ],
+    "aparencia inofensiva": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "car",
+        "valor": 1
+      }
+    ],
+    "arma secundaria grande": [
+      {
+        "tipo": "poder",
+        "slug": "estilo_de_duas_armas"
+      }
+    ],
+    "arremesso multiplo": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "des",
+        "valor": 1
+      },
+      {
+        "tipo": "poder",
+        "slug": "estilo_de_arremesso"
+      }
+    ],
+    "arremesso potente": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "for",
+        "valor": 1
+      },
+      {
+        "tipo": "poder",
+        "slug": "estilo_de_arremesso"
+      }
+    ],
+    "ataque com escudo": [
+      {
+        "tipo": "poder",
+        "slug": "estilo_de_arma_e_escudo"
+      }
+    ],
+    "ataque pesado": [
+      {
+        "tipo": "poder",
+        "slug": "estilo_de_duas_maos"
+      }
+    ],
     "ataque poderoso": [
-      { "tipo": "atributo_min", "atributo": "for", "valor": 1 }
+      {
+        "tipo": "atributo_min",
+        "atributo": "for",
+        "valor": 1
+      }
     ],
     "ataque preciso": [
-      { "tipo": "atributo_min", "atributo": "des", "valor": 1 },
-      { "tipo": "poder", "slug": "ataque_poderoso" }
+      {
+        "tipo": "poder",
+        "slug": "ataque_poderoso"
+      }
     ],
-    "esquiva": [
-      { "tipo": "atributo_min", "atributo": "des", "valor": 1 }
+    "atletico": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "for",
+        "valor": 2
+      }
     ],
-    "ataque desarmado aprimorado": [
-      { "tipo": "atributo_min", "atributo": "sab", "valor": 1 }
+    "atraente": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "car",
+        "valor": 1
+      }
     ],
-    "acuidade com armas": [
-      { "tipo": "atributo_min", "atributo": "des", "valor": 1 }
+    "bloqueio com escudo": [
+      {
+        "tipo": "poder",
+        "slug": "estilo_de_arma_e_escudo"
+      }
     ],
-    "foco em arma": [
-      { "tipo": "proficiencia_arma" }
-    ],
-    "conjuracao acelerada": [
-      { "tipo": "conjura_magias" }
-    ],
-    "especializacao em magia": [
-      { "tipo": "conjura_magias" }
-    ],
-    "combate defensivo": [
-      { "tipo": "atributo_min", "atributo": "des", "valor": 1 }
+    "carga de cavalaria": [
+      {
+        "tipo": "poder",
+        "slug": "ginete"
+      }
     ],
     "celebrar ritual": [
-      { "tipo": "conjura_magias" }
+      {
+        "tipo": "nivel_min",
+        "valor": 8
+      },
+      {
+        "tipo": "pericia_treinada",
+        "slug": "misticismo"
+      },
+      {
+        "tipo": "pericia_treinada",
+        "slug": "religiao"
+      },
+      {
+        "tipo": "conjura_magias"
+      }
+    ],
+    "comandar": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "car",
+        "valor": 1
+      }
+    ],
+    "combate defensivo": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "int",
+        "valor": 1
+      }
+    ],
+    "costas largas": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "con",
+        "valor": 1
+      },
+      {
+        "tipo": "atributo_min",
+        "atributo": "for",
+        "valor": 1
+      }
+    ],
+    "disparo rapido": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "des",
+        "valor": 1
+      }
+    ],
+    "empunhadura poderosa": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "for",
+        "valor": 3
+      }
     ],
     "escrever pergaminho": [
-      { "tipo": "conjura_magias" }
+      {
+        "tipo": "conjura_magias"
+      }
+    ],
+    "esquiva": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "des",
+        "valor": 1
+      }
+    ],
+    "estilo de arma longa": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "for",
+        "valor": 1
+      },
+      {
+        "tipo": "pericia_treinada",
+        "slug": "luta"
+      }
+    ],
+    "estilo de arremesso": [
+      {
+        "tipo": "pericia_treinada",
+        "slug": "pontaria"
+      }
+    ],
+    "estilo de disparo": [
+      {
+        "tipo": "pericia_treinada",
+        "slug": "pontaria"
+      }
+    ],
+    "estilo de duas armas": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "des",
+        "valor": 2
+      },
+      {
+        "tipo": "pericia_treinada",
+        "slug": "luta"
+      }
+    ],
+    "estilo de duas maos": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "for",
+        "valor": 2
+      },
+      {
+        "tipo": "pericia_treinada",
+        "slug": "luta"
+      }
+    ],
+    "estilo de uma arma": [
+      {
+        "tipo": "pericia_treinada",
+        "slug": "luta"
+      }
+    ],
+    "estilo desarmado": [
+      {
+        "tipo": "pericia_treinada",
+        "slug": "luta"
+      }
+    ],
+    "fanatico": [
+      {
+        "tipo": "nivel_min",
+        "valor": 12
+      }
+    ],
+    "finta aprimorada": [
+      {
+        "tipo": "pericia_treinada",
+        "slug": "enganacao"
+      }
+    ],
+    "foco em arma": [
+      {
+        "tipo": "proficiencia_arma"
+      }
+    ],
+    "foco em magia": [
+      {
+        "tipo": "conjura_magias"
+      }
+    ],
+    "ginete": [
+      {
+        "tipo": "pericia_treinada",
+        "slug": "cavalgar"
+      }
+    ],
+    "inexpugnavel": [
+      {
+        "tipo": "nivel_min",
+        "valor": 6
+      }
+    ],
+    "inventario organizado": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "int",
+        "valor": 1
+      }
+    ],
+    "investigador": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "int",
+        "valor": 1
+      }
+    ],
+    "magia acelerada": [
+      {
+        "tipo": "conjura_magias"
+      }
+    ],
+    "magia ampliada": [
+      {
+        "tipo": "conjura_magias"
+      }
+    ],
+    "magia discreta": [
+      {
+        "tipo": "conjura_magias"
+      }
+    ],
+    "magia ilimitada": [
+      {
+        "tipo": "conjura_magias"
+      }
+    ],
+    "medicina": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "sab",
+        "valor": 1
+      },
+      {
+        "tipo": "pericia_treinada",
+        "slug": "cura"
+      }
+    ],
+    "mira apurada": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "sab",
+        "valor": 1
+      },
+      {
+        "tipo": "poder",
+        "slug": "estilo_de_disparo"
+      }
+    ],
+    "parceiro": [
+      {
+        "tipo": "nivel_min",
+        "valor": 5
+      }
+    ],
+    "piqueiro": [
+      {
+        "tipo": "poder",
+        "slug": "estilo_de_arma_longa"
+      }
+    ],
+    "preparar pocao": [
+      {
+        "tipo": "conjura_magias"
+      }
+    ],
+    "presenca aterradora": [
+      {
+        "tipo": "pericia_treinada",
+        "slug": "intimidacao"
+      }
+    ],
+    "reflexos de combate": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "des",
+        "valor": 1
+      }
+    ],
+    "saque rapido": [
+      {
+        "tipo": "pericia_treinada",
+        "slug": "iniciativa"
+      }
+    ],
+    "sentidos agucados": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "sab",
+        "valor": 1
+      },
+      {
+        "tipo": "pericia_treinada",
+        "slug": "percepcao"
+      }
+    ],
+    "torcida": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "car",
+        "valor": 1
+      }
+    ],
+    "vitalidade": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "con",
+        "valor": 1
+      }
+    ],
+    "vontade de ferro": [
+      {
+        "tipo": "atributo_min",
+        "atributo": "sab",
+        "valor": 1
+      }
     ]
   }
 }

@@ -227,7 +227,7 @@ def validar_papel_magia_para_classe(
     return True, ""
 
 
-def custo_pm_magia_slug(magia_slug: str) -> int:
+def custo_pm_magia_slug(magia_slug: str, regra_versao: Optional[str] = None) -> int:
     meta = metadados_magia_mb_por_slug(magia_slug)
     if not meta:
         return 0
@@ -235,7 +235,7 @@ def custo_pm_magia_slug(magia_slug: str) -> int:
         circulo = int(meta.get("circulo", 0) or 0)
     except (TypeError, ValueError):
         circulo = 0
-    return custo_pm_preparar_ou_lancar_magia(circulo)
+    return custo_pm_preparar_ou_lancar_magia(circulo, regra_versao)
 
 
 def simular_gasto_pm(
@@ -255,10 +255,11 @@ def simular_gasto_pm(
     arcanista_caminho: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Calcula custo e novo saldo de PM sem persistir."""
+    rv = regra_versao or REGRA_VERSAO_MB
     if custo_pm_override is not None:
         custo = int(custo_pm_override)
     else:
-        custo = custo_pm_magia_slug(magia_slug)
+        custo = custo_pm_magia_slug(magia_slug, rv)
     pm_max = pontos_magia_maximos_conjuracao(
         classe_slug,
         nivel,
@@ -268,7 +269,7 @@ def simular_gasto_pm(
         int_valor,
         sab_valor,
         car_valor,
-        regra_versao=regra_versao or REGRA_VERSAO_MB,
+        regra_versao=rv,
         arcanista_caminho=arcanista_caminho,
     )
     atual = int(pa_atual)
