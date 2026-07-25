@@ -23,6 +23,7 @@ from app.games.tormenta.rules.conjuracao_combate_t20 import (
     magia_mb_exige_concentracao,
 )
 from app.games.tormenta.rules.devocao_divindade_t20 import (
+    classe_usa_truque_devocao_mb,
     divindade_mb_slug_de_ficha,
     magia_e_truque_devocao_mb,
 )
@@ -359,8 +360,9 @@ class TormentaPersonagemMagiasService:
                 raise DadosInvalidos(motivo_l)
 
         div_slug_lanc = divindade_mb_slug_de_ficha(fj, p.divindade)
+        # v1.3 não tem círculo 0: prece de devoção ainda custa 0 PM.
         truque_devocao = bool(
-            circulo_mag == 0
+            classe_usa_truque_devocao_mb(classe_slug)
             and div_slug_lanc
             and magia_e_truque_devocao_mb(div_slug_lanc, slug)
         )
