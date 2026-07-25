@@ -129,15 +129,15 @@ Inventor e classes com itens superiores: cross-ref `03-classes-tormenta.md`.
 
 | ID | Requisito | Prioridade |
 |----|-----------|------------|
-| RF-T07a | Catálogo `equipamentos_mb_catalogo.json` alinhado v1.3 Tabelas 3-3 e 3-5 | **Parcial** | Armaduras Tabela 3-5 + espacos; overlay armas kit/origem (`armas_v13_overlay.json`) |
+| RF-T07a | Catálogo `equipamentos_mb_catalogo.json` alinhado v1.3 Tabelas 3-3 e 3-5 | **Parcial** | Overlay armas + nomes sincronizados no catálogo de equipamentos |
 | RF-T07b | API `GET /tormenta/regras/equipamentos` | P0 |
 | RF-T07c | Modal equipamentos na ficha + vínculo SQL | P0 |
 | RF-T07d | **Defesa** = 10 + DES + armadura + escudo; armadura pesada sem DES e −3 m | P0 |
 | RF-T07e | Penalidade de armadura em perícias For/Des conforme item equipado | P1 |
 | RF-T07f | Carga: limite 10+2×FOR, sobrecarga, ocupação por espaços | P2 |
 | RF-T07g | Equipamento inicial na criação (passo 7 wizard / p.140) + itens de origem | P1 |
-| RF-T07h | Metadados de arma: proficiência, dano, crítico, alcance, habilidades | P1 |
-| RF-T07i | Itens superiores / melhorias (metadados + remissão Tabela 3-8) | P3 |
+| RF-T07h | Metadados de arma: proficiência, dano, crítico, alcance, habilidades | **Parcial** | Modal Ataques + overlay; flags Adaptável/Ágil… ainda P1 |
+| RF-T07i | Itens superiores / melhorias (metadados + remissão Tabela 3-8) | **Parcial** | JSON + `GET /itens-superiores` + UI no modal de ataques (MVP mods explícitos) |
 
 ## Estado de implementação
 
@@ -155,6 +155,8 @@ Inventor e classes com itens superiores: cross-ref `03-classes-tormenta.md`.
 | Penalidade armadura por perícia | **Feito** | `penalidade_armadura_t20.py`; ficha + rolador v1.3; proficiência For/Des (RF-T07e-1) |
 | Carga / espaços | **Feito** | `carga_t20.py`, API `carga-preview`, ficha v1.3 |
 | Revisão preços/stats catálogo v1.3 | **Feito** | Tabela 3-3 core (~56 itens); legacy MB documentado (Cajado, Estilingue, Wakizashi, mangual, martelo leve, arco composto) |
+| Modal Ataques (catálogo + inventário) | **Feito** | `modalAtaquesTormenta` + `t20-ataques-modal.js` |
+| Itens superiores / materiais (RF-T07i MVP) | **Feito** | `itens_superiores_v13.json` + `GET /tormenta/regras/itens-superiores` |
 
 ## Implementação — criação v1.3 (dashboard)
 

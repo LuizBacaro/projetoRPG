@@ -25,6 +25,11 @@ preservadas apenas como legado para depuração e migração histórica.
     compatibilidade com o resto do código.
   - Metadados por item: `slug`, `nome`, `categoria_v13`, `prerequisitos`,
     `descricao_resumo` (curta), `pagina_referencia`, `fonte_catalogo`.
+- `itens_superiores_v13.json`
+  - Tabelas 3-7 / 3-8 / 3-9 (melhorias + materiais especiais).
+  - API: `GET /tormenta/regras/itens-superiores`.
+- `armas_v13_overlay.json` + `equipamentos_mb_catalogo.json`
+  - Stats de combate (Tabela 3-3) e autocomplete de inventário.
 
 ## Alias MB → v1.3
 

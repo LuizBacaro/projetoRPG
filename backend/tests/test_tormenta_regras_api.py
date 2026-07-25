@@ -310,6 +310,38 @@ def test_get_regras_equipamentos_pagina(client_regras_tormenta):
     assert r.headers.get("X-Total-Count")
 
 
+def test_get_regras_equipamentos_inclui_armas_overlay(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/equipamentos",
+        params={"q": "montante", "skip": 0, "limit": 10},
+    )
+    assert r.status_code == 200, r.text
+    nomes = [x["nome"].lower() for x in r.json()["itens"]]
+    assert any("montante" in n for n in nomes)
+
+
+def test_get_regras_itens_superiores_v13(client_regras_tormenta):
+    r = client_regras_tormenta.get("/api/v1/tormenta/regras/itens-superiores")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["precos_melhoria"] == [300, 3000, 9000, 18000]
+    assert body["max_melhorias"] == 4
+    assert len(body["melhorias"]) >= 20
+    assert len(body["materiais"]) >= 6
+    slugs = {m["slug"] for m in body["melhorias"]}
+    assert "certeira" in slugs
+    assert "cruel" in slugs
+    mats = {m["slug"] for m in body["materiais"]}
+    assert "adamante" in mats
+    r2 = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/itens-superiores",
+        params={"aplica_em": "arma"},
+    )
+    assert r2.status_code == 200
+    for m in r2.json()["melhorias"]:
+        assert "arma" in (m.get("aplica_em") or [])
+
+
 def test_get_regras_bestiario_pagina_e_detalhe(client_regras_tormenta):
     r = client_regras_tormenta.get(
         "/api/v1/tormenta/regras/bestiario",
