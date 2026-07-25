@@ -322,17 +322,6 @@
                             <div class="ficha-ataque-vazio">Nenhum ataque cadastrado</div>
                         </div>
                     </div>
-                    <div id="t20FichaAtaquesEditor" style="display:none; margin-top:.75rem">
-                        <div style="display:grid; grid-template-columns:1fr 70px 90px 120px 52px 36px; gap:.4rem; margin-bottom:.4rem; font-size:.72rem; color:var(--t20-muted);">
-                            <span>Nome</span><span>Bônus</span><span>Dano</span><span>Tipo</span><span>Emp.</span><span></span>
-                        </div>
-                        <div id="t20FichaAtaquesEditorLista"></div>
-                        <div style="display:flex; gap:.5rem; margin-top:.5rem; flex-wrap:wrap">
-                            <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="t20BtnAdicionarLinhaAtaque">+ Adicionar</button>
-                            <button type="button" class="ficha-btn-adicionar tormenta-btn" id="t20BtnSalvarAtaques" style="background:#22c55e; color:#fff">💾 Salvar</button>
-                            <button type="button" class="ficha-btn-adicionar tormenta-btn" id="t20BtnCancelarAtaques" style="background:#64748b; color:#fff">Cancelar</button>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="t20-ficha-secao t20-dnd-drop-zone t20-ficha-secao--so-completa" id="t20GrimorioDropZone" data-dnd-accept="magia">
@@ -1324,6 +1313,100 @@
             </div>
         </div>
 
+        <div id="modalAtaquesTormenta" class="equipamentos-overlay t20-ataques-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="tituloModalAtaquesTormenta">
+            <div class="equipamentos-container t20-ataques-modal">
+                <div class="equipamentos-header">
+                    <div class="equipamentos-header-esquerda">
+                        <span class="equipamentos-icone">⚔️</span>
+                        <div>
+                            <h2 class="equipamentos-titulo" id="tituloModalAtaquesTormenta">Ataques e armas</h2>
+                            <p class="equipamentos-subtitulo">Catálogo Tormenta 20 v1.3 (Tabela 3-3), inventário da ficha e itens superiores (p.164+). <span class="t20-hint">Esc fecha.</span></p>
+                        </div>
+                    </div>
+                    <button type="button" class="equipamentos-fechar" id="t20BtnFecharModalAtaques" aria-label="Fechar">✕</button>
+                </div>
+                <div class="t20-ataques-modal-grid">
+                    <div class="t20-ataques-modal-col t20-ataques-modal-col--fontes">
+                        <div class="equipamentos-abas t20-ataques-abas">
+                            <button type="button" class="equipamentos-aba ativa" id="t20AtqAbaLivro">📖 Livro</button>
+                            <button type="button" class="equipamentos-aba" id="t20AtqAbaInventario">🎒 Inventário</button>
+                            <button type="button" class="equipamentos-aba" id="t20AtqAbaLista">📋 Em edição</button>
+                        </div>
+                        <div id="t20AtqPainelLivro" class="equipamentos-conteudo ativo">
+                            <div class="equipamentos-busca-wrapper" style="margin-bottom:.5rem">
+                                <span class="equipamentos-busca-label">🔍</span>
+                                <input type="text" id="t20AtqBusca" class="equipamentos-busca" placeholder="Buscar arma…" autocomplete="off" />
+                            </div>
+                            <div id="t20AtqCatalogoLista" class="t20-atq-scroll-lista"></div>
+                        </div>
+                        <div id="t20AtqPainelInventario" class="equipamentos-conteudo" hidden>
+                            <div id="t20AtqInventarioLista" class="t20-atq-scroll-lista"></div>
+                        </div>
+                        <div id="t20AtqPainelLista" class="equipamentos-conteudo" hidden>
+                            <div id="t20AtqDraftLista" class="t20-atq-scroll-lista"></div>
+                        </div>
+                    </div>
+                    <div class="t20-ataques-modal-col t20-ataques-modal-col--form">
+                        <h3 class="t20-ataques-form-titulo">Detalhes do ataque</h3>
+                        <input type="hidden" id="t20AtqFormArmaBase" value="" />
+                        <input type="hidden" id="t20AtqFormCustoBase" value="0" />
+                        <div class="t20-ataques-form-grid">
+                            <label class="equipamentos-form-grupo t20-atq-span2">
+                                <span class="equipamentos-form-label">Nome</span>
+                                <input type="text" id="t20AtqFormNome" class="equipamentos-form-input" placeholder="Ex.: Espada longa" />
+                            </label>
+                            <label class="equipamentos-form-grupo">
+                                <span class="equipamentos-form-label">Bônus</span>
+                                <input type="text" id="t20AtqFormBonus" class="equipamentos-form-input" placeholder="+0" value="+0" />
+                            </label>
+                            <label class="equipamentos-form-grupo">
+                                <span class="equipamentos-form-label">Dano</span>
+                                <input type="text" id="t20AtqFormDano" class="equipamentos-form-input" placeholder="1d8" />
+                            </label>
+                            <label class="equipamentos-form-grupo">
+                                <span class="equipamentos-form-label">Tipo</span>
+                                <input type="text" id="t20AtqFormTipo" class="equipamentos-form-input" placeholder="Corte" />
+                            </label>
+                            <label class="equipamentos-form-grupo">
+                                <span class="equipamentos-form-label">Crítico</span>
+                                <input type="text" id="t20AtqFormCritico" class="equipamentos-form-input" placeholder="19" />
+                            </label>
+                            <label class="equipamentos-form-grupo">
+                                <span class="equipamentos-form-label">Alcance</span>
+                                <input type="text" id="t20AtqFormAlcance" class="equipamentos-form-input" placeholder="—" />
+                            </label>
+                            <label class="equipamentos-form-grupo t20-atq-emp">
+                                <span class="equipamentos-form-label">Empunhado</span>
+                                <input type="checkbox" id="t20AtqFormEmp" />
+                            </label>
+                            <label class="equipamentos-form-grupo t20-atq-span2">
+                                <span class="equipamentos-form-label">Notas</span>
+                                <input type="text" id="t20AtqFormNotas" class="equipamentos-form-input" placeholder="Opcional" />
+                            </label>
+                        </div>
+                        <div class="t20-ataques-superior">
+                            <h4 class="t20-ataques-form-titulo">Item superior (até 4 melhorias)</h4>
+                            <p class="t20-hint" style="margin:0 0 .4rem">Tabelas 3-7 / 3-8 / 3-9 — efeitos explícitos aplicados no bônus/dano quando houver.</p>
+                            <div id="t20AtqMelhoriasChecks" class="t20-atq-melhorias"></div>
+                            <label class="equipamentos-form-grupo" style="margin-top:.5rem">
+                                <span class="equipamentos-form-label">Material especial</span>
+                                <select id="t20AtqMaterial" class="equipamentos-form-input"></select>
+                            </label>
+                            <p id="t20AtqPreviewSuperior" class="t20-atq-preview" aria-live="polite"></p>
+                        </div>
+                        <div class="t20-ataques-form-actions">
+                            <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20AtqBtnAplicarForm">➕ Incluir na lista</button>
+                            <button type="button" class="tormenta-btn" id="t20AtqBtnLimparForm">Limpar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="t20-ataques-modal-footer">
+                    <button type="button" class="tormenta-btn" id="t20AtqBtnCancelar">Cancelar</button>
+                    <button type="button" class="tormenta-btn" id="t20AtqBtnSalvarTudo" style="background:#22c55e;color:#fff">💾 Salvar ataques</button>
+                </div>
+            </div>
+        </div>
+
         <div id="modalConsumiveisTormenta" class="equipamentos-overlay" aria-hidden="true">
             <div class="equipamentos-container">
                 <div class="equipamentos-header">
@@ -1612,7 +1695,7 @@
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-ui.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-resumo.js?v=20260707v13attr"></script>
-<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260725prod503"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260725ataques"></script>
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
@@ -1632,6 +1715,7 @@
 <script src="/games/tormenta/js/t20-multiclasse-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/t20-subir-nivel.js?v=20260725wizard"></script>
+<script src="/games/tormenta/js/t20-ataques-modal.js?v=20260725ataques2"></script>
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
@@ -4461,12 +4545,28 @@
             if (a.empunhado === true) nomeTxt += ' 🖐';
             if (a.bonus_ativo === false) nomeTxt += ' ⚠';
             nm.textContent = nomeTxt;
+            const chips = [];
+            if (Array.isArray(a.melhorias)) a.melhorias.forEach((s) => chips.push(String(s)));
+            if (a.material) chips.push(String(a.material));
+            if (chips.length) {
+                const chipWrap = document.createElement('span');
+                chipWrap.className = 't20-atq-chips t20-atq-chips--ficha';
+                chips.slice(0, 3).forEach((c) => {
+                    const sp = document.createElement('span');
+                    sp.className = 't20-atq-chip';
+                    sp.textContent = c;
+                    chipWrap.appendChild(sp);
+                });
+                nm.appendChild(chipWrap);
+            }
             nm.title =
                 a.bonus_ativo === false
                     ? 'Limite p.141 — bônus de ataque inativo (máx. 2 empunhados)'
                     : a.empunhado === true
                       ? 'Empunhado'
-                      : '';
+                      : chips.length
+                        ? 'Superior: ' + chips.join(', ')
+                        : '';
             const atk = document.createElement('span');
             atk.className = 'ficha-ataque-bonus t20-roll-alvo';
             const atkTxt = t20FormatarBonusAtaqueExibido(a);
@@ -4502,90 +4602,30 @@
     }
 
     function t20AbrirEditorAtaques() {
-        const ed = q('t20FichaAtaquesEditor');
-        const holder = q('t20FichaAtaquesEditorLista');
-        if (!ed || !holder) return;
-        holder.innerHTML = '';
-        const src = t20AtaquesLista.length ? t20AtaquesLista : [{}];
-        src.forEach((a) => t20AdicionarLinhaAtaqueEditor(a));
-        ed.style.display = 'block';
+        if (window.T20AtaquesModal && typeof window.T20AtaquesModal.abrir === 'function') {
+            window.T20AtaquesModal.abrir();
+            return;
+        }
     }
 
-    function t20AdicionarLinhaAtaqueEditor(ataque) {
-        const a = ataque || {};
-        const lista = q('t20FichaAtaquesEditorLista');
-        if (!lista) return;
-        const div = document.createElement('div');
-        div.className = 'ataque-linha';
-        div.style.cssText =
-            'display:grid; grid-template-columns:1fr 70px 90px 120px 52px 36px; gap:.4rem; margin-bottom:.3rem;';
-        const bn = String(a.bonus_ataque != null ? a.bonus_ataque : a.teste || '');
-        const tp = String(a.tipo_dano != null ? a.tipo_dano : a.tipo || '');
-        const emp = a.empunhado === true;
-        const inpNome = document.createElement('input');
-        inpNome.type = 'text';
-        inpNome.className = 'ataque-nome t20-input';
-        inpNome.placeholder = 'Nome';
-        inpNome.value = String(a.nome || '');
-        const inpBonus = document.createElement('input');
-        inpBonus.type = 'text';
-        inpBonus.className = 'ataque-bonus t20-input';
-        inpBonus.placeholder = '+0';
-        inpBonus.value = bn;
-        const inpDano = document.createElement('input');
-        inpDano.type = 'text';
-        inpDano.className = 'ataque-dano t20-input';
-        inpDano.placeholder = '1d6';
-        inpDano.value = String(a.dano || '');
-        const inpTipo = document.createElement('input');
-        inpTipo.type = 'text';
-        inpTipo.className = 'ataque-tipo t20-input';
-        inpTipo.placeholder = 'tipo';
-        inpTipo.value = tp;
-        const lblEmp = document.createElement('label');
-        lblEmp.className = 't20-ataque-emp-label';
-        lblEmp.title = 'Empunhado (conta no limite de 2 — p.141)';
-        lblEmp.style.cssText = 'display:flex;align-items:center;justify-content:center;font-size:.68rem;gap:.15rem';
-        const cbEmp = document.createElement('input');
-        cbEmp.type = 'checkbox';
-        cbEmp.className = 'ataque-empunhado';
-        cbEmp.checked = emp;
-        lblEmp.append(cbEmp, document.createTextNode('Emp.'));
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'tormenta-btn';
-        btn.style.cssText = 'background:#b91c1c;color:#fff;border:none;border-radius:4px;cursor:pointer';
-        btn.textContent = '✕';
-        btn.addEventListener('click', () => div.remove());
-        div.append(inpNome, inpBonus, inpDano, inpTipo, lblEmp, btn);
-        lista.appendChild(div);
-    }
-
-    function t20ColetarAtaquesEditor() {
-        const holder = q('t20FichaAtaquesEditorLista');
-        if (!holder) return [];
-        return Array.from(holder.querySelectorAll('.ataque-linha'))
-            .map((l) => ({
-                nome: (l.querySelector('.ataque-nome') && l.querySelector('.ataque-nome').value.trim()) || '',
-                bonus_ataque: (l.querySelector('.ataque-bonus') && l.querySelector('.ataque-bonus').value.trim()) || '',
-                dano: (l.querySelector('.ataque-dano') && l.querySelector('.ataque-dano').value.trim()) || '',
-                tipo_dano: (l.querySelector('.ataque-tipo') && l.querySelector('.ataque-tipo').value.trim()) || '',
-                empunhado: Boolean(l.querySelector('.ataque-empunhado')?.checked),
-            }))
-            .filter((x) => x.nome || x.dano || x.bonus_ataque);
-    }
-
-    function t20SalvarAtaquesEditor() {
-        t20AtaquesLista = t20ColetarAtaquesEditor().map((r) => ({
-            nome: r.nome,
-            bonus_ataque: r.bonus_ataque,
-            dano: r.dano,
-            tipo_dano: r.tipo_dano,
+    function t20AplicarAtaquesDoModal(lista) {
+        t20AtaquesLista = (Array.isArray(lista) ? lista : []).map((r) => ({
+            nome: r.nome || '',
+            bonus_ataque: r.bonus_ataque != null ? r.bonus_ataque : r.teste || '',
+            dano: r.dano || '',
+            tipo_dano: r.tipo_dano != null ? r.tipo_dano : r.tipo || '',
             empunhado: r.empunhado === true,
-            critico: '',
-            alcance: '',
-            teste: r.bonus_ataque,
-            tipo: r.tipo_dano,
+            critico: r.critico || '',
+            alcance: r.alcance || '',
+            teste: r.bonus_ataque != null ? r.bonus_ataque : r.teste || '',
+            tipo: r.tipo_dano != null ? r.tipo_dano : r.tipo || '',
+            arma_base: r.arma_base || '',
+            melhorias: Array.isArray(r.melhorias) ? r.melhorias.slice() : [],
+            material: r.material || '',
+            custo_ts_estimado: r.custo_ts_estimado != null ? r.custo_ts_estimado : null,
+            notas: r.notas || '',
+            origem: r.origem,
+            arma_natural: r.arma_natural === true,
         }));
         t20AplicarLimitesEquipamentoFicha();
         if (window.T20LimitesEquipamento) {
@@ -4597,21 +4637,12 @@
         }
         renderT20AtaquesLista();
         t20AtualizarVitaisBreakdownTormenta();
-        const ed = q('t20FichaAtaquesEditor');
-        if (ed) ed.style.display = 'none';
     }
-
-    function t20CancelarAtaquesEditor() {
-        const ed = q('t20FichaAtaquesEditor');
-        if (ed) ed.style.display = 'none';
-    }
+    window.t20AplicarAtaquesDoModal = t20AplicarAtaquesDoModal;
+    window.renderT20AtaquesLista = renderT20AtaquesLista;
 
     function t20ToggleEditorAtaquesLista() {
-        const ed = q('t20FichaAtaquesEditor');
-        if (!ed) return;
-        const vis = String(ed.style.display || '').toLowerCase() === 'block';
-        if (vis) t20CancelarAtaquesEditor();
-        else t20AbrirEditorAtaques();
+        t20AbrirEditorAtaques();
     }
 
     function t20SlugClasseMb() {
@@ -7347,6 +7378,14 @@
                 row.arma_natural = true;
             }
             if (a.notas) row.notas = String(a.notas);
+            if (a.arma_base) row.arma_base = String(a.arma_base);
+            if (Array.isArray(a.melhorias) && a.melhorias.length) {
+                row.melhorias = a.melhorias.map((s) => String(s));
+            }
+            if (a.material) row.material = String(a.material);
+            if (a.custo_ts_estimado != null && a.custo_ts_estimado !== '') {
+                row.custo_ts_estimado = Number(a.custo_ts_estimado);
+            }
             return row;
         });
     }
@@ -7483,6 +7522,13 @@
                 origem: o.origem === 'raca' ? 'raca' : undefined,
                 arma_natural: o.arma_natural === true || o.origem === 'raca',
                 notas: String(o.notas || '').trim(),
+                arma_base: String(o.arma_base || '').trim(),
+                melhorias: Array.isArray(o.melhorias) ? o.melhorias.map((s) => String(s)) : [],
+                material: String(o.material || '').trim(),
+                custo_ts_estimado:
+                    o.custo_ts_estimado != null && o.custo_ts_estimado !== ''
+                        ? Number(o.custo_ts_estimado)
+                        : null,
             }))
             .filter((x) => x.nome || x.dano || x.bonus_ataque);
         t20SyncAtaquesWindow();
@@ -8387,9 +8433,6 @@
             if (e.target === q('t20ModalMbXp')) t20FecharModalMbXp();
         });
         q('f_xp')?.addEventListener('input', t20AtualizarResumoBotaoXpMb);
-        q('t20BtnAdicionarLinhaAtaque')?.addEventListener('click', () => t20AdicionarLinhaAtaqueEditor({}));
-        q('t20BtnSalvarAtaques')?.addEventListener('click', t20SalvarAtaquesEditor);
-        q('t20BtnCancelarAtaques')?.addEventListener('click', t20CancelarAtaquesEditor);
         q('t20BtnAdicionarAtaques')?.addEventListener('click', t20ToggleEditorAtaquesLista);
 
         q('t20BtnAdicionarArmaduraProtecao')?.addEventListener('click', t20AbrirModalArmaduras);
@@ -8654,6 +8697,14 @@
         }
         document.addEventListener('keydown', (ev) => {
             if (ev.key !== 'Escape') return;
+            const ovAtqEsc = q('modalAtaquesTormenta');
+            if (ovAtqEsc && ovAtqEsc.classList.contains('is-open')) {
+                if (window.T20AtaquesModal && typeof window.T20AtaquesModal.fechar === 'function') {
+                    window.T20AtaquesModal.fechar();
+                }
+                ev.preventDefault();
+                return;
+            }
             const ovGrEsc = q('modalGrimorioTormenta');
             if (ovGrEsc && ovGrEsc.classList.contains('is-open')) {
                 fecharModalGrimorioTormenta();

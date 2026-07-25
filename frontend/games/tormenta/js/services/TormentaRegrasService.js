@@ -199,6 +199,25 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao carregar equipamentos MB');
     }
 
+    _urlItensSuperiores() {
+        return window.getApiUrl('/tormenta/regras/itens-superiores');
+    }
+
+    /**
+     * Melhorias (T3-7/3-8) e materiais especiais (T3-9).
+     * @param {{ aplicaEm?: string }} [opts]
+     */
+    async listarItensSuperiores(opts = {}) {
+        const q = new URLSearchParams();
+        if (opts.aplicaEm) q.set('aplica_em', String(opts.aplicaEm));
+        const qs = q.toString();
+        const res = await fetch(this._urlItensSuperiores() + (qs ? `?${qs}` : ''), {
+            headers: this._headers(),
+            cache: 'no-store',
+        });
+        return this._handleJson(res, 'Erro ao carregar itens superiores');
+    }
+
     async listarTalentosCatalogo(params = {}) {
         const q = new URLSearchParams();
         if (params.q) q.set('q', params.q);

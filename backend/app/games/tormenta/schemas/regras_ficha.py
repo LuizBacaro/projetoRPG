@@ -481,6 +481,39 @@ class TormentaCatalogoPaginaResponse(BaseModel):
     )
 
 
+class TormentaMelhoriaItemV13(BaseModel):
+    slug: str = Field(..., max_length=80)
+    nome: str = Field(..., max_length=120)
+    aplica_em: List[str] = Field(default_factory=list)
+    efeito_resumo: str = Field(default="", max_length=500)
+    mods: Dict[str, Any] = Field(default_factory=dict)
+    pre_requisito: Optional[str] = Field(default=None, max_length=80)
+    incompativel_com: Optional[List[str]] = None
+    restricao: Optional[str] = Field(default=None, max_length=200)
+    pagina_referencia: Optional[int] = Field(default=None, ge=1, le=500)
+
+
+class TormentaMaterialEspecialItemV13(BaseModel):
+    slug: str = Field(..., max_length=80)
+    nome: str = Field(..., max_length=120)
+    aplica_em: List[str] = Field(default_factory=list)
+    efeito_resumo: str = Field(default="", max_length=800)
+    mods: Dict[str, Any] = Field(default_factory=dict)
+    custo_ts: Optional[Dict[str, Optional[int]]] = None
+    restricao: Optional[str] = Field(default=None, max_length=300)
+    pagina_referencia: Optional[int] = Field(default=None, ge=1, le=500)
+
+
+class TormentaItensSuperioresV13Response(BaseModel):
+    precos_melhoria: List[int] = Field(
+        ..., description="Tabela 3-7: custo T$ da 1ª–4ª melhoria."
+    )
+    precos_melhoria_detalhe: List[Dict[str, Any]] = Field(default_factory=list)
+    melhorias: List[TormentaMelhoriaItemV13] = Field(default_factory=list)
+    materiais: List[TormentaMaterialEspecialItemV13] = Field(default_factory=list)
+    max_melhorias: int = Field(default=4, ge=1, le=4)
+
+
 class TormentaBestiarioAtaqueItem(BaseModel):
     nome: str = Field(..., max_length=120)
     bonus_ataque: str = Field(default="+0", max_length=20)
