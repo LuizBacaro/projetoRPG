@@ -1,0 +1,263 @@
+{
+  "_meta": {
+    "fonte": "Tormenta 20 — Módulo Básico (Cap. 5, talentos). Textos resumidos para autocomplete na ficha; expandir conforme mesa.",
+    "nota": "Chave de merge é o nome (case-insensitive) com a lista agregada das classes MB. Itens só neste ficheiro aparecem no catálogo se não estiverem nas tabelas de classe.",
+    "nomenclatura_v13": "Na v1.3 do jogo, «talentos» passam a ser «poderes» (gerais, de classe e concedidos); este catálogo alimenta a UI de Poderes na ficha.",
+    "categorias_v13": [
+      "geral",
+      "combate",
+      "destino",
+      "magia",
+      "concedido",
+      "tormenta",
+      "classe"
+    ]
+  },
+  "itens": [
+    {
+      "nome": "Fortitude Maior",
+      "categoria": "Geral",
+      "secao": "Resistência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Aumenta a resistência Fortitude em +2 (cumulativo com outras fontes do mesmo tipo, limite do MB).",
+      "pagina_referencia": "MB p. 129",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Reflexos Rápidos",
+      "categoria": "Geral",
+      "secao": "Resistência",
+      "prerequisitos": "—",
+      "descricao_resumo": "+2 em testes de resistência Reflexos (cumulativo conforme limite do MB).",
+      "pagina_referencia": "MB p. 129",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Vontade de Ferro",
+      "categoria": "Geral",
+      "secao": "Resistência",
+      "prerequisitos": "—",
+      "descricao_resumo": "+2 em testes de resistência Vontade (cumulativo conforme limite do MB).",
+      "pagina_referencia": "MB p. 129",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Armaduras (leves e médias)",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Proficiência com armaduras leves e médias; sem penalidade de armadura por não proficiência nessas categorias.",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Armaduras (leves)",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Proficiência com armaduras leves.",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Armaduras (leves, médias e pesadas)",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Proficiência com armaduras leves, médias e pesadas.",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Armas (simples e marciais)",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Proficiência com armas simples e marciais.",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Armas (simples)",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Proficiência com armas simples.",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Armas Simples",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Proficiência com armas simples (redação alternativa no MB).",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Escudos",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Proficiência com escudos.",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Escudos (exceto de metal)",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Proficiência com escudos que não sejam de metal (druida, MB).",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Rastrear",
+      "categoria": "Geral",
+      "secao": "Perícia",
+      "prerequisitos": "—",
+      "descricao_resumo": "Permite usar Sobrevivência para rastrear com CD ajustada (MB).",
+      "pagina_referencia": "MB p. 130",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Ataque Desarmado Aprimorado",
+      "categoria": "Combate",
+      "secao": "Ataque",
+      "prerequisitos": "Sab 13",
+      "descricao_resumo": "Seus ataques desarmados causam dano letal e podem afetar criaturas incorpóreas (MB).",
+      "pagina_referencia": "MB p. 126",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Arma Exótica (nunchaku, sai, shuriken)",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Proficiência com as armas exóticas listadas (monge, MB).",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Usar Armas (clava, bordão, adaga, dardo, funda, bordão, lança, maça, machado)",
+      "categoria": "Combate",
+      "secao": "Proficiência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Lista fechada de armas simples do druida (MB).",
+      "pagina_referencia": "MB p. 118",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Fortitude Maior (MB)",
+      "categoria": "Geral",
+      "secao": "Resistência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Mesmo efeito que Fortitude Maior; entrada como aparece na tabela do paladino no JSON de classes.",
+      "pagina_referencia": "MB p. 129",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Acuidade com Armas",
+      "categoria": "Combate",
+      "secao": "Ataque",
+      "prerequisitos": "Sab 13",
+      "descricao_resumo": "Somar Sabedoria em vez de Força nas jogadas de ataque com armas leves corpo a corpo se for vantajoso (MB).",
+      "pagina_referencia": "MB p. 126",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Duro de Matar",
+      "categoria": "Geral",
+      "secao": "Resistência",
+      "prerequisitos": "—",
+      "descricao_resumo": "Permanece lutando com 0 PV ou menos; estabiliza automaticamente em 0 PV (MB).",
+      "pagina_referencia": "MB p. 128",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Foco em Arma",
+      "categoria": "Combate",
+      "secao": "Ataque",
+      "prerequisitos": "Proficiência com a arma",
+      "descricao_resumo": "+2 em jogadas de ataque com uma arma escolhida (MB).",
+      "pagina_referencia": "MB p. 127",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Esquiva",
+      "categoria": "Combate",
+      "secao": "Defesa",
+      "prerequisitos": "Des 13",
+      "descricao_resumo": "+1 na Defesa (não acumula com armadura pesada; MB).",
+      "pagina_referencia": "MB p. 127",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Iniciativa Aprimorada",
+      "categoria": "Combate",
+      "secao": "Iniciativa",
+      "prerequisitos": "—",
+      "descricao_resumo": "+4 em testes de Iniciativa (MB).",
+      "pagina_referencia": "MB p. 128",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Percepção Aguçada",
+      "categoria": "Geral",
+      "secao": "Perícia",
+      "prerequisitos": "—",
+      "descricao_resumo": "+2 em testes de Percepção (MB).",
+      "pagina_referencia": "MB p. 130",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Tolerância a Veneno",
+      "categoria": "Geral",
+      "secao": "Resistência",
+      "prerequisitos": "—",
+      "descricao_resumo": "+4 em testes de Fortitude contra venenos (MB).",
+      "pagina_referencia": "MB p. 131",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Conjuração Acelerada",
+      "categoria": "Magia",
+      "secao": "Conjuração",
+      "prerequisitos": "Capacidade de conjurar magias",
+      "descricao_resumo": "Conjurar magia de ação padrão como ação de movimento (+2 PM; MB).",
+      "pagina_referencia": "MB p. 132",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Especialização em Magia",
+      "categoria": "Magia",
+      "secao": "Conjuração",
+      "prerequisitos": "Capacidade de conjurar magias",
+      "descricao_resumo": "+2 na CD de resistência de magias de uma escola escolhida (MB).",
+      "pagina_referencia": "MB p. 132",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Ataque Poderoso",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "secao": "Ataque",
+      "prerequisitos": "For 13",
+      "descricao_resumo": "Sacrifica precisão por dano extra no ataque corpo a corpo (v1.3 p.125).",
+      "pagina_referencia": "v1.3 p. 125",
+      "fonte_catalogo": "core"
+    },
+    {
+      "nome": "Ataque Preciso",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "secao": "Ataque",
+      "prerequisitos": "Des 13, Ataque Poderoso",
+      "descricao_resumo": "Ignora parte da Defesa do alvo com ataques corpo a corpo (v1.3 p.125).",
+      "pagina_referencia": "v1.3 p. 125",
+      "fonte_catalogo": "core"
+    }
+  ]
+}

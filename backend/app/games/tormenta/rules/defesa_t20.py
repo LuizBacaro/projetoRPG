@@ -102,17 +102,22 @@ def ca_efetiva_personagem(
     ficha_json: Optional[Any] = None,
 ) -> int:
     """
-    CA de combate: base salva na ficha + armaduras/escudos equipados (RF-T07d-1).
+    CA de combate: base salva na ficha + armaduras/escudos + Defesa racial (RF-T07d-1).
     """
     from app.games.tormenta.rules.limites_equipamento_v13_t20 import soma_bonus_ca_ficha
     from app.games.tormenta.rules.regra_versao_t20 import (
         REGRA_VERSAO_V13,
         regra_versao_de_ficha,
     )
+    from app.games.tormenta.rules.tracos_raciais_t20 import ca_bonus_racial_de_ficha
 
-    armaduras, ataques = _listas_protecao_ficha(ficha_json)
-    rv = regra_versao_de_ficha(ficha_json if isinstance(ficha_json, dict) else {})
+    fj = ficha_json if isinstance(ficha_json, dict) else {}
+    armaduras, ataques = _listas_protecao_ficha(fj)
+    racial = ca_bonus_racial_de_ficha(fj)
+    rv = regra_versao_de_ficha(fj)
     if rv == REGRA_VERSAO_V13:
-        return defesa_total_v13_ficha(int(des_valor), armaduras, ataques)
+        return defesa_total_v13_ficha(
+            int(des_valor), armaduras, ataques, outros_bonus=racial
+        )
     bonus = soma_bonus_ca_ficha(armaduras, ataques)
-    return int(ca or 10) + bonus
+    return int(ca or 10) + bonus + racial

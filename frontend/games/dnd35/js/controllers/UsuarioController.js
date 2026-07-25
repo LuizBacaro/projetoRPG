@@ -9,6 +9,7 @@ class UsuarioController {
         this.service  = new UsuarioService();
         this.modal    = new ModalUsuario(this.service, () => this.carregar());
         this.usuarios = [];
+        this.totalApi = 0;
         this.filtros  = {
             busca: '',
             perfil: 'todos',
@@ -16,12 +17,46 @@ class UsuarioController {
         };
         this._bindBotoes();
         this._bindTabelaAcoes();
+        this._aplicarBuscaDaUrl();
         this.carregar();
+    }
+
+    _aplicarBuscaDaUrl() {
+        try {
+            const params = new URLSearchParams(window.location.search || '');
+            const q = (params.get('q') || params.get('email') || params.get('busca') || '').trim();
+            if (!q) return;
+            this.filtros.busca = q.toLowerCase();
+            const input = document.getElementById('filtroBuscaUsuarios');
+            if (input) input.value = q;
+            this.filtros.perfil = 'todos';
+            this.filtros.status = 'todos';
+            const selPerfil = document.getElementById('filtroPerfilUsuarios');
+            const selStatus = document.getElementById('filtroStatusUsuarios');
+            if (selPerfil) selPerfil.value = 'todos';
+            if (selStatus) selStatus.value = 'todos';
+        } catch (_) {
+            /* ignore */
+        }
+    }
+
+    _limparFiltros() {
+        this.filtros = { busca: '', perfil: 'todos', status: 'todos' };
+        const input = document.getElementById('filtroBuscaUsuarios');
+        const selPerfil = document.getElementById('filtroPerfilUsuarios');
+        const selStatus = document.getElementById('filtroStatusUsuarios');
+        if (input) input.value = '';
+        if (selPerfil) selPerfil.value = 'todos';
+        if (selStatus) selStatus.value = 'todos';
+        this._atualizarPainel();
     }
 
     _bindBotoes() {
         document.getElementById('btnNovoUsuario')
             ?.addEventListener('click', () => this.modal.abrirParaCriar());
+
+        document.getElementById('btnLimparFiltrosUsuarios')
+            ?.addEventListener('click', () => this._limparFiltros());
 
         document.getElementById('filtroBuscaUsuarios')
             ?.addEventListener('input', (event) => {
@@ -72,14 +107,34 @@ class UsuarioController {
             });
     }
 
+    _normalizarPerfil(perfil) {
+        return String(perfil || '').trim().toLowerCase();
+    }
+
     async carregar() {
         try {
-            const res     = await this.service.listar();
-            this.usuarios = res.usuarios || [];
+            const res = await this.service.listar(false);
+            this.usuarios = (res.usuarios || []).map((u) => ({
+                ...u,
+                perfil: this._normalizarPerfil(u.perfil),
+            }));
+            this.totalApi = Number.isFinite(Number(res.total))
+                ? Number(res.total)
+                : this.usuarios.length;
             this._atualizarPainel();
+            if (this.filtros.busca) {
+                this._rolarAtePrimeiroFiltrado();
+            }
         } catch (err) {
             console.error('Erro ao carregar usuários:', err);
             this._renderizarErro();
+        }
+    }
+
+    _rolarAtePrimeiroFiltrado() {
+        const row = document.querySelector('#tabelaUsuarios tr[data-usuario-id]');
+        if (row && typeof row.scrollIntoView === 'function') {
+            row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
     }
 
@@ -90,8 +145,9 @@ class UsuarioController {
 
     _usuariosFiltrados() {
         return this.usuarios.filter((usuario) => {
+            const perfil = this._normalizarPerfil(usuario.perfil);
             const matchPerfil = this.filtros.perfil === 'todos'
-                || usuario.perfil === this.filtros.perfil;
+                || perfil === this.filtros.perfil;
 
             const matchStatus = this.filtros.status === 'todos'
                 || (this.filtros.status === 'ativo' ? !!usuario.ativo : !usuario.ativo);
@@ -101,6 +157,7 @@ class UsuarioController {
                 usuario.nome,
                 usuario.email,
                 usuario.usuario_responsavel,
+                String(usuario.id),
             ]
                 .filter(Boolean)
                 .some((valor) => String(valor).toLowerCase().includes(termo));
@@ -110,10 +167,13 @@ class UsuarioController {
     }
 
     _atualizarResumo() {
-        const total = this.usuarios.length;
+        const carregados = this.usuarios.length;
+        const total = Math.max(this.totalApi || 0, carregados);
         const ativos = this.usuarios.filter((usuario) => usuario.ativo).length;
-        const governanca = this.usuarios.filter((usuario) => ['administrador', 'mestre'].includes(usuario.perfil)).length;
-        const inativos = total - ativos;
+        const governanca = this.usuarios.filter((usuario) =>
+            ['administrador', 'mestre'].includes(this._normalizarPerfil(usuario.perfil))
+        ).length;
+        const inativos = carregados - ativos;
         const filtrados = this._usuariosFiltrados().length;
 
         this._definirTexto('statTotalUsuarios', total);
@@ -124,9 +184,13 @@ class UsuarioController {
         const resumo = document.getElementById('resumoFiltrado');
         if (!resumo) return;
 
-        resumo.textContent = filtrados === total
-            ? `${total} registro(s) disponíveis para revisão.`
-            : `${filtrados} de ${total} registro(s) visíveis com os filtros atuais.`;
+        let texto = filtrados === carregados
+            ? `${carregados} usuário(s) na lista global (Excluir/Inativar aqui).`
+            : `${filtrados} de ${carregados} usuário(s) visíveis com os filtros atuais.`;
+        if (this.totalApi > carregados) {
+            texto += ` Atenção: API reportou total ${this.totalApi}, mas só ${carregados} foram carregados.`;
+        }
+        resumo.textContent = texto;
     }
 
     _renderizarTabela() {
@@ -150,13 +214,14 @@ class UsuarioController {
                 <tr>
                     <td colspan="7" class="usuarios-loading">
                         Nenhum registro corresponde aos filtros atuais.
+                        Use <strong>Limpar filtros</strong> para ver todos os ${this.usuarios.length} usuário(s).
                     </td>
                 </tr>`;
             return;
         }
 
         tbody.innerHTML = usuarios.map(u => `
-            <tr class="${u.ativo ? '' : 'usuario-inativo'}">
+            <tr class="${u.ativo ? '' : 'usuario-inativo'}" data-usuario-id="${u.id}" data-usuario-email="${this._escapar(u.email)}">
                 <td>${this._badgePerfil(u.perfil)}</td>
                 <td>
                     <div class="usuarios-coluna-nome">
@@ -199,12 +264,13 @@ class UsuarioController {
     }
 
     _badgePerfil(perfil) {
+        const p = this._normalizarPerfil(perfil);
         const map = {
             administrador: '<span class="badge badge-admin">Administrador</span>',
             mestre:        '<span class="badge badge-mestre">Mestre</span>',
             jogador:       '<span class="badge badge-jogador">Jogador</span>',
         };
-        return map[perfil] ?? `<span class="badge">${perfil}</span>`;
+        return map[p] ?? `<span class="badge">${this._escapar(perfil)}</span>`;
     }
 
     _badgeStatus(ativo) {
@@ -249,7 +315,6 @@ class UsuarioController {
         }
     }
 
-    // ✅ REFATORADO: usa window.ModalConfirm centralizado
     inativar(id) {
         ModalConfirm.mostrar({
             icone:           '🚫',
@@ -270,7 +335,6 @@ class UsuarioController {
         }
     }
 
-    // ✅ REFATORADO: usa window.ModalConfirm centralizado
     reativar(id) {
         ModalConfirm.mostrar({
             icone:          '✅',
@@ -291,10 +355,12 @@ class UsuarioController {
     }
 
     excluir(id) {
+        const u = this.usuarios.find((x) => Number(x.id) === Number(id));
+        const rotulo = u ? `${u.nome} (${u.email})` : `ID ${id}`;
         ModalConfirm.mostrar({
             icone:           '🗑️',
             titulo:          'Excluir Usuário',
-            texto:           'Deseja excluir este usuário definitivamente? Esta ação não pode ser desfeita.',
+            texto:           `Excluir definitivamente ${rotulo}? Esta ação não pode ser desfeita. Se houver campanha/personagem vinculados, a API pode recusar — nesse caso inative ou limpe os vínculos antes.`,
             textoConfirmar:  '🗑️ Excluir',
             classeConfirmar: 'modal-confirm-btn-perigo',
             onConfirmar:     () => this._executarExcluir(id),
@@ -317,6 +383,7 @@ let usuarioController;
 (function init() {
     try {
         usuarioController = new UsuarioController();
+        window.usuarioController = usuarioController;
     } catch (error) {
         console.error('❌ Falha no bootstrap do UsuarioController:', error);
         const tbody = document.getElementById('tabelaUsuarios');

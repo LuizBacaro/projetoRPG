@@ -28,7 +28,10 @@ var API_CONFIG = {
     RESILIENCE: {
         RETRY_ATTEMPTS: 3,
         RETRY_BASE_DELAY_MS: 300,
-        CIRCUIT_BREAKER_THRESHOLD: 3,
+        /** POSTs de preview Tormenta em cold start Render (503 readiness/DB). */
+        RETRY_ATTEMPTS_REGRAS_POST: 5,
+        RETRY_BASE_DELAY_MS_503: 900,
+        CIRCUIT_BREAKER_THRESHOLD: 5,
         CIRCUIT_BREAKER_COOLDOWN_MS: 8000,
     },
 };
@@ -86,6 +89,11 @@ function installFetchResilience() {
             return false;
         }
 
+        // 502/503/504: cold start Render, readiness middleware, Neon momentâneo
+        if (response.status === 502 || response.status === 503 || response.status === 504) {
+            return true;
+        }
+
         if (response.status >= 500) {
             return true;
         }
@@ -95,6 +103,25 @@ function installFetchResilience() {
 
     function isIdempotentMethod(method) {
         return ['GET', 'HEAD', 'OPTIONS'].indexOf(method) !== -1;
+    }
+
+    /**
+     * POSTs de `/tormenta/regras/*` são cálculos (preview/validar) sem mutar ficha —
+     * seguros para retry em 503 de cold start (o login já fazia isso via auth-session).
+     */
+    function isSafeRetryablePost(url) {
+        if (!url) return false;
+        return url.indexOf('/tormenta/regras/') !== -1;
+    }
+
+    function maxAttemptsFor(method, url) {
+        if (isIdempotentMethod(method)) {
+            return API_CONFIG.RESILIENCE.RETRY_ATTEMPTS;
+        }
+        if (method === 'POST' && isSafeRetryablePost(url)) {
+            return API_CONFIG.RESILIENCE.RETRY_ATTEMPTS_REGRAS_POST;
+        }
+        return 1;
     }
 
     window.fetch = async function(input, init) {
@@ -117,8 +144,7 @@ function installFetchResilience() {
             breaker.state = 'half-open';
         }
 
-        var allowRetry = isIdempotentMethod(method);
-        var maxAttempts = allowRetry ? API_CONFIG.RESILIENCE.RETRY_ATTEMPTS : 1;
+        var maxAttempts = maxAttemptsFor(method, url);
         var lastError = null;
         var lastResponse = null;
 
@@ -134,9 +160,10 @@ function installFetchResilience() {
                     return response;
                 }
 
-                var retryableByStatus = shouldRetry(method, response, null);
+                var retryableByStatus = shouldRetry(method, response, null) && maxAttempts > 1;
                 if (!retryableByStatus || attempt === maxAttempts) {
-                    if (retryableByStatus) {
+                    if (retryableByStatus && response.status !== 503) {
+                        // 503 de cold start não deve abrir o breaker (rajadas da ficha)
                         breaker.failures += 1;
                         if (breaker.failures >= API_CONFIG.RESILIENCE.CIRCUIT_BREAKER_THRESHOLD) {
                             openCircuit();
@@ -148,7 +175,7 @@ function installFetchResilience() {
                 }
             } catch (error) {
                 lastError = error;
-                var retryableByError = shouldRetry(method, null, error);
+                var retryableByError = shouldRetry(method, null, error) && maxAttempts > 1;
 
                 if (!retryableByError || attempt === maxAttempts) {
                     if (retryableByError) {
@@ -161,8 +188,13 @@ function installFetchResilience() {
                 }
             }
 
-            var jitter = Math.floor(Math.random() * 80);
-            var delayMs = (API_CONFIG.RESILIENCE.RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1)) + jitter;
+            var jitter = Math.floor(Math.random() * 120);
+            var statusHint = lastResponse && lastResponse.status;
+            var base =
+                statusHint === 503 || statusHint === 502 || statusHint === 504
+                    ? API_CONFIG.RESILIENCE.RETRY_BASE_DELAY_MS_503
+                    : API_CONFIG.RESILIENCE.RETRY_BASE_DELAY_MS;
+            var delayMs = base * Math.pow(2, attempt - 1) + jitter;
             await sleep(delayMs);
         }
 

@@ -359,7 +359,7 @@ def validar_lancar_magia_preparador_mb(
     vinculos: List[Dict[str, Any]],
     divindade_slug: Optional[str] = None,
 ) -> Tuple[bool, str]:
-    """Círculo ≥1 exige preparada; truque exige grimório (mago) ou repertório/devoção (divino)."""
+    """Círculo ≥1 exige preparada; prece de devoção e truques (c0 legado) têm exceções."""
     if not classe_usa_limite_preparadas_mb(slug_classe):
         return True, ""
     slug = str(magia_slug or "").strip().lower()
@@ -375,6 +375,20 @@ def validar_lancar_magia_preparador_mb(
         pap = str(v.get("papel", "")).strip().lower()
         if sl and pap:
             papeis_por_slug.setdefault(sl, set()).add(pap)
+
+    from app.games.tormenta.rules.devocao_divindade_t20 import (
+        classe_usa_truque_devocao_mb,
+        magia_e_truque_devocao_mb,
+    )
+
+    # Prece de devoção (MB / v1.3): lançável sem preparar e sem repertório.
+    if (
+        classe_usa_truque_devocao_mb(slug_classe)
+        and divindade_slug
+        and magia_e_truque_devocao_mb(divindade_slug, slug)
+    ):
+        return True, ""
+
     if circ >= 1:
         if "preparada" not in papeis_por_slug.get(slug, set()):
             return (
@@ -385,17 +399,6 @@ def validar_lancar_magia_preparador_mb(
     if not exige_grimorio_para_preparar_mb(slug_classe):
         papeis = papeis_por_slug.get(slug, set())
         if "conhecida" in papeis or "preparada" in papeis:
-            return True, ""
-        from app.games.tormenta.rules.devocao_divindade_t20 import (
-            classe_usa_truque_devocao_mb,
-            magia_e_truque_devocao_mb,
-        )
-
-        if (
-            classe_usa_truque_devocao_mb(slug_classe)
-            and divindade_slug
-            and magia_e_truque_devocao_mb(divindade_slug, slug)
-        ):
             return True, ""
         return (
             False,

@@ -338,8 +338,16 @@ def preview_subir_nivel_mb(
             "avisos": avisos,
         }
 
-    pv_ant = pv_maximos_mb(slug, nv0, con_valor, regra_versao=regra_versao_de_ficha(fj))
-    pv_nov = pv_maximos_mb(slug, nv1, con_valor, regra_versao=regra_versao_de_ficha(fj))
+    from app.games.tormenta.rules.tracos_raciais_t20 import slug_raca_de_ficha
+
+    raca_slug = slug_raca_de_ficha(fj)
+    rv_ficha = regra_versao_de_ficha(fj)
+    pv_ant = pv_maximos_mb(
+        slug, nv0, con_valor, regra_versao=rv_ficha, slug_raca=raca_slug or None
+    )
+    pv_nov = pv_maximos_mb(
+        slug, nv1, con_valor, regra_versao=rv_ficha, slug_raca=raca_slug or None
+    )
     pv_ganho = None
     if pv_ant is not None and pv_nov is not None:
         pv_ganho = max(0, pv_nov - pv_ant)
@@ -379,6 +387,13 @@ def preview_subir_nivel_mb(
             regra_versao=rv,
             arcanista_caminho=arcanista,
         )
+        if raca_slug:
+            from app.games.tormenta.rules.tracos_raciais_t20 import contrib_pm_racial
+
+            if pa_ant is not None:
+                pa_ant += contrib_pm_racial(raca_slug, nv_pm0, rv)
+            if pa_nov is not None:
+                pa_nov += contrib_pm_racial(raca_slug, nv_pm1, rv)
         if pa_ant is not None and pa_nov is not None:
             pa_ganho = max(0, pa_nov - pa_ant)
 

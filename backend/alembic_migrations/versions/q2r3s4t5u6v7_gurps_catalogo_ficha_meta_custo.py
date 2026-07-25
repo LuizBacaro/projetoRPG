@@ -9,6 +9,9 @@ Adiciona uma coluna JSON `meta_custo` opcional em
 persistir o contrato enriquecido do catalogo (cost_model, opcoes_custo,
 custo_por_nivel, faixa, autocontrole, etc.). Postgres usa `JSONB`, SQLite
 (testes) usa `JSON` generico.
+
+Idempotente: se a coluna já existir (schema criado/atualizado fora do Alembic
+ou retry após falha parcial), a revision só avança o stamp.
 """
 
 from typing import Sequence, Union
@@ -29,17 +32,29 @@ def _json_type():
     return sa.JSON().with_variant(postgresql.JSONB(), "postgresql")
 
 
+def _tem_coluna(tabela: str, coluna: str) -> bool:
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    if tabela not in inspector.get_table_names():
+        return False
+    return any(c["name"] == coluna for c in inspector.get_columns(tabela))
+
+
 def upgrade() -> None:
-    op.add_column(
-        "gurps_catalogo_ficha_vantagens",
-        sa.Column("meta_custo", _json_type(), nullable=True),
-    )
-    op.add_column(
-        "gurps_catalogo_ficha_desvantagens",
-        sa.Column("meta_custo", _json_type(), nullable=True),
-    )
+    if not _tem_coluna("gurps_catalogo_ficha_vantagens", "meta_custo"):
+        op.add_column(
+            "gurps_catalogo_ficha_vantagens",
+            sa.Column("meta_custo", _json_type(), nullable=True),
+        )
+    if not _tem_coluna("gurps_catalogo_ficha_desvantagens", "meta_custo"):
+        op.add_column(
+            "gurps_catalogo_ficha_desvantagens",
+            sa.Column("meta_custo", _json_type(), nullable=True),
+        )
 
 
 def downgrade() -> None:
-    op.drop_column("gurps_catalogo_ficha_desvantagens", "meta_custo")
-    op.drop_column("gurps_catalogo_ficha_vantagens", "meta_custo")
+    if _tem_coluna("gurps_catalogo_ficha_desvantagens", "meta_custo"):
+        op.drop_column("gurps_catalogo_ficha_desvantagens", "meta_custo")
+    if _tem_coluna("gurps_catalogo_ficha_vantagens", "meta_custo"):
+        op.drop_column("gurps_catalogo_ficha_vantagens", "meta_custo")

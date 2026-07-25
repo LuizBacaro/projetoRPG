@@ -99,8 +99,9 @@ Bardo: arcano espontâneo (CAR). Clérigo/Druida: divino (SAB), devoção.
 | Item | Estado |
 |------|--------|
 | Grimório SQL + modal | **Feito** |
-| Catálogo ~706 metadados | **Feito** |
-| Custo PM = círculo (MB) | **Feito** — v13 usa 1/3/6/10/15 |
+| Catálogo v1.3 (~227 metadados, círculos **1–5**) | **Feito** (`magias_mb_catalogo.json`; legado MB em `*.legacy_mb.json`) |
+| Custo PM Tabela 4-1 (1/3/6/10/15) | **Feito** (`custo_pm_preparar_ou_lancar_magia(..., "v13")` + lançamento na ficha) |
+| Aliases MB→v1.3 + aviso de órfãos na UI | **Feito** |
 | Arcanista 3 caminhos | **Feito** |
 | CD com atributo **valor** | **Feito** |
 | Concentração + RM | **Feito** (revisar fórmula CD) |
@@ -109,10 +110,9 @@ Bardo: arcano espontâneo (CAR). Clérigo/Druida: divino (SAB), devoção.
 
 | Módulo | Correção |
 |--------|----------|
-| `conjuracao_t20.custo_pm_preparar_ou_lancar_magia` | Mapa `{1:1, 2:3, 3:6, 4:10, 5:15}` |
-| `conjuracao_classe_mb.json` | Arcanista + caminho; caçador; remover mago/feiticeiro |
-| Preview CD magia | 10 + ⌊nível/2⌋ + valor atributo-chave |
-| UI ficha | Escolha caminho arcanista na criação |
+| Listas nomeadas por classe/nível (progressão magias) | Revalidar stubs `magias_*_mb.json` vs listas v1.3 (P1) |
+| Preview CD magia | Revisar edge cases multiclasse |
+| UI ficha | Polimento de rótulos «MB» remanescentes |
 
 ## Critérios de aceite
 

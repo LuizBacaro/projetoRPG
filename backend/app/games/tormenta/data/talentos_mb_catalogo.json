@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "fonte": "Tormenta 20 — Módulo Básico (Cap. 5, talentos). Textos resumidos para autocomplete na ficha; expandir conforme mesa.",
-    "nota": "Chave de merge é o nome (case-insensitive) com a lista agregada das classes MB. Itens só neste ficheiro aparecem no catálogo se não estiverem nas tabelas de classe.",
-    "nomenclatura_v13": "Na v1.3 do jogo, «talentos» passam a ser «poderes» (gerais, de classe e concedidos); este catálogo alimenta a UI de Poderes na ficha.",
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf",
+    "referencia_paginas": "Cap.2 Poderes p.124–136 (tabelas p.126–128)",
+    "nomenclatura_v13": "v1.3: «poderes» substituem «talentos»; catálogo alimenta a UI de Poderes na ficha.",
     "categorias_v13": [
       "geral",
       "combate",
@@ -15,249 +15,1558 @@
   },
   "itens": [
     {
-      "nome": "Fortitude Maior",
-      "categoria": "Geral",
-      "secao": "Resistência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Aumenta a resistência Fortitude em +2 (cumulativo com outras fontes do mesmo tipo, limite do MB).",
-      "pagina_referencia": "MB p. 129",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Reflexos Rápidos",
-      "categoria": "Geral",
-      "secao": "Resistência",
-      "prerequisitos": "—",
-      "descricao_resumo": "+2 em testes de resistência Reflexos (cumulativo conforme limite do MB).",
-      "pagina_referencia": "MB p. 129",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Vontade de Ferro",
-      "categoria": "Geral",
-      "secao": "Resistência",
-      "prerequisitos": "—",
-      "descricao_resumo": "+2 em testes de resistência Vontade (cumulativo conforme limite do MB).",
-      "pagina_referencia": "MB p. 129",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Usar Armaduras (leves e médias)",
+      "nome": "Acuidade com Arma",
+      "slug": "acuidade_com_arma",
       "categoria": "Combate",
-      "secao": "Proficiência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Proficiência com armaduras leves e médias; sem penalidade de armadura por não proficiência nessas categorias.",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
+      "categoria_v13": "combate",
+      "prerequisitos": "Des 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando usa uma arma corpo a corpo leve ou uma arma de arremesso, você pode usar sua Destreza em vez de Força nos testes de ataque e rolagens de dano."
     },
     {
-      "nome": "Usar Armaduras (leves)",
+      "nome": "Arma Secundária Grande",
+      "slug": "arma_secundaria_grande",
       "categoria": "Combate",
-      "secao": "Proficiência",
+      "categoria_v13": "combate",
       "prerequisitos": "—",
-      "descricao_resumo": "Proficiência com armaduras leves.",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13"
     },
     {
-      "nome": "Usar Armaduras (leves, médias e pesadas)",
+      "nome": "Arremesso Múltiplo",
+      "slug": "arremesso_multiplo",
       "categoria": "Combate",
-      "secao": "Proficiência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Proficiência com armaduras leves, médias e pesadas.",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
+      "categoria_v13": "combate",
+      "prerequisitos": "Des 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Uma vez por rodada, quando faz um ataque com uma arma de arremesso, você pode gastar 1 PM para fazer um ataque adicional contra o mesmo alvo, arremessando outra arma de arremesso.",
+      "custo_pm": 1
     },
     {
-      "nome": "Usar Armas (simples e marciais)",
+      "nome": "Arremesso Potente",
+      "slug": "arremesso_potente",
       "categoria": "Combate",
-      "secao": "Proficiência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Proficiência com armas simples e marciais.",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
+      "categoria_v13": "combate",
+      "prerequisitos": "For 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando usa uma arma de arremesso, você pode usar sua Força em vez de Destreza nos testes de ataque."
     },
     {
-      "nome": "Usar Armas (simples)",
+      "nome": "Ataque com Escudo",
+      "slug": "ataque_com_escudo",
       "categoria": "Combate",
-      "secao": "Proficiência",
+      "categoria_v13": "combate",
       "prerequisitos": "—",
-      "descricao_resumo": "Proficiência com armas simples.",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Uma vez por rodada, se estiver empunhando um escudo e fizer a ação agredir, você pode gastar 1 PM para fazer um ataque corpo a corpo extra com o escudo.",
+      "custo_pm": 1
     },
     {
-      "nome": "Usar Armas Simples",
+      "nome": "Ataque Pesado",
+      "slug": "ataque_pesado",
       "categoria": "Combate",
-      "secao": "Proficiência",
+      "categoria_v13": "combate",
       "prerequisitos": "—",
-      "descricao_resumo": "Proficiência com armas simples (redação alternativa no MB).",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Usar Escudos",
-      "categoria": "Combate",
-      "secao": "Proficiência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Proficiência com escudos.",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Usar Escudos (exceto de metal)",
-      "categoria": "Combate",
-      "secao": "Proficiência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Proficiência com escudos que não sejam de metal (druida, MB).",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Rastrear",
-      "categoria": "Geral",
-      "secao": "Perícia",
-      "prerequisitos": "—",
-      "descricao_resumo": "Permite usar Sobrevivência para rastrear com CD ajustada (MB).",
-      "pagina_referencia": "MB p. 130",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Ataque Desarmado Aprimorado",
-      "categoria": "Combate",
-      "secao": "Ataque",
-      "prerequisitos": "Sab 13",
-      "descricao_resumo": "Seus ataques desarmados causam dano letal e podem afetar criaturas incorpóreas (MB).",
-      "pagina_referencia": "MB p. 126",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Usar Arma Exótica (nunchaku, sai, shuriken)",
-      "categoria": "Combate",
-      "secao": "Proficiência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Proficiência com as armas exóticas listadas (monge, MB).",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Usar Armas (clava, bordão, adaga, dardo, funda, bordão, lança, maça, machado)",
-      "categoria": "Combate",
-      "secao": "Proficiência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Lista fechada de armas simples do druida (MB).",
-      "pagina_referencia": "MB p. 118",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Fortitude Maior (MB)",
-      "categoria": "Geral",
-      "secao": "Resistência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Mesmo efeito que Fortitude Maior; entrada como aparece na tabela do paladino no JSON de classes.",
-      "pagina_referencia": "MB p. 129",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Acuidade com Armas",
-      "categoria": "Combate",
-      "secao": "Ataque",
-      "prerequisitos": "Sab 13",
-      "descricao_resumo": "Somar Sabedoria em vez de Força nas jogadas de ataque com armas leves corpo a corpo se for vantajoso (MB).",
-      "pagina_referencia": "MB p. 126",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Duro de Matar",
-      "categoria": "Geral",
-      "secao": "Resistência",
-      "prerequisitos": "—",
-      "descricao_resumo": "Permanece lutando com 0 PV ou menos; estabiliza automaticamente em 0 PV (MB).",
-      "pagina_referencia": "MB p. 128",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Foco em Arma",
-      "categoria": "Combate",
-      "secao": "Ataque",
-      "prerequisitos": "Proficiência com a arma",
-      "descricao_resumo": "+2 em jogadas de ataque com uma arma escolhida (MB).",
-      "pagina_referencia": "MB p. 127",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Esquiva",
-      "categoria": "Combate",
-      "secao": "Defesa",
-      "prerequisitos": "Des 13",
-      "descricao_resumo": "+1 na Defesa (não acumula com armadura pesada; MB).",
-      "pagina_referencia": "MB p. 127",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Iniciativa Aprimorada",
-      "categoria": "Combate",
-      "secao": "Iniciativa",
-      "prerequisitos": "—",
-      "descricao_resumo": "+4 em testes de Iniciativa (MB).",
-      "pagina_referencia": "MB p. 128",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Percepção Aguçada",
-      "categoria": "Geral",
-      "secao": "Perícia",
-      "prerequisitos": "—",
-      "descricao_resumo": "+2 em testes de Percepção (MB).",
-      "pagina_referencia": "MB p. 130",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Tolerância a Veneno",
-      "categoria": "Geral",
-      "secao": "Resistência",
-      "prerequisitos": "—",
-      "descricao_resumo": "+4 em testes de Fortitude contra venenos (MB).",
-      "pagina_referencia": "MB p. 131",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Conjuração Acelerada",
-      "categoria": "Magia",
-      "secao": "Conjuração",
-      "prerequisitos": "Capacidade de conjurar magias",
-      "descricao_resumo": "Conjurar magia de ação padrão como ação de movimento (+2 PM; MB).",
-      "pagina_referencia": "MB p. 132",
-      "fonte_catalogo": "core"
-    },
-    {
-      "nome": "Especialização em Magia",
-      "categoria": "Magia",
-      "secao": "Conjuração",
-      "prerequisitos": "Capacidade de conjurar magias",
-      "descricao_resumo": "+2 na CD de resistência de magias de uma escola escolhida (MB).",
-      "pagina_referencia": "MB p. 132",
-      "fonte_catalogo": "core"
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando faz um ataque corpo a corpo com uma arma de duas mãos, você pode pagar 1 PM."
     },
     {
       "nome": "Ataque Poderoso",
+      "slug": "ataque_poderoso",
       "categoria": "Combate",
       "categoria_v13": "combate",
-      "secao": "Ataque",
-      "prerequisitos": "For 13",
-      "descricao_resumo": "Sacrifica precisão por dano extra no ataque corpo a corpo (v1.3 p.125).",
-      "pagina_referencia": "v1.3 p. 125",
-      "fonte_catalogo": "core"
+      "prerequisitos": "For 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Sempre que faz um ataque corpo a corpo, você pode sofrer –2 no teste de ataque para receber +5 na rolagem de dano."
     },
     {
       "nome": "Ataque Preciso",
+      "slug": "ataque_preciso",
       "categoria": "Combate",
       "categoria_v13": "combate",
-      "secao": "Ataque",
-      "prerequisitos": "Des 13, Ataque Poderoso",
-      "descricao_resumo": "Ignora parte da Defesa do alvo com ataques corpo a corpo (v1.3 p.125).",
-      "pagina_referencia": "v1.3 p. 125",
-      "fonte_catalogo": "core"
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Se estiver empunhando uma arma corpo a corpo em uma das mãos e nada na outra, você recebe +2 na margem de ameaça e +1 no multiplicador de crítico com ela."
+    },
+    {
+      "nome": "Bloqueio com Escudo",
+      "slug": "bloqueio_com_escudo",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando sofre dano, você pode gastar 1 PM para receber redução de dano igual ao bônus na Defesa que seu escudo fornece contra este dano.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Carga de Cavalaria",
+      "slug": "carga_de_cavalaria",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Ginete",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando faz uma investida montada, você causa +2d8 pontos de dano."
+    },
+    {
+      "nome": "Combate Defensivo",
+      "slug": "combate_defensivo",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Int 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando usa a ação agredir, você pode usar este poder."
+    },
+    {
+      "nome": "Derrubar Aprimorado",
+      "slug": "derrubar_aprimorado",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em testes de ataque para derrubar.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Desarmar Aprimorado",
+      "slug": "desarmar_aprimorado",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em testes de ataque para desarmar.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Disparo Preciso",
+      "slug": "disparo_preciso",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode fazer ataques à distância contra oponentes envolvidos em combate corpo a corpo sem sofrer a penalidade de –5 no teste de ataque."
+    },
+    {
+      "nome": "Disparo Rápido",
+      "slug": "disparo_rapido",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Des 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Se estiver empunhando uma arma de disparo que possa recarregar como ação livre e gastar uma ação completa para agredir, pode fazer um ataque adicional com ela."
+    },
+    {
+      "nome": "Empunhadura Poderosa",
+      "slug": "empunhadura_poderosa",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "For 3",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Ao usar uma arma feita para uma categoria de tamanho maior que a sua, a penalidade que você sofre nos testes de ataque diminui para –2 (normalmente, usar uma arma de uma categoria de tamanho maior impõe –5 nos testes de ataque)."
+    },
+    {
+      "nome": "Encouraçado",
+      "slug": "encouracado",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Armaduras pesadas",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Se estiver usando uma armadura pesada, você recebe +2 na Defesa."
+    },
+    {
+      "nome": "Esquiva",
+      "slug": "esquiva",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Des 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 na Defesa e Reflexos. Pré-requisito: Des 1."
+    },
+    {
+      "nome": "Estilo de Arma e Escudo",
+      "slug": "estilo_de_arma_e_escudo",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Escudos",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Se você estiver usando um escudo, o bônus na Defesa que ele fornece aumenta em +2."
+    },
+    {
+      "nome": "Estilo de Arma Longa",
+      "slug": "estilo_de_arma_longa",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "For 1, Luta",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em testes de ataque com armas alongadas e pode atacar alvos adjacentes com essas armas."
+    },
+    {
+      "nome": "Estilo de Arremesso",
+      "slug": "estilo_de_arremesso",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Pontaria",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode sacar armas de arremesso como uma ação livre e recebe +2 nas rolagens de dano com elas."
+    },
+    {
+      "nome": "Estilo de Disparo",
+      "slug": "estilo_de_disparo",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Pontaria",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Se estiver usando uma arma de disparo, você soma sua Destreza nas rolagens de dano."
+    },
+    {
+      "nome": "Estilo de Duas Armas",
+      "slug": "estilo_de_duas_armas",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Des 2, Luta",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Se estiver empunhando duas armas (e pelo menos uma delas for leve) e fizer a ação agredir, você pode fazer dois ataques, um com cada arma."
+    },
+    {
+      "nome": "Estilo de Duas Mãos",
+      "slug": "estilo_de_duas_maos",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "For 2, Luta",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Se estiver usando uma arma corpo a corpo com as duas mãos, você recebe +5 nas rolagens de dano."
+    },
+    {
+      "nome": "Estilo de Uma Arma",
+      "slug": "estilo_de_uma_arma",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Luta",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Se estiver usando uma arma corpo a corpo em uma das mãos e nada na outra, você recebe +2 na Defesa e nos testes de ataque com essa arma (exceto ataques desarmados)."
+    },
+    {
+      "nome": "Estilo Desarmado",
+      "slug": "estilo_desarmado",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Luta",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Seus ataques desarmados causam 1d6 pontos de dano e podem causar dano letal ou não letal (sem penalidades)."
+    },
+    {
+      "nome": "Fanático",
+      "slug": "fanatico",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "12º nível de personagem",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Seu deslocamento não é reduzido por usar armaduras pesadas."
+    },
+    {
+      "nome": "Finta Aprimorada",
+      "slug": "finta_aprimorada",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Enganação",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em testes de Enganação para fintar e pode fintar como uma ação de movimento."
+    },
+    {
+      "nome": "Foco em Arma",
+      "slug": "foco_em_arma",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Proficiência com a arma",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Escolha uma arma. Você recebe +2 em testes de ataque com essa arma."
+    },
+    {
+      "nome": "Ginete",
+      "slug": "ginete",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Cavalgar",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você passa automaticamente em testes de Cavalgar para não cair da montaria quando sofre dano."
+    },
+    {
+      "nome": "Inexpugnável",
+      "slug": "inexpugnavel",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "6º nível de personagem",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Se estiver usando uma armadura pesada, você recebe +2 em todos os testes de resistência."
+    },
+    {
+      "nome": "Mira Apurada",
+      "slug": "mira_apurada",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Sab 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando usa a ação mirar, você recebe +2 em testes de ataque e na margem de ameaça com ataques à distância até o fim do turno."
+    },
+    {
+      "nome": "Piqueiro",
+      "slug": "piqueiro",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Uma vez por rodada, se estiver empunhando uma arma alongada e um inimigo entrar voluntariamente em seu alcance corpo a corpo, você pode gastar 1 PM para fazer um ataque corpo a corpo contra este oponente com esta arma.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Presença Aterradora",
+      "slug": "presenca_aterradora",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Intimidação",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode gastar uma ação padrão e 1 PM para assustar todas as criaturas a sua escolha em alcance curto."
+    },
+    {
+      "nome": "Proficiência",
+      "slug": "proficiencia",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Escolha uma proficiência: armas marciais, armas de fogo, armaduras pesadas ou escudos (se for proficiente em armas marciais, você também pode escolher armas exóticas)."
+    },
+    {
+      "nome": "Quebrar Aprimorado",
+      "slug": "quebrar_aprimorado",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em testes de ataque para quebrar.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Reflexos de Combate",
+      "slug": "reflexos_de_combate",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Des 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você ganha uma ação de movimento extra no seu primeiro turno de cada combate."
+    },
+    {
+      "nome": "Saque Rápido",
+      "slug": "saque_rapido",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Iniciativa",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em Iniciativa e pode sacar ou guardar itens como uma ação livre (em vez de ação de movimento)."
+    },
+    {
+      "nome": "Trespassar",
+      "slug": "trespassar",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando você faz um ataque corpo a corpo e reduz os pontos de vida do alvo para 0 ou menos, pode gastar 1 PM para fazer um ataque adicional contra outra criatura dentro do seu alcance.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Vitalidade",
+      "slug": "vitalidade",
+      "categoria": "Combate",
+      "categoria_v13": "combate",
+      "prerequisitos": "Con 1",
+      "pagina_referencia": "v1.3 p.124–128",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +1 PV por nível de personagem e +2 em Fortitude."
+    },
+    {
+      "nome": "Afinidade com a Tormenta",
+      "slug": "afinidade_com_a_tormenta",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Aharadak",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Almejar o Impossível",
+      "slug": "almejar_o_impossivel",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Valkaria ou Thwor",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Anfíbio",
+      "slug": "anfibio",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto do Oceano",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Apostar com o Trapaceiro",
+      "slug": "apostar_com_o_trapaceiro",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Hyninn",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Armas da Ambição",
+      "slug": "armas_da_ambicao",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Valkaria",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Arsenal das Profundezas",
+      "slug": "arsenal_das_profundezas",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto do Oceano",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Astúcia da Serpente",
+      "slug": "astucia_da_serpente",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Sszzaas",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Ataque Piedoso",
+      "slug": "ataque_piedoso",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Lena ou Thyatis",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Aura de Medo",
+      "slug": "aura_de_medo",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Kallyadranoch",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Aura de Paz",
+      "slug": "aura_de_paz",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Marah",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Aura Restauradora",
+      "slug": "aura_restauradora",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Lena",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Bênção do Mana",
+      "slug": "bencao_do_mana",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Wynna",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Carícia Sombria",
+      "slug": "caricia_sombria",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Tenebra",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Centelha Mágica",
+      "slug": "centelha_magica",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Wynna",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Compreender os Ermos",
+      "slug": "compreender_os_ermos",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Allihanna",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Conhecimento Enciclopédico",
+      "slug": "conhecimento_enciclopedico",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Tanna-Toh",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Conjurar Arma",
+      "slug": "conjurar_arma",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Arsenal",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Coragem Total",
+      "slug": "coragem_total",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Arsenal, Khalmyr, Lin-Wu ou Valkaria",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Arsenal, Khalmyr, Lin-Wu, Valkaria Você é imune a efeitos de medo, mágicos ou não.",
+      "custo_pm": 2
+    },
+    {
+      "nome": "Cura Gentil",
+      "slug": "cura_gentil",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Lena",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Curandeira Perfeita",
+      "slug": "curandeira_perfeita",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Lena",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Dedo Verde",
+      "slug": "dedo_verde",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Allihanna",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Descanso Natural",
+      "slug": "descanso_natural",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Allihanna",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Dom da Esperança",
+      "slug": "dom_da_esperanca",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Marah",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Dom da Imortalidade",
+      "slug": "dom_da_imortalidade",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Thyatis, paladino",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Dom da Profecia",
+      "slug": "dom_da_profecia",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Thyatis",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Dom da Ressurreição",
+      "slug": "dom_da_ressurreicao",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Thyatis, clérigo",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Dom da Verdade",
+      "slug": "dom_da_verdade",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Khalmyr",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Escamas Dracônicas",
+      "slug": "escamas_draconicas",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Kallyadranoch",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Kallyadranoch Você recebe +2 na Defesa e em Fortitude.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Escudo Mágico",
+      "slug": "escudo_magico",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Wynna",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Espada Justiceira",
+      "slug": "espada_justiceira",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Khalmyr",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Espada Solar",
+      "slug": "espada_solar",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Azgher",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Familiar Ofídico",
+      "slug": "familiar_ofidico",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Sszzaas",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Farsa do Fingidor",
+      "slug": "farsa_do_fingidor",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Hyninn",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Forma de Macaco",
+      "slug": "forma_de_macaco",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Hyninn",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Fulgor Solar",
+      "slug": "fulgor_solar",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Azgher",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Fé Guerreira",
+      "slug": "fe_guerreira",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Arsenal",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Fúria Divina",
+      "slug": "furia_divina",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Thwor",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Golpista Divino",
+      "slug": "golpista_divino",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Hyninn",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Habitante do Deserto",
+      "slug": "habitante_do_deserto",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Azgher",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Inimigo de Tenebra",
+      "slug": "inimigo_de_tenebra",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Azgher",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Kiai Divino",
+      "slug": "kiai_divino",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Lin-Wu",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Liberdade Divina",
+      "slug": "liberdade_divina",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Valkaria",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Manto da Penumbra",
+      "slug": "manto_da_penumbra",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Tenebra",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Mente Analítica",
+      "slug": "mente_analitica",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Tanna-Toh",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Mente Vazia",
+      "slug": "mente_vazia",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Lin-Wu",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Mestre dos Mares",
+      "slug": "mestre_dos_mares",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto do Oceano",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Olhar Amedrontador",
+      "slug": "olhar_amedrontador",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Megalokk ou Thwor",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Palavras de Bondade",
+      "slug": "palavras_de_bondade",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Marah",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Percepção Temporal",
+      "slug": "percepcao_temporal",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Aharadak",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Pesquisa Abençoada",
+      "slug": "pesquisa_abencoada",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Tanna-Toh",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Poder Oculto",
+      "slug": "poder_oculto",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Nimb",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Presas Primordiais",
+      "slug": "presas_primordiais",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Kallyadranoch ou Megalokk",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Presas Venenosas",
+      "slug": "presas_venenosas",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Sszzaas",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Rejeição Divina",
+      "slug": "rejeicao_divina",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Aharadak",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Reparar Injustiça",
+      "slug": "reparar_injustica",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Khalmyr",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Sangue de Ferro",
+      "slug": "sangue_de_ferro",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Arsenal",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Sangue Ofídico",
+      "slug": "sangue_ofidico",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Sszzaas",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Servos do Dragão",
+      "slug": "servos_do_dragao",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Kallyadranoch",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Sopro do Mar",
+      "slug": "sopro_do_mar",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Oceano",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Sorte dos Loucos",
+      "slug": "sorte_dos_loucos",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Nimb",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Talento Artístico",
+      "slug": "talento_artistico",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Marah",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Teurgista Místico",
+      "slug": "teurgista_mistico",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Wynna, habilidade de classe Magias",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Tradição de Lin-Wu",
+      "slug": "tradicao_de_lin_wu",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Lin-Wu",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Transmissão da Loucura",
+      "slug": "transmissao_da_loucura",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Nimb",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Tropas Duyshidakk",
+      "slug": "tropas_duyshidakk",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Thwor",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Urro Divino",
+      "slug": "urro_divino",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Megalokk",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Visão nas Trevas",
+      "slug": "visao_nas_trevas",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Tenebra",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Voz da Civilização",
+      "slug": "voz_da_civilizacao",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Tanna-Toh",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Voz da Natureza",
+      "slug": "voz_da_natureza",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Allihanna",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Voz dos Monstros",
+      "slug": "voz_dos_monstros",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Megalokk",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Zumbificar",
+      "slug": "zumbificar",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Tenebra",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Êxtase da Loucura",
+      "slug": "extase_da_loucura",
+      "categoria": "Concedido",
+      "categoria_v13": "concedido",
+      "prerequisitos": "Devoto de Aharadak ou Nimb",
+      "pagina_referencia": "v1.3 p.127, 132–136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Acrobático",
+      "slug": "acrobatico",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Des 2",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode usar sua Destreza em vez de Força em testes de Atletismo."
+    },
+    {
+      "nome": "Ao Sabor do Destino",
+      "slug": "ao_sabor_do_destino",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "6º nível de personagem",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Confiando em suas próprias habilidades (ou em sua própria sorte), você abre mão de usar itens mágicos."
+    },
+    {
+      "nome": "Aparência Inofensiva",
+      "slug": "aparencia_inofensiva",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Car 1",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "A primeira criatura inteligente (Int –3 ou maior) que atacar você em uma cena deve fazer um teste de Vontade (CD Car)."
+    },
+    {
+      "nome": "Atlético",
+      "slug": "atletico",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "For 2",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em Atletismo e +3m em seu deslocamento."
+    },
+    {
+      "nome": "Atraente",
+      "slug": "atraente",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Car 1",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em testes de perícias baseadas em Carisma contra criaturas que possam se sentir fisicamente atraídas por você."
+    },
+    {
+      "nome": "Comandar",
+      "slug": "comandar",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Car 1",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode gastar uma ação de movimento e 1 PM para gritar ordens para seus aliados em alcance médio."
+    },
+    {
+      "nome": "Costas Largas",
+      "slug": "costas_largas",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Con 1, For 1",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Seu limite de carga aumenta em 5 espaços e você pode se beneficiar de um item vestido adicional."
+    },
+    {
+      "nome": "Foco em Perícia",
+      "slug": "foco_em_pericia",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Treinado na perícia escolhida",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Escolha uma perícia. Quando faz um teste dessa perícia, você pode gastar 1 PM para rolar dois dados e usar o melhor resultado.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Inventário Organizado",
+      "slug": "inventario_organizado",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Int 1",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você soma sua Inteligência no limite de espaços que pode carregar."
+    },
+    {
+      "nome": "Investigador",
+      "slug": "investigador",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Int 1",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em Investigação e soma sua Inteligência em Intuição."
+    },
+    {
+      "nome": "Lobo Solitário",
+      "slug": "lobo_solitario",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +1 em testes de perícia e Defesa se estiver sem nenhum aliado em alcance curto."
+    },
+    {
+      "nome": "Medicina",
+      "slug": "medicina",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Sab 1, treinado em Cura",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode gastar uma ação completa para fazer um teste de Cura (CD 15) em uma criatura."
+    },
+    {
+      "nome": "Parceiro",
+      "slug": "parceiro",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Adestramento ou Diplomacia, 5º nível de personagem",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você possui um parceiro animal ou humanoide que o acompanha em aventuras."
+    },
+    {
+      "nome": "Sentidos Aguçados",
+      "slug": "sentidos_agucados",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Sab 1, Percepção",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em Percepção, não fica desprevenido contra inimigos que não possa perceber e, sempre que erra um ataque devido a camuflagem, pode rolar mais uma vez o dado da chance de falha."
+    },
+    {
+      "nome": "Sortudo",
+      "slug": "sortudo",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando faz um teste, você pode gastar 3 PM para rolá-lo novamente.",
+      "custo_pm": 3
+    },
+    {
+      "nome": "Surto Heroico",
+      "slug": "surto_heroico",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Uma vez por rodada, você pode gastar 5 PM para realizar uma ação padrão ou de movimento adicional.",
+      "custo_pm": 5
+    },
+    {
+      "nome": "Torcida",
+      "slug": "torcida",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Car 1",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +2 em testes de perícia e Defesa quando tem a torcida a seu favor."
+    },
+    {
+      "nome": "Treinamento em Perícia",
+      "slug": "treinamento_em_pericia",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você se torna treinado em uma perícia a sua escolha."
+    },
+    {
+      "nome": "Venefício",
+      "slug": "veneficio",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Ofício (alquimista)",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Quando usa um veneno, você não corre risco de se envenenar acidentalmente."
+    },
+    {
+      "nome": "Vontade de Ferro",
+      "slug": "vontade_de_ferro",
+      "categoria": "Destino",
+      "categoria_v13": "destino",
+      "prerequisitos": "Sab 1",
+      "pagina_referencia": "v1.3 p.126, 129–130",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +1 PM para cada dois níveis de personagem e +2 em Vontade.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Celebrar Ritual",
+      "slug": "celebrar_ritual",
+      "categoria": "Magia",
+      "categoria_v13": "magia",
+      "prerequisitos": "Habilidade Magias, Misticismo ou Religião, 8º nível de personagem",
+      "pagina_referencia": "v1.3 p.126, 131",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode lançar magias como rituais. Isso dobra seu limite de PM, mas muda a execução para 1 hora (ou o dobro, o que for maior) e exige um gasto de T$ 10 por PM gasto (em incensos, ofe­ rendas...)."
+    },
+    {
+      "nome": "Escrever Pergaminho",
+      "slug": "escrever_pergaminho",
+      "categoria": "Magia",
+      "categoria_v13": "magia",
+      "prerequisitos": "Habilidade Magias, Ofício (escriba)",
+      "pagina_referencia": "v1.3 p.126, 131",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode usar a perícia Ofício (escriba) para fabricar pergaminhos com magias que conheça."
+    },
+    {
+      "nome": "Foco em Magia",
+      "slug": "foco_em_magia",
+      "categoria": "Magia",
+      "categoria_v13": "magia",
+      "prerequisitos": "Lançar magias",
+      "pagina_referencia": "v1.3 p.126, 131",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Escolha uma magia que possa lançar. Seu custo diminui em –1 PM (cumulativo com outras reduções de custo)."
+    },
+    {
+      "nome": "Magia Acelerada",
+      "slug": "magia_acelerada",
+      "categoria": "Magia",
+      "categoria_v13": "magia",
+      "prerequisitos": "Lançar magias de 2º círculo",
+      "pagina_referencia": "v1.3 p.126, 131",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Muda a execução da magia para ação livre.",
+      "custo_pm": 4
+    },
+    {
+      "nome": "Magia Ampliada",
+      "slug": "magia_ampliada",
+      "categoria": "Magia",
+      "categoria_v13": "magia",
+      "prerequisitos": "Lançar magias",
+      "pagina_referencia": "v1.3 p.126, 131",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Aumenta o alcance da magia em um passo (de curto para médio, de médio para longo) ou dobra a área de efeito da magia.",
+      "custo_pm": 2
+    },
+    {
+      "nome": "Magia Discreta",
+      "slug": "magia_discreta",
+      "categoria": "Magia",
+      "categoria_v13": "magia",
+      "prerequisitos": "Lançar magias",
+      "pagina_referencia": "v1.3 p.126, 131",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você lança a magia sem gesticular e falar, usando apenas concentração.",
+      "custo_pm": 2
+    },
+    {
+      "nome": "Magia Ilimitada",
+      "slug": "magia_ilimitada",
+      "categoria": "Magia",
+      "categoria_v13": "magia",
+      "prerequisitos": "Lançar magias",
+      "pagina_referencia": "v1.3 p.126, 131",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você soma seu atributo-chave no limite de PM que pode gastar numa magia."
+    },
+    {
+      "nome": "Preparar Poção",
+      "slug": "preparar_pocao",
+      "categoria": "Magia",
+      "categoria_v13": "magia",
+      "prerequisitos": "Habilidade Magias, Ofício (alquimista)",
+      "pagina_referencia": "v1.3 p.126, 131",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode usar a perícia Ofício (alquimista) para fabricar poções com magias que conheça de 1º e 2º círculos."
+    },
+    {
+      "nome": "Anatomia Insana",
+      "slug": "anatomia_insana",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você tem 25% de chance (resultado “1” em 1d4) de ignorar o dano adicional de um acerto crítico ou ataque furtivo."
+    },
+    {
+      "nome": "Antenas",
+      "slug": "antenas",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +1 em Iniciativa, Percepção e Vontade."
+    },
+    {
+      "nome": "Armamento Aberrante",
+      "slug": "armamento_aberrante",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "Um poder da Tormenta",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode gastar uma ação de movimento e 1 PM para produzir uma versão orgânica de qualquer arma corpo a corpo ou de arremesso com a qual seja proficiente — ela brota do seu braço, ombro ou costas como uma planta grotesca e então se desprende."
+    },
+    {
+      "nome": "Articulações Flexíveis",
+      "slug": "articulacoes_flexiveis",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você recebe +1 em Acrobacia, Furtividade e Reflexos."
+    },
+    {
+      "nome": "Asas Insetoides",
+      "slug": "asas_insetoides",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "Quatro poderes da Tormenta",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode gastar 1 PM para receber deslocamento de voo 9m até o fim do seu turno.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Carapaça",
+      "slug": "carapaca",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Sua pele é recoberta por placas quitinosas."
+    },
+    {
+      "nome": "Corpo Aberrante",
+      "slug": "corpo_aberrante",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "Um poder da Tormenta",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Crostas vermelhas em várias partes de seu corpo tornam seus ataques mais perigosos."
+    },
+    {
+      "nome": "Cuspir Enxame",
+      "slug": "cuspir_enxame",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13",
+      "descricao_resumo": "Você pode gastar uma ação completa e 2 PM para criar um enxame de insetos rubros em um ponto a sua escolha em alcance curto e com duração sustentada.",
+      "custo_pm": 1
+    },
+    {
+      "nome": "Dentes Afiados",
+      "slug": "dentes_afiados",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Desprezar a Realidade",
+      "slug": "desprezar_a_realidade",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "Quatro poderes da Tormenta",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Empunhadura Rubra",
+      "slug": "empunhadura_rubra",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Fome de Mana",
+      "slug": "fome_de_mana",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Larva Explosiva",
+      "slug": "larva_explosiva",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Legião Aberrante",
+      "slug": "legiao_aberrante",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "Três poderes da Tormenta",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Membros Estendidos",
+      "slug": "membros_estendidos",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Membros Extras",
+      "slug": "membros_extras",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "Quatro poderes da Tormenta",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Mente Aberrante",
+      "slug": "mente_aberrante",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Mãos Membranosas",
+      "slug": "maos_membranosas",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Olhos Vermelhos",
+      "slug": "olhos_vermelhos",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Pele Corrompida",
+      "slug": "pele_corrompida",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Sangue Ácido",
+      "slug": "sangue_acido",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
+    },
+    {
+      "nome": "Visco Rubro",
+      "slug": "visco_rubro",
+      "categoria": "Tormenta",
+      "categoria_v13": "tormenta",
+      "prerequisitos": "—",
+      "pagina_referencia": "v1.3 p.128, 136",
+      "fonte_catalogo": "core_v13"
     }
   ]
 }

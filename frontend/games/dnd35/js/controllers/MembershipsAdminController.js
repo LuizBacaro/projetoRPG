@@ -84,6 +84,9 @@
                 </td>
                 <td>${rotuloStatusAcesso(m.ativo)}</td>
                 <td>
+                    <a class="btn-acao btn-acao-editar" href="/games/dnd35/pages/usuarios.html?q=${encodeURIComponent(m.usuario_email || '')}" title="Abrir este usuário na lista global (Excluir/Inativar)">
+                        <span>📋</span><span>Lista global</span>
+                    </a>
                     <button class="btn-acao ${m.ativo ? 'btn-acao-inativar' : 'btn-acao-reativar'} btn-toggle-membership" data-id="${m.id}" data-ativo="${m.ativo ? '1' : '0'}" type="button">
                         ${m.ativo ? 'Desativar' : 'Reativar'}
                     </button>

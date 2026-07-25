@@ -8,8 +8,8 @@ class TormentaGrimorioService {
         this._regras = new TormentaRegrasService();
     }
 
-    obterConjuracaoMb() {
-        return this._regras.obterConjuracaoMb();
+    obterConjuracaoMb(opts = {}) {
+        return this._regras.obterConjuracaoMb(opts);
     }
 
     listarCatalogoMb(params = {}) {

@@ -18,7 +18,7 @@ def test_slugs_poderes_de_beneficios_origem():
 
 
 def test_nome_poder_por_slug_v13():
-    assert nome_poder_por_slug_v13("lobo_solitario") == "Lobo Solitario"
+    assert nome_poder_por_slug_v13("lobo_solitario") == "Lobo Solitário"
 
 
 def test_listar_poderes_sync_origem_e_concedido():

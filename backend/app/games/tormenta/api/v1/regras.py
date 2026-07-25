@@ -743,12 +743,15 @@ def calcular_modificadores_condicoes(
 @router.get(
     "/magias",
     response_model=TormentaMagiaMbCatalogoPaginaResponse,
-    summary="Catálogo MB de magias (metadados; busca e paginação)",
+    summary="Catálogo v1.3 de magias (metadados; busca e paginação)",
 )
 def listar_catalogo_magias(
     q: Optional[str] = None,
     circulo: Optional[int] = Query(
-        None, ge=0, le=20, description="0 = truque; omitir para todos."
+        None,
+        ge=1,
+        le=5,
+        description="Círculos v1.3 (1–5). Omita para listar todos.",
     ),
     tipo: Optional[str] = Query(None, description="arcana ou divina."),
     escola: Optional[str] = Query(
@@ -1397,6 +1400,11 @@ def obter_pv_preview_mb(
     int_valor: int = Query(10, ge=-99, le=99),
     sab_valor: int = Query(10, ge=-99, le=99),
     car_valor: int = Query(10, ge=-99, le=99),
+    slug_raca: Optional[str] = Query(
+        None,
+        max_length=40,
+        description="Slug da raça (PV/PM raciais, ex.: anao, elfo).",
+    ),
     regra_versao: Optional[str] = Query(
         None,
         description="Versão de regras: mb ou v13. Default: mb.",
@@ -1420,6 +1428,7 @@ def obter_pv_preview_mb(
         int_valor=int_valor,
         sab_valor=sab_valor,
         car_valor=car_valor,
+        slug_raca=(slug_raca or "").strip().lower() or None,
     )
     return TormentaPvPreviewResponse(**data)
 
@@ -1464,6 +1473,7 @@ def obter_pv_preview_multiclasse_v13(
         classes,
         body.con_valor,
         body.slug_primario.strip().lower(),
+        slug_raca=(body.slug_raca or "").strip().lower() or None,
     )
     return TormentaPvMulticlassePreviewResponse(**data)
 

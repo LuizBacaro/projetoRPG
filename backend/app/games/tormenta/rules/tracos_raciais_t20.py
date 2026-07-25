@@ -134,13 +134,22 @@ def humano_versatil_pericias_extra(humano_versatil: Optional[str]) -> int:
     return 2
 
 
+def slug_raca_de_ficha(ficha_json: Optional[Dict[str, Any]]) -> str:
+    """Slug da raça em ``ficha_json`` (vazio se livre/ausente)."""
+    fj = ficha_json if isinstance(ficha_json, dict) else {}
+    slug = str(fj.get("raca_tormenta_slug") or fj.get("raca") or "").strip().lower()
+    if not slug or slug == "__livre__":
+        return ""
+    return slug
+
+
 def tamanho_racial_de_ficha(ficha_json: Optional[Dict[str, Any]]) -> str:
     """Tamanho de combate derivado da raça (e config Duende quando aplicável)."""
     from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
 
     fj = ficha_json if isinstance(ficha_json, dict) else {}
-    slug = str(fj.get("raca_tormenta_slug") or fj.get("raca") or "").strip().lower()
-    if not slug or slug == "__livre__":
+    slug = slug_raca_de_ficha(fj)
+    if not slug:
         return "medio"
     rv = regra_versao_de_ficha(fj)
     duende_cfg = fj.get("duende") if slug == "duende" else None
@@ -150,6 +159,88 @@ def tamanho_racial_de_ficha(ficha_json: Optional[Dict[str, Any]]) -> str:
         duende_config=duende_cfg if isinstance(duende_cfg, dict) else None,
     )
     return str(prev.get("tamanho") or "medio").strip().lower()
+
+
+def ca_bonus_racial(
+    slug: str,
+    regra_versao: Optional[str] = None,
+) -> int:
+    """Bônus fixo de Defesa do traço racial (ex.: Couro Rígido +1)."""
+    row = tracos_mecanicos_por_slug(slug, regra_versao)
+    if not row:
+        return 0
+    return int(row.get("ca_bonus", 0) or 0)
+
+
+def ca_bonus_racial_de_ficha(ficha_json: Optional[Dict[str, Any]]) -> int:
+    """``ca_bonus`` da raça persistida na ficha."""
+    from app.games.tormenta.rules.regra_versao_t20 import regra_versao_de_ficha
+
+    fj = ficha_json if isinstance(ficha_json, dict) else {}
+    slug = slug_raca_de_ficha(fj)
+    if not slug:
+        return 0
+    if slug == "duende":
+        du = fj.get("duende")
+        prev = preview_tracos_raciais(
+            slug,
+            regra_versao=regra_versao_de_ficha(fj),
+            duende_config=du if isinstance(du, dict) else None,
+        )
+        return int(prev.get("ca_bonus", 0) or 0)
+    return ca_bonus_racial(slug, regra_versao_de_ficha(fj))
+
+
+def contrib_pv_racial(
+    slug: str,
+    nivel: int,
+    regra_versao: Optional[str] = None,
+) -> int:
+    """PV extras da raça: bonus_nivel1 + (nível−1)×bonus_por_nível (Anão)."""
+    row = tracos_mecanicos_por_slug(slug, regra_versao)
+    if not row:
+        return 0
+    try:
+        nv = max(1, min(40, int(nivel)))
+    except (TypeError, ValueError):
+        nv = 1
+    n1 = int(row.get("pv_bonus_nivel1", 0) or 0)
+    pn = int(row.get("pv_bonus_por_nivel", 0) or 0)
+    return n1 + max(0, nv - 1) * pn
+
+
+def contrib_pm_racial(
+    slug: str,
+    nivel: int,
+    regra_versao: Optional[str] = None,
+) -> int:
+    """PM extras da raça: nível × pm_bonus_por_nível (Elfo Sangue Mágico)."""
+    row = tracos_mecanicos_por_slug(slug, regra_versao)
+    if not row:
+        return 0
+    try:
+        nv = max(1, min(40, int(nivel)))
+    except (TypeError, ValueError):
+        nv = 1
+    pn = int(row.get("pm_bonus_por_nivel", 0) or 0)
+    return nv * pn if pn else 0
+
+
+def _arma_natural_preview(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    raw = row.get("arma_natural")
+    if not isinstance(raw, dict):
+        return None
+    nome = str(raw.get("nome") or "").strip()
+    if not nome:
+        return None
+    return {
+        "nome": nome,
+        "dano": str(raw.get("dano") or "").strip(),
+        "critico": str(raw.get("critico") or "").strip(),
+        "tipo_dano": str(raw.get("tipo_dano") or "").strip(),
+        "ataque_extra_pm": int(raw.get("ataque_extra_pm", 0) or 0),
+        "notas": str(raw.get("notas") or "").strip(),
+    }
 
 
 def _escolhas_resumo_ha(slug: str, row: Dict[str, Any]) -> List[str]:
@@ -240,14 +331,20 @@ def preview_tracos_raciais(
             "tamanho": None,
             "deslocamento_m": None,
             "ca_bonus": 0,
+            "ca_bonus_label": None,
             "ca_vs_grande_ou_maior": 0,
             "ataque_bonus": 0,
             "furtividade_bonus": 0,
+            "furtividade_sem_armadura": 0,
             "fortitude_bonus": 0,
             "reflexos_bonus": 0,
             "vontade_bonus": 0,
             "pericias_bonus": {},
             "pericias_treinadas_extra": 0,
+            "pv_bonus_nivel1": 0,
+            "pv_bonus_por_nivel": 0,
+            "pm_bonus_por_nivel": 0,
+            "arma_natural": None,
             "reducao_dano": {},
             "imunidades_dano": {},
             "magias_inatas": [],
@@ -278,6 +375,7 @@ def preview_tracos_raciais(
         slug, rv, humano_versatil=humano_versatil
     )
 
+    label_ca = str(row.get("ca_bonus_label") or "").strip() or None
     base = {
         "slug": s,
         "encontrado": True,
@@ -285,14 +383,20 @@ def preview_tracos_raciais(
         "tamanho": row.get("tamanho"),
         "deslocamento_m": row.get("deslocamento_m"),
         "ca_bonus": int(row.get("ca_bonus", 0) or 0),
+        "ca_bonus_label": label_ca,
         "ca_vs_grande_ou_maior": int(row.get("ca_vs_grande_ou_maior", 0) or 0),
         "ataque_bonus": int(row.get("ataque_bonus", 0) or 0),
         "furtividade_bonus": int(row.get("furtividade_bonus", 0) or 0),
+        "furtividade_sem_armadura": int(row.get("furtividade_sem_armadura", 0) or 0),
         "fortitude_bonus": int(row.get("fortitude_bonus", 0) or 0),
         "reflexos_bonus": int(row.get("reflexos_bonus", 0) or 0),
         "vontade_bonus": int(row.get("vontade_bonus", 0) or 0),
         "pericias_bonus": out_per,
         "pericias_treinadas_extra": extra,
+        "pv_bonus_nivel1": int(row.get("pv_bonus_nivel1", 0) or 0),
+        "pv_bonus_por_nivel": int(row.get("pv_bonus_por_nivel", 0) or 0),
+        "pm_bonus_por_nivel": int(row.get("pm_bonus_por_nivel", 0) or 0),
+        "arma_natural": _arma_natural_preview(row),
         "reducao_dano": {},
         "imunidades_dano": {},
         "magias_inatas": [],

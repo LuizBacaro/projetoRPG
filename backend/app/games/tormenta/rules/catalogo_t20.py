@@ -12,6 +12,7 @@ _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _EQUIP_JSON = _DATA_DIR / "equipamentos_mb_catalogo.json"
 _TALENT_JSON = _DATA_DIR / "talentos_mb_catalogo.json"
 _MAGIAS_JSON = _DATA_DIR / "magias_mb_catalogo.json"
+_MAGIAS_ALIASES_MB_V13 = _DATA_DIR / "magias_mb_v13_slug_aliases.json"
 _BESTIARIO_JSON = _DATA_DIR / "bestiario_mb_stub.json"
 
 _MAGIA_FIELD_LIMITS: Dict[str, int] = {
@@ -486,23 +487,58 @@ def lista_magias_mb_catalogo() -> List[Dict[str, Any]]:
     return list(_carregar_magias_mb_catalogo_json())
 
 
+@lru_cache(maxsize=1)
+def _mapa_aliases_mb_para_v13() -> Dict[str, str]:
+    """Mapa slug MB antigo → slug v1.3 no catálogo atual.
+
+    Usado para preservar compatibilidade com vínculos gravados em
+    `tormenta_magias_personagem` antes da migração para o catálogo Jogo do Ano
+    v1.3 (magias de círculos 0 e 6–9 do MB tornam-se órfãs).
+    """
+    if not _MAGIAS_ALIASES_MB_V13.is_file():
+        return {}
+    try:
+        raw = json.loads(_MAGIAS_ALIASES_MB_V13.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    aliases = raw.get("aliases") if isinstance(raw, dict) else None
+    if not isinstance(aliases, dict):
+        return {}
+    return {
+        str(k).strip().lower(): str(v).strip().lower()
+        for k, v in aliases.items()
+        if isinstance(k, str) and isinstance(v, str) and k.strip() and v.strip()
+    }
+
+
+def resolver_slug_mb_para_v13(slug: str) -> str:
+    """Retorna slug v1.3 se `slug` (MB antigo) estiver mapeado; senão o próprio slug."""
+    s = str(slug or "").strip().lower()
+    if not s:
+        return s
+    return _mapa_aliases_mb_para_v13().get(s, s)
+
+
 def magia_mb_slug_no_catalogo(slug: str) -> bool:
-    """True se o slug existe no catálogo `magias_mb_catalogo.json` (validação de vínculos)."""
+    """True se o slug (ou seu alias MB→v1.3) existe no catálogo atual."""
     s = str(slug or "").strip().lower()
     if not s:
         return False
+    v13 = resolver_slug_mb_para_v13(s)
     return any(
-        str(r.get("slug", "")).strip().lower() == s for r in lista_magias_mb_catalogo()
+        str(r.get("slug", "")).strip().lower() == v13
+        for r in lista_magias_mb_catalogo()
     )
 
 
 def metadados_magia_mb_por_slug(slug: str) -> Dict[str, Any] | None:
-    """Metadados do catálogo para um slug, ou None."""
+    """Metadados do catálogo para um slug (ou alias MB→v1.3), ou None."""
     s = str(slug or "").strip().lower()
     if not s:
         return None
+    v13 = resolver_slug_mb_para_v13(s)
     for r in lista_magias_mb_catalogo():
-        if str(r.get("slug", "")).strip().lower() == s:
+        if str(r.get("slug", "")).strip().lower() == v13:
             return dict(r)
     return None
 
