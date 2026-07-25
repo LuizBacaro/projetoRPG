@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260725subirNivel" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260725editarCheckFix" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260629s47" />
 </head>
 <body class="tormenta-ficha-body">
@@ -599,15 +599,18 @@
             </div>
         </div>
 
-        <dialog id="t20EditarFichaDialog" class="t20-ficha-dialog">
+        <dialog id="t20EditarFichaDialog" class="t20-ficha-dialog t20-ficha-dialog--editar">
             <div class="t20-ficha-dialog__panel">
                 <div class="t20-ficha-dialog__head">
-                    <h2 class="t20-ficha-dialog__titulo">Dados da ficha</h2>
+                    <div>
+                        <h2 class="t20-ficha-dialog__titulo">Editar ficha</h2>
+                        <p class="t20-ficha-dialog__lead">Altere identificação, atributos, raça, classe e notas. Role a página para ver todas as seções.</p>
+                    </div>
                 </div>
                 <div class="t20-ficha-dialog__body">
                     <div class="t20-ficha-secao">
                         <h3 class="t20-ficha-secao-titulo">Identificação</h3>
-                        <div class="t20-identity-grid t20-identity-grid--stack">
+                        <div class="t20-identity-grid t20-dialog-ident-grid">
                             <div class="t20-ficha-field t20-ficha-field--wide">
                                 <label for="f_nome">Personagem</label>
                                 <input id="f_nome" type="text" required maxlength="120" />
@@ -666,16 +669,19 @@
                     </div>
                     <div class="t20-ficha-secao">
                         <h3 class="t20-ficha-secao-titulo">Raça &amp; treinamento</h3>
-                        <div class="t20-identity-grid t20-identity-grid--stack">
-                            <div class="t20-ficha-field t20-ficha-field--book">
-                                <label for="f_raca_select">Raça (Módulo Básico)</label>
-                                <select id="f_raca_select" class="t20-input"></select>
+                        <div class="t20-dialog-raca-layout">
+                            <div class="t20-dialog-raca-layout__escolha">
+                                <div class="t20-ficha-field t20-ficha-field--book">
+                                    <label for="f_raca_select">Raça (Módulo Básico)</label>
+                                    <select id="f_raca_select" class="t20-input"></select>
+                                </div>
+                                <div class="t20-ficha-field t20-ficha-field--book" id="wrapRacaLivre" style="display: none">
+                                    <label for="f_raca_livre">Nome da raça (livre)</label>
+                                    <input id="f_raca_livre" maxlength="120" placeholder="Ex.: Meio-orc, lefeu de outra região…" />
+                                </div>
+                                <input type="hidden" id="f_raca" value="" />
                             </div>
-                            <div class="t20-ficha-field t20-ficha-field--book" id="wrapRacaLivre" style="display: none">
-                                <label for="f_raca_livre">Nome da raça (livre)</label>
-                                <input id="f_raca_livre" maxlength="120" placeholder="Ex.: Meio-orc, lefeu de outra região…" />
-                            </div>
-                            <input type="hidden" id="f_raca" value="" />
+                            <div class="t20-dialog-raca-layout__opcoes">
                             <div class="t20-ficha-field t20-ficha-field--wide" id="wrapRacaMais2" style="display: none">
                                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-end">
                                     <div class="t20-ficha-field" style="margin: 0">
@@ -823,7 +829,8 @@
                                     <select id="f_silfide_magia_2" class="t20-input"></select>
                                 </div>
                             </div>
-                            <div class="t20-ficha-field t20-ficha-field--wide">
+                            </div>
+                            <div class="t20-dialog-raca-layout__tracos">
                                 <p class="t20-hint t20-dialog-tracos-raca" id="f_tracos_raca_txt">Escolha uma raça para ver os traços raciais (MB, texto do livro).</p>
                                 <p class="t20-hint" id="t20TracosMecanicosHint" style="margin-top:0.35rem"></p>
                             </div>
@@ -831,7 +838,7 @@
                     </div>
                     <div class="t20-ficha-secao">
                         <h3 class="t20-ficha-secao-titulo">Classe, nível &amp; MB</h3>
-                        <div class="t20-identity-grid t20-identity-grid--compact">
+                        <div class="t20-identity-grid t20-identity-grid--compact t20-dialog-classe-grid">
                             <div class="t20-ficha-field t20-ficha-field--book" id="wrapOrigemSlug" style="display: none">
                                 <label for="f_origem_slug">Origem (v1.3)</label>
                                 <select id="f_origem_slug" class="t20-input"></select>
@@ -877,9 +884,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="t20-ficha-field t20-ficha-field--book"><label for="f_origem">Origem</label><input id="f_origem" maxlength="120" /></div>
-                            <div class="t20-ficha-field t20-ficha-field--book"><label for="f_classe_só">Classe(s)</label><input id="f_classe_só" maxlength="120" /></div>
-                            <div class="t20-ficha-field"><label for="f_nivel">Nível</label><input id="f_nivel" type="number" min="0" max="40" /></div>
+                            <div class="t20-ficha-field t20-ficha-field--span2 t20-ficha-field--book"><label for="f_origem">Origem</label><input id="f_origem" maxlength="120" /></div>
+                            <div class="t20-ficha-field t20-ficha-field--span2 t20-ficha-field--book"><label for="f_classe_só">Classe(s)</label><input id="f_classe_só" maxlength="120" /></div>
+                            <div class="t20-ficha-field t20-ficha-field--span2"><label for="f_nivel">Nível</label><input id="f_nivel" type="number" min="0" max="40" /></div>
                             <div class="t20-ficha-field t20-ficha-field--wide">
                                 <p class="t20-hint" style="margin:0">
                                     Progressão automática (PV/PM/benefícios):
@@ -1015,17 +1022,22 @@
                                 </div>
                                 <p id="t20MulticlassePmHint" class="t20-hint" style="margin: 0.35rem 0 0">—</p>
                             </div>
-                            <div class="t20-ficha-field t20-ficha-field--wide">
-                                <label style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; font-weight: 600">
-                                    <input type="checkbox" id="f_conjuracao_manual_mb" style="margin-top: 0.2rem" />
-                                    <span>Conjuração / grimório fora do MB listado (multiclasse, talentos, inventor, mesa)</span>
+                            <div class="t20-ficha-field t20-ficha-field--wide t20-dialog-check-block">
+                                <label class="t20-dialog-check-block__label" for="f_conjuracao_manual_mb">
+                                    <input type="checkbox" id="f_conjuracao_manual_mb" />
+                                    <span class="t20-dialog-check-block__text">
+                                        Conjuração / grimório fora do MB listado
+                                        <span class="t20-dialog-check-block__sub">
+                                            (multiclasse, talentos, inventor, mesa)
+                                        </span>
+                                    </span>
                                 </label>
-                                <p class="t20-hint" style="margin: 0.25rem 0 0 1.6rem">
+                                <p class="t20-hint t20-dialog-check-block__hint">
                                     Marque se o personagem conjura por outra via que o app não deduz só pela classe MB (grava
                                     <strong>tormenta_conjuracao_manual_mb</strong> na ficha).
                                 </p>
                             </div>
-                            <div class="t20-ficha-field">
+                            <div class="t20-ficha-field t20-ficha-field--span2">
                                 <label for="f_nivel_conj_mb">Nível de conjuração MB (opcional)</label>
                                 <input
                                     type="number"
@@ -1048,8 +1060,8 @@
                                     + Adicionar classe conjuradora
                                 </button>
                             </div>
-                            <div class="t20-ficha-field">
-                                <label for="f_grimorio_pm_sessao">PM gastos na sessão — Pontos de Magia (opcional)</label>
+                            <div class="t20-ficha-field t20-ficha-field--span2">
+                                <label for="f_grimorio_pm_sessao">PM gastos na sessão (opcional)</label>
                                 <input
                                     type="number"
                                     id="f_grimorio_pm_sessao"
@@ -1060,7 +1072,7 @@
                                     title="tormenta_grimorio_sessao_mb.pm_gastos_sessao"
                                 />
                             </div>
-                            <div class="t20-ficha-field t20-ficha-field--double">
+                            <div class="t20-ficha-field t20-ficha-field--wide">
                                 <label for="f_grimorio_prep_txt">Preparadas / anotação de sessão (opcional)</label>
                                 <textarea
                                     id="f_grimorio_prep_txt"
@@ -1070,9 +1082,9 @@
                                     title="tormenta_grimorio_sessao_mb.preparadas_anotacao"
                                 ></textarea>
                             </div>
-                            <div class="t20-ficha-field t20-ficha-field--book"><label for="f_tendencia">Tendência (MB)</label><select id="f_tendencia" class="t20-input" title="Alinhamento — Módulo Básico p.116–119 (lista via API)"></select></div>
-                            <div class="t20-ficha-field t20-ficha-field--double t20-ficha-field--book"><label for="f_divindade">Divindade (MB)</label><select id="f_divindade" class="t20-input" title="Panteão — Módulo Básico p.120–126 (lista via API)"></select></div>
-                            <div class="t20-ficha-field t20-ficha-field--double" id="wrapPoderConcedido" style="display: none">
+                            <div class="t20-ficha-field t20-ficha-field--span2 t20-ficha-field--book"><label for="f_tendencia">Tendência (MB)</label><select id="f_tendencia" class="t20-input" title="Alinhamento — Módulo Básico p.116–119 (lista via API)"></select></div>
+                            <div class="t20-ficha-field t20-ficha-field--span2 t20-ficha-field--book"><label for="f_divindade">Divindade (MB)</label><select id="f_divindade" class="t20-input" title="Panteão — Módulo Básico p.120–126 (lista via API)"></select></div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="wrapPoderConcedido" style="display: none">
                                 <label for="f_poder_concedido">Poder concedido (devoto)</label>
                                 <select id="f_poder_concedido" class="t20-input"></select>
                             </div>
@@ -1082,10 +1094,10 @@
                                     <span>Devoto</span>
                                 </label>
                             </div>
-                            <div class="t20-ficha-field t20-ficha-field--full" id="wrapDevocaoHint" style="display: none">
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="wrapDevocaoHint" style="display: none">
                                 <p id="t20DevocaoHint" class="t20-hint" style="margin: 0"></p>
                             </div>
-                            <div class="t20-ficha-field t20-ficha-field--full" id="t20DivindadeObrigacoesHost" style="display: none"></div>
+                            <div class="t20-ficha-field t20-ficha-field--wide" id="t20DivindadeObrigacoesHost" style="display: none"></div>
                             <div class="t20-ficha-field"><label for="f_sexo">Sexo</label><input id="f_sexo" maxlength="40" /></div>
                             <div class="t20-ficha-field"><label for="f_idade">Idade</label><input id="f_idade" maxlength="80" /></div>
                             <div class="t20-ficha-field"><label for="f_dlg_desl">Deslocamento</label><input id="f_dlg_desl" maxlength="80" placeholder="Ex.: 9 m" title="Espelhado no cabeçalho da ficha" /></div>
@@ -1616,11 +1628,14 @@
         </div>
 
         <div class="equipamentos-overlay t20-subir-nivel-overlay" id="modalSubirNivelTormenta" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="tituloModalSubirNivel">
-            <div class="equipamentos-modal t20-subir-nivel-modal">
-                <div class="equipamentos-cabecalho">
-                    <div>
-                        <h2 id="tituloModalSubirNivel" class="equipamentos-titulo">Subir nível</h2>
-                        <p class="t20-subir-nivel-lead" id="subirNivelLead">Assistente guiado — um nível de cada vez.</p>
+            <div class="equipamentos-container t20-subir-nivel-modal">
+                <div class="equipamentos-header">
+                    <div class="equipamentos-header-esquerda">
+                        <span class="equipamentos-icone" aria-hidden="true">⬆</span>
+                        <div>
+                            <h2 id="tituloModalSubirNivel" class="equipamentos-titulo">Subir nível</h2>
+                            <p class="t20-subir-nivel-lead" id="subirNivelLead">Assistente guiado — um nível de cada vez.</p>
+                        </div>
                     </div>
                     <button type="button" class="equipamentos-fechar" id="btnFecharModalSubirNivel" aria-label="Fechar">✕</button>
                 </div>
@@ -1664,7 +1679,7 @@
                 </div>
 
                 <div class="t20-subir-nivel-footer">
-                    <button type="button" class="tormenta-btn tormenta-btn--outline-red" id="btnFecharModalSubirNivel2">Cancelar</button>
+                    <button type="button" class="tormenta-btn" id="btnFecharModalSubirNivel2">Cancelar</button>
                     <div class="t20-subir-nivel-footer__dir">
                         <button type="button" class="tormenta-btn" id="btnSubirNivelVoltar" hidden>Voltar</button>
                         <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnSubirNivelAvancar">Continuar</button>
@@ -1715,7 +1730,7 @@
 <script src="/games/tormenta/js/t20-multiclasse-v13.js?v=20260704ha3"></script>
 <script src="/games/tormenta/js/t20-dinheiro-tabela-v13.js?v=20260629mc"></script>
 <script src="/games/tormenta/js/t20-subir-nivel.js?v=20260725wizard"></script>
-<script src="/games/tormenta/js/t20-ataques-modal.js?v=20260725ataques2"></script>
+<script src="/games/tormenta/js/t20-ataques-modal.js?v=20260725ataques3"></script>
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
@@ -4602,6 +4617,7 @@
     }
 
     function t20AbrirEditorAtaques() {
+        t20SyncAtaquesWindow();
         if (window.T20AtaquesModal && typeof window.T20AtaquesModal.abrir === 'function') {
             window.T20AtaquesModal.abrir();
             return;
@@ -4626,7 +4642,9 @@
             notas: r.notas || '',
             origem: r.origem,
             arma_natural: r.arma_natural === true,
+            proficiencia_arma: r.proficiencia_arma,
         }));
+        t20SyncAtaquesWindow();
         t20AplicarLimitesEquipamentoFicha();
         if (window.T20LimitesEquipamento) {
             const res = window.T20LimitesEquipamento.resumoLimitesFicha(
