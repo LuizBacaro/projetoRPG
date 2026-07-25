@@ -50,12 +50,33 @@ class UsuarioService {
     }
 
     async listar(apenasAtivos = false) {
-        const url = apenasAtivos ? `${this._url()}?apenas_ativos=true` : this._url();
-        const res = await fetch(url, { headers: this._headers() });
+        const pageSize = 200;
+        let skip = 0;
+        let total = null;
+        const usuarios = [];
 
-        if (res.status === 401) { AuthService?.logout(); return { usuarios: [] }; }
-        if (!res.ok) throw new Error('Erro ao listar usuários');
-        return res.json();
+        while (total == null || usuarios.length < total) {
+            const sp = new URLSearchParams();
+            if (apenasAtivos) sp.set('apenas_ativos', 'true');
+            sp.set('skip', String(skip));
+            sp.set('limit', String(pageSize));
+            const res = await fetch(`${this._url()}?${sp}`, { headers: this._headers() });
+
+            if (res.status === 401) {
+                AuthService?.logout();
+                return { total: 0, skip: 0, limit: pageSize, usuarios: [] };
+            }
+            if (!res.ok) throw new Error('Erro ao listar usuários');
+            const data = await res.json();
+            const lote = Array.isArray(data.usuarios) ? data.usuarios : [];
+            total = Number.isFinite(Number(data.total)) ? Number(data.total) : lote.length;
+            usuarios.push(...lote);
+            if (!lote.length || lote.length < pageSize) break;
+            skip += lote.length;
+            if (skip > 10000) break;
+        }
+
+        return { total: total ?? usuarios.length, skip: 0, limit: pageSize, usuarios };
     }
 
     async buscarPorId(id) {

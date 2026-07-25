@@ -92,13 +92,28 @@
         const td = formatTamanhoDeslocLinha(data);
         if (td) parts.push(td);
         if (data.ca_bonus) {
-            const tamHint = data.tamanho_label || 'raça';
             const sinal = data.ca_bonus > 0 ? '+' : '';
-            parts.push(`CA ${sinal}${data.ca_bonus} (${tamHint})`);
+            const rotulo = data.ca_bonus_label || 'raça';
+            parts.push(`Defesa ${sinal}${data.ca_bonus} (${rotulo})`);
         } else if (data.ca_bonus < 0) {
-            parts.push(`CA ${data.ca_bonus} (${data.tamanho_label || 'Grande'})`);
+            const rotulo = data.ca_bonus_label || 'raça';
+            parts.push(`Defesa ${data.ca_bonus} (${rotulo})`);
         }
-        if (data.ataque_bonus) parts.push(`Ataque +${data.ataque_bonus} (tamanho)`);
+        if (data.pv_bonus_nivel1 || data.pv_bonus_por_nivel) {
+            const n1 = Number(data.pv_bonus_nivel1) || 0;
+            const pn = Number(data.pv_bonus_por_nivel) || 0;
+            if (n1 && pn) parts.push(`PV +${n1} (1º) / +${pn}/nível`);
+            else if (n1) parts.push(`PV +${n1} (1º nível)`);
+            else if (pn) parts.push(`PV +${pn}/nível`);
+        }
+        if (data.pm_bonus_por_nivel) {
+            parts.push(`PM +${data.pm_bonus_por_nivel}/nível`);
+        }
+        if (data.arma_natural && data.arma_natural.nome) {
+            const a = data.arma_natural;
+            parts.push(`${a.nome} ${a.dano || ''} ${a.critico || ''}`.trim());
+        }
+        if (data.ataque_bonus) parts.push(`Ataque +${data.ataque_bonus}`);
         if (data.manobra_bonus) {
             const sinal = data.manobra_bonus > 0 ? '+' : '';
             parts.push(`Manobras ${sinal}${data.manobra_bonus}`);
@@ -148,6 +163,17 @@
             window.__t20TracosRaciaisCadCache = null;
             const hintCad = q('cadRacaTamanhoDeslocHint');
             if (hintCad) hintCad.textContent = '';
+            if ((!opts || opts.modo !== 'cadastro') && typeof window.t20SincronizarArmaNaturalRacial === 'function') {
+                window.t20SincronizarArmaNaturalRacial(null);
+            }
+            if ((!opts || opts.modo !== 'cadastro') && typeof window.t20AtualizarVitaisBreakdownTormenta === 'function') {
+                window.t20AtualizarVitaisBreakdownTormenta();
+            }
+            if ((!opts || opts.modo !== 'cadastro') && typeof window.t20CalcularPvMb === 'function') {
+                window.t20CalcularPvMb(true);
+            }
+            const hint = q('t20TracosMecanicosHint');
+            if (hint) hint.textContent = '';
             return null;
         }
         const rv = getRegraVersaoTracos();
@@ -159,11 +185,22 @@
                 aplicarCamposTamanhoDesloc(data, { modo: modoCad ? 'cadastro' : 'ficha' });
             }
             if (!modoCad) {
+                if (typeof window.t20SincronizarArmaNaturalRacial === 'function') {
+                    window.t20SincronizarArmaNaturalRacial(data);
+                }
                 if (typeof atualizarResistenciasTotaisTormenta === 'function') {
                     atualizarResistenciasTotaisTormenta(true);
                 }
                 if (typeof atualizarResistenciasBreakdownTormenta === 'function') {
                     atualizarResistenciasBreakdownTormenta({ somenteBreakdown: true });
+                }
+                if (window.T20FichaVitais && typeof window.t20AtualizarVitaisBreakdownTormenta === 'function') {
+                    window.t20AtualizarVitaisBreakdownTormenta();
+                } else if (window.T20BreakdownFicha && typeof window.T20BreakdownFicha.atualizarCa === 'function') {
+                    window.T20BreakdownFicha.atualizarCa();
+                }
+                if (typeof window.t20CalcularPvMb === 'function') {
+                    window.t20CalcularPvMb(true);
                 }
                 const hint = q('t20TracosMecanicosHint');
                 if (hint) hint.textContent = montarHintMecanicos(data, rv);

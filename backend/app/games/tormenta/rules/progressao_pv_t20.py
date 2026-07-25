@@ -28,24 +28,22 @@ def pv_maximos_mb(
     nivel: int,
     con_valor: int,
     regra_versao: Optional[str] = None,
+    *,
+    slug_raca: Optional[str] = None,
 ) -> Optional[int]:
     """
-    PV máximos: pv_inicial + (nível−1)×pv_por_nível + nível×CON.
+    PV máximos: pv_inicial + (nível−1)×pv_por_nível + nível×CON [+ PV racial].
 
     Tabelas fixas (sem rolagem de dado por nível).
     """
-    row = classe_por_slug(slug_classe, regra_versao)
-    if not row:
-        return None
-    try:
-        nv = int(nivel)
-    except (TypeError, ValueError):
-        nv = 1
-    nv = max(1, min(40, nv))
-    pv_ini = int(row.get("pv_inicial", 8) or 8)
-    pv_pn = int(row.get("pv_por_nivel", 2) or 0)
-    mod_con = contribuicao_atributo_t20(int(con_valor), regra_versao)
-    return pv_ini + max(0, nv - 1) * pv_pn + nv * mod_con
+    prev = preview_pv_mb(
+        slug_classe,
+        nivel,
+        con_valor,
+        regra_versao=regra_versao,
+        slug_raca=slug_raca,
+    )
+    return prev.get("pv_max") if prev.get("encontrado") else None
 
 
 def preview_pv_mb(
@@ -60,8 +58,14 @@ def preview_pv_mb(
     int_valor: int = 10,
     sab_valor: int = 10,
     car_valor: int = 10,
+    slug_raca: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Breakdown PV/PM para API/UI."""
+    from app.games.tormenta.rules.tracos_raciais_t20 import (
+        contrib_pm_racial,
+        contrib_pv_racial,
+    )
+
     rv = normalizar_regra_versao(regra_versao)
     row = classe_por_slug(slug_classe, rv)
     if not row:
@@ -74,6 +78,8 @@ def preview_pv_mb(
             "pm_por_nivel": None,
             "nivel": nivel,
             "mod_con": contribuicao_atributo_t20(int(con_valor), rv),
+            "contrib_pv_racial": 0,
+            "contrib_pm_racial": 0,
         }
     try:
         nv = int(nivel)
@@ -85,7 +91,9 @@ def preview_pv_mb(
     pv_pn = int(row.get("pv_por_nivel", 2) or 0)
     de_niveis = max(0, nv - 1) * pv_pn
     de_con = nv * mod_con
-    total = pv_ini + de_niveis + de_con
+    raca = str(slug_raca or "").strip().lower()
+    de_raca = contrib_pv_racial(raca, nv, rv) if raca else 0
+    total = pv_ini + de_niveis + de_con + de_raca
     pm_pn_raw = row.get("pm_por_nivel")
     pm_pn_i: Optional[int] = None
     if pm_pn_raw is not None:
@@ -94,8 +102,9 @@ def preview_pv_mb(
         except (TypeError, ValueError):
             pm_pn_i = None
     pm_max: Optional[int] = None
+    de_pm_raca = contrib_pm_racial(raca, nv, rv) if raca else 0
     if rv == REGRA_VERSAO_V13 and pm_pn_i is not None and pm_pn_i > 0:
-        pm_max = nv * pm_pn_i
+        pm_max = nv * pm_pn_i + de_pm_raca
     elif rv != REGRA_VERSAO_V13:
         pm_max = pontos_magia_maximos_conjuracao(
             slug_classe,
@@ -109,6 +118,10 @@ def preview_pv_mb(
             regra_versao=rv,
             arcanista_caminho=arcanista_caminho,
         )
+        if pm_max is not None and de_pm_raca:
+            pm_max += de_pm_raca
+    elif de_pm_raca:
+        pm_max = de_pm_raca
     return {
         "classe_slug": str(slug_classe).strip().lower(),
         "classe_nome": str(row.get("nome", "")),
@@ -120,6 +133,8 @@ def preview_pv_mb(
         "mod_con": mod_con,
         "contrib_niveis_extras": de_niveis,
         "contrib_constituicao": de_con,
+        "contrib_pv_racial": de_raca,
+        "contrib_pm_racial": de_pm_raca,
         "pv_max": total,
         "pm_por_nivel": pm_pn_i,
         "pm_max": pm_max,
@@ -235,7 +250,13 @@ def preview_pm_multiclasse_v13(
         partes.append(f"{nome} {nv}×{pm_pn}={pm_classe}")
     formula = " + ".join(partes) + (f" = {total} PM" if partes else "")
     bonus_racial = 0
+    bonus_core = 0
     if ficha_json is not None:
+        from app.games.tormenta.rules.tracos_raciais_t20 import (
+            contrib_pm_racial,
+            slug_raca_de_ficha,
+        )
+
         try:
             nv_bonus = (
                 int(nivel_personagem)
@@ -244,13 +265,23 @@ def preview_pm_multiclasse_v13(
             )
         except (TypeError, ValueError):
             nv_bonus = sum(niveis_map.values()) if niveis_map else 1
-        bonus_racial = pm_bonus_racial_ha_de_ficha(ficha_json, max(1, nv_bonus))
-    if bonus_racial and total is not None:
-        total += bonus_racial
-        formula = (formula + f" + {bonus_racial} racial HA = {total} PM").strip()
+        nv_bonus = max(1, nv_bonus)
+        bonus_racial = pm_bonus_racial_ha_de_ficha(ficha_json, nv_bonus)
+        raca = slug_raca_de_ficha(ficha_json)
+        if raca:
+            bonus_core = contrib_pm_racial(raca, nv_bonus, REGRA_VERSAO_V13)
+    extra = bonus_racial + bonus_core
+    if extra and total is not None:
+        total += extra
+        bits = []
+        if bonus_core:
+            bits.append(f"{bonus_core} racial")
+        if bonus_racial:
+            bits.append(f"{bonus_racial} racial HA")
+        formula = (formula + f" + {' + '.join(bits)} = {total} PM").strip()
     return {
         "regra_versao": REGRA_VERSAO_V13,
-        "pm_max": total if partes or bonus_racial else None,
+        "pm_max": total if partes or extra else None,
         "breakdown": breakdown,
         "formula": formula,
         "nivel_total_classes": sum(niveis_map.values()) if niveis_map else 0,
@@ -303,8 +334,12 @@ def preview_pv_multiclasse_v13(
     classes: List[Dict[str, Any]],
     con_valor: int,
     slug_primario: str,
+    *,
+    slug_raca: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Breakdown PV máximos v1.3 multiclasse (p.34)."""
+    from app.games.tormenta.rules.tracos_raciais_t20 import contrib_pv_racial
+
     niveis_map = _niveis_por_classe_de_lista(classes)
     mod_con = contribuicao_atributo_t20(int(con_valor), REGRA_VERSAO_V13)
     if not niveis_map:
@@ -314,6 +349,7 @@ def preview_pv_multiclasse_v13(
             "pv_max": None,
             "mod_con": mod_con,
             "contrib_constituicao": 0,
+            "contrib_pv_racial": 0,
             "breakdown": [],
             "formula": "",
             "nivel_total_classes": 0,
@@ -367,17 +403,23 @@ def preview_pv_multiclasse_v13(
             }
         )
     de_con = total_nv * mod_con
-    pv_max = base + de_con if todas_ok and breakdown else None
+    raca = str(slug_raca or "").strip().lower()
+    de_raca = contrib_pv_racial(raca, total_nv, REGRA_VERSAO_V13) if raca else 0
+    pv_max = base + de_con + de_raca if todas_ok and breakdown else None
     formula = ""
     if partes and pv_max is not None:
         con_txt = f"{total_nv}×{mod_con}" if mod_con != 0 else f"{total_nv}×CON"
-        formula = " + ".join(partes) + f" + {con_txt} = {pv_max} PV"
+        formula = " + ".join(partes) + f" + {con_txt}"
+        if de_raca:
+            formula += f" + {de_raca} (raça)"
+        formula += f" = {pv_max} PV"
     return {
         "regra_versao": REGRA_VERSAO_V13,
         "encontrado": pv_max is not None,
         "pv_max": pv_max,
         "mod_con": mod_con,
         "contrib_constituicao": de_con,
+        "contrib_pv_racial": de_raca,
         "breakdown": breakdown,
         "formula": formula,
         "nivel_total_classes": total_nv,
@@ -389,7 +431,11 @@ def pv_maximos_v13_multiclasse(
     classes: List[Dict[str, Any]],
     con_valor: int,
     slug_primario: str,
+    *,
+    slug_raca: Optional[str] = None,
 ) -> Optional[int]:
     """PV máximos v1.3 multiclasse — soma por classe + CON × nível total (p.34)."""
-    prev = preview_pv_multiclasse_v13(classes, con_valor, slug_primario)
+    prev = preview_pv_multiclasse_v13(
+        classes, con_valor, slug_primario, slug_raca=slug_raca
+    )
     return prev.get("pv_max")

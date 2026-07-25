@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Checagens leves de qualidade sobre `magias_mb_catalogo.json` (duplicatas, slugs, campos mínimos)."""
+"""Checagens de qualidade sobre `magias_mb_catalogo.json` (catálogo Tormenta 20 v1.3).
+
+Fonte canónica: Edição Jogo do Ano v1.3 (círculos 1–5). O snapshot MB legado
+(~707, círculos 0–9) vive em `magias_mb_catalogo.legacy_mb.json` e não é
+validado por este script.
+"""
 
 from __future__ import annotations
 
@@ -10,6 +15,10 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
 _CATALOGO = _ROOT / "app" / "games" / "tormenta" / "data" / "magias_mb_catalogo.json"
+
+# Volume esperado: listas arcana+divina v1.3 (entradas tipadas; ~141 descrições únicas).
+_TOTAL_MIN = 150
+_TOTAL_MAX = 280
 
 
 def main() -> int:
@@ -44,10 +53,12 @@ def main() -> int:
             erros.append(f"{slug!r}: tipo inválido {tipo!r}")
         try:
             c = int(row["circulo"])
-            if c < 0 or c > 20:
-                erros.append(f"{slug!r}: circulo fora 0..20")
+            if c < 1 or c > 5:
+                erros.append(f"{slug!r}: circulo {c} fora de 1..5 (catálogo v1.3)")
         except (KeyError, TypeError, ValueError):
             erros.append(f"{slug!r}: circulo ausente ou inválido")
+        if str(row.get("nome") or "").startswith("[Stub]") or slug.startswith("stub_"):
+            erros.append(f"stub de CI remanescente: {slug!r}")
         slugs.append(slug)
         if nome and tipo in ("arcana", "divina"):
             key = (nome.lower(), tipo)
@@ -59,23 +70,38 @@ def main() -> int:
 
     for (nome_l, tipo), lst in sorted(by_pair.items()):
         if len(lst) > 1:
-            avisos.append(f"nome+tipo repetidos ({len(lst)}): {nome_l!r} / {tipo} → {', '.join(lst[:5])}")
+            avisos.append(
+                f"nome+tipo repetidos ({len(lst)}): {nome_l!r} / {tipo} → {', '.join(lst[:5])}"
+            )
 
     meta = data.get("meta")
     if not isinstance(meta, dict):
         avisos.append("`meta` ausente ou não-objeto")
 
     com_escola = sum(1 for row in itens if isinstance(row, dict) and row.get("escola"))
-    if len(itens) < 600:
-        avisos.append(f"total {len(itens)} < 600 (esperado catálogo MB completo)")
-    if com_escola < len(itens) * 0.05:
+    n = len(itens)
+    if n < _TOTAL_MIN or n > _TOTAL_MAX:
+        erros.append(
+            f"total {n} fora da faixa v1.3 esperada ({_TOTAL_MIN}–{_TOTAL_MAX})"
+        )
+    if com_escola < n * 0.8:
         avisos.append(
-            f"cobertura escola baixa: {com_escola}/{len(itens)} "
-            "(G5: use enrich_magias_mb_catalogo.py com pp.150–209)"
+            f"cobertura escola baixa: {com_escola}/{n} "
+            "(v1.3: listas p.174–177 devem trazer escola)"
         )
 
+    # amostras canónicas do livro
+    nomes = {
+        str(row.get("nome") or "").strip().lower()
+        for row in itens
+        if isinstance(row, dict)
+    }
+    for amostra in ("abençoar alimentos", "adaga mental", "bola de fogo", "curar ferimentos"):
+        if amostra not in nomes:
+            erros.append(f"magia v1.3 ausente: {amostra!r}")
+
     print(f"Catálogo: {_CATALOGO}")
-    print(f"Total de itens: {len(itens)} (com escola: {com_escola})")
+    print(f"Total de itens: {n} (com escola: {com_escola}) — esperado v1.3 {_TOTAL_MIN}–{_TOTAL_MAX}")
     print(f"Avisos (nome+tipo): {len(avisos)}")
     for a in avisos[:30]:
         print(f"  AVISO: {a}")

@@ -64,6 +64,18 @@ def circulo_maximo_magias_lancaveis_mb(
     if n < ini:
         return 0
 
+    # v1.3: catálogo tem apenas círculos 1–5; motor deve refletir isso na UI.
+    if rv == REGRA_VERSAO_V13:
+        teto_v13 = 5
+        if eff in ("clerigo", "druida", "feiticeiro", "mago", "arcanista"):
+            return min(teto_v13, max(1, (n + 1) // 2))
+        if eff == "bardo":
+            return min(teto_v13, max(1, 1 + (n - 1) // 3))
+        if eff in ("paladino", "ranger", "cacador"):
+            return min(teto_v13, max(1, 1 + (n - ini) // 4))
+        return min(teto_v13, max(1, (n + 1) // 2))
+
+    # MB clássico (D&D 3.5) mantém teto 9º para vínculos legados.
     if eff in ("clerigo", "druida", "feiticeiro"):
         return min(9, (n + 1) // 2)
     if eff == "mago":

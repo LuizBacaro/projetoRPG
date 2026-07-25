@@ -61,14 +61,14 @@ def test_clerigo_lancar_truque_repertorio():
 def test_clerigo_lancar_truque_devocao_sem_repertorio():
     ok, _ = validar_lancar_magia_preparador_mb(
         slug_classe="clerigo",
-        magia_slug="virtude",
-        circulo_magia=0,
+        magia_slug="curar_ferimentos",
+        circulo_magia=1,
         vinculos=[],
         divindade_slug="lena",
     )
     assert ok is True
-    assert truque_devocao_por_divindade_mb("lena") == "virtude"
-    assert magia_e_truque_devocao_mb("lena", "virtude")
+    assert truque_devocao_por_divindade_mb("lena") == "curar_ferimentos"
+    assert magia_e_truque_devocao_mb("lena", "curar_ferimentos")
 
 
 def test_clerigo_lancar_truque_sem_vinculo_rejeita():

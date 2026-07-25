@@ -89,10 +89,11 @@ Cada deus oferece **4** poderes concedidos; devoto escolhe **1** ao aderir. Cros
 
 ## Gap código
 
-- Frontend ainda pode exibir «Talento» — trocar para «Poder».
-- Expandir `talentos_mb_catalogo.json` com slugs estáveis e categorias p.124–136.
-- Poderes concedidos: sincronizar nomes com Tabela 1-20 (ex.: Aharadak → Afinidade com a Tormenta, Êxtase da Loucura, Percepção Temporal, Rejeição Divina).
-- Integrar novos concedidos do suplemento Deuses de Arton (p.42+).
+- Frontend ainda pode exibir «Talento» em alguns rótulos legados — preferir «Poder».
+- Catálogo Cap. 2 populado (~162) com `categoria_v13` + overlay de pré-requisitos — **feito**.
+- Poderes concedidos alinhados a `tendencias_divindades_mb.json` (incl. Êxtase da Loucura).
+- Listas nomeadas «Poder de [Classe]» por nível — fora deste RF (fase seguinte).
+- Integrar novos concedidos do suplemento Deuses de Arton (p.42+) — P1 backlog HA.
 
 ## Critérios de aceite
 

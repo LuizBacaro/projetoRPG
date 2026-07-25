@@ -21,7 +21,11 @@ class ModalUsuario {
         // Bind dos botões do modal
         document.getElementById('btnCancelarModal')
             ?.addEventListener('click', () => this.fechar());
-        this.btnSalvar?.addEventListener('click', () => this.salvar());
+        document.getElementById('formUsuario')
+            ?.addEventListener('submit', (event) => {
+                event.preventDefault();
+                this.salvar();
+            });
         document.getElementById('btnFecharModalUsuario')
             ?.addEventListener('click', () => this.fechar());
 

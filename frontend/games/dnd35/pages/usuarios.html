@@ -96,6 +96,10 @@
                         <option value="inativo">Inativos</option>
                     </select>
                 </label>
+
+                <button id="btnLimparFiltrosUsuarios" class="btn btn-secondary" type="button" style="align-self:end;" title="Mostrar todos os usuários da plataforma">
+                    Limpar filtros
+                </button>
             </div>
         </section>
 
@@ -105,10 +109,13 @@
                     <span class="usuarios-table-kicker">Registro administrativo</span>
                     <h2>Usuários da plataforma</h2>
                 </div>
-                <div class="usuarios-table-note">Alterações críticas devem manter trilha de auditoria e revisão visual clara.</div>
+                <div class="usuarios-table-note">
+                    Lista global da conta (todos os jogos). <strong>Excluir / Inativar</strong> só existem aqui —
+                    a secção «Acessos por jogo» abaixo apenas concede/revoga membership.
+                </div>
             </div>
 
-            <div class="tabela-usuarios-container">
+            <div class="tabela-usuarios-container tabela-usuarios-container--scroll">
                 <table class="tabela-usuarios">
                     <thead>
                         <tr>
@@ -232,42 +239,44 @@
                 ⚠️ Usuário inativo — somente o Status pode ser alterado.
             </div>
 
-            <div class="form-group">
-                <label>Perfil *</label>
-                <select id="selectPerfil">
-                    <option value="administrador">Administrador</option>
-                    <option value="mestre">Mestre</option>
-                    <option value="jogador" selected>Jogador</option>
-                </select>
-            </div>
+            <form id="formUsuario" autocomplete="on">
+                <div class="form-group">
+                    <label for="selectPerfil">Perfil *</label>
+                    <select id="selectPerfil">
+                        <option value="administrador">Administrador</option>
+                        <option value="mestre">Mestre</option>
+                        <option value="jogador" selected>Jogador</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label>Nome *</label>
-                <input id="inputNome" type="text" placeholder="Nome completo" />
-            </div>
+                <div class="form-group">
+                    <label for="inputNome">Nome *</label>
+                    <input id="inputNome" name="nome" type="text" placeholder="Nome completo" autocomplete="name" />
+                </div>
 
-            <div class="form-group">
-                <label>E-mail * (usado no login)</label>
-                <input id="inputEmail" type="email" placeholder="email@exemplo.com" />
-            </div>
+                <div class="form-group">
+                    <label for="inputEmail">E-mail * (usado no login)</label>
+                    <input id="inputEmail" name="email" type="email" placeholder="email@exemplo.com" autocomplete="email" />
+                </div>
 
-            <div class="form-group">
-                <label>Senha * <small style="color:#888">(mín. 6 caracteres — deixe em branco para não alterar)</small></label>
-                <input id="inputSenha" type="password" placeholder="••••••" />
-            </div>
+                <div class="form-group">
+                    <label for="inputSenha">Senha * <small style="color:#888">(mín. 6 caracteres — deixe em branco para não alterar)</small></label>
+                    <input id="inputSenha" name="senha" type="password" placeholder="••••••" autocomplete="new-password" />
+                </div>
 
-            <div class="form-group">
-                <label>Status *</label>
-                <select id="selectStatus">
-                    <option value="ativo">Ativo</option>
-                    <option value="inativo">Inativo</option>
-                </select>
-            </div>
+                <div class="form-group">
+                    <label for="selectStatus">Status *</label>
+                    <select id="selectStatus">
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
 
-            <div class="modal-acoes">
-                <button class="btn btn-secondary" id="btnCancelarModal">Cancelar</button>
-                <button class="btn btn-primary"   id="btnSalvarModal">Salvar</button>
-            </div>
+                <div class="modal-acoes">
+                    <button class="btn btn-secondary" id="btnCancelarModal" type="button">Cancelar</button>
+                    <button class="btn btn-primary" id="btnSalvarModal" type="submit">Salvar</button>
+                </div>
+            </form>
         </div>
     </div>
 

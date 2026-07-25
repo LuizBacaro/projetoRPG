@@ -564,11 +564,17 @@ class TormentaMagiaMbCatalogoItem(BaseModel):
     )
     nome: str = Field(..., max_length=200)
     circulo: int = Field(
-        ..., ge=0, le=20, description="0 = truque; 1+ = círculo da magia (MB)."
+        ...,
+        ge=0,
+        le=20,
+        description=(
+            "Círculo da magia. Catálogo v1.3 usa 1–5; 0 (truque) e 6–9 são "
+            "aceites apenas para vínculos legados MB."
+        ),
     )
     tipo: Literal["arcana", "divina"] = Field(
         ...,
-        description="Arcana ou divina (MB — tipos de magia).",
+        description="Arcana ou divina.",
     )
     escola: Optional[str] = Field(default=None, max_length=80)
     resistencia: Optional[str] = Field(default=None, max_length=120)
@@ -686,6 +692,15 @@ class TormentaConjuracaoPreviewResponse(BaseModel):
     )
 
 
+class TormentaArmaNaturalRacial(BaseModel):
+    nome: str = Field(..., max_length=80)
+    dano: str = Field(default="", max_length=40)
+    critico: str = Field(default="", max_length=20)
+    tipo_dano: str = Field(default="", max_length=40)
+    ataque_extra_pm: int = Field(default=0, ge=0, le=20)
+    notas: str = Field(default="", max_length=500)
+
+
 class TormentaTracosRaciaisPreviewResponse(BaseModel):
     slug: str
     encontrado: bool
@@ -706,14 +721,29 @@ class TormentaTracosRaciaisPreviewResponse(BaseModel):
         description="Anão/Golem: deslocamento não reduzido por armadura ou carga.",
     )
     ca_bonus: int = 0
+    ca_bonus_label: Optional[str] = Field(
+        None,
+        max_length=80,
+        description="Nome do traço (ex.: Couro Rígido).",
+    )
     ca_vs_grande_ou_maior: int = 0
     ataque_bonus: int = 0
     furtividade_bonus: int = 0
+    furtividade_sem_armadura: int = Field(
+        default=0,
+        description="Bônus de Furtividade só sem armadura (ex.: Trog +5).",
+    )
     fortitude_bonus: int = 0
     reflexos_bonus: int = 0
     vontade_bonus: int = 0
     pericias_bonus: Dict[str, int] = Field(default_factory=dict)
     pericias_treinadas_extra: int = Field(default=0, ge=0, le=20)
+    pv_bonus_nivel1: int = Field(default=0, ge=0, le=99)
+    pv_bonus_por_nivel: int = Field(default=0, ge=0, le=30)
+    pm_bonus_por_nivel: int = Field(default=0, ge=0, le=30)
+    arma_natural: Optional[TormentaArmaNaturalRacial] = None
+    manobra_bonus: int = 0
+    armas_aumentadas: bool = False
     reducao_dano: Dict[str, int] = Field(
         default_factory=dict,
         description="RD por tipo de dano (escolhas raciais v1.3, ex.: qareen).",
@@ -1018,6 +1048,7 @@ class TormentaPvMulticlassePreviewRequest(BaseModel):
     classes: List[TormentaMulticlasseClasseItem] = Field(default_factory=list)
     slug_primario: str = Field(..., min_length=1, max_length=40)
     con_valor: int = Field(default=0, ge=-99, le=99)
+    slug_raca: Optional[str] = Field(default=None, max_length=40)
     regra_versao: Optional[str] = Field(default=None, max_length=8)
 
 
@@ -1027,6 +1058,7 @@ class TormentaPvMulticlassePreviewResponse(BaseModel):
     pv_max: Optional[int] = Field(default=None, ge=1, le=999)
     mod_con: int = Field(default=0, ge=-99, le=99)
     contrib_constituicao: int = Field(default=0, ge=-999, le=999)
+    contrib_pv_racial: int = Field(default=0, ge=0, le=999)
     breakdown: List[TormentaPvMulticlasseLinha] = Field(default_factory=list)
     formula: str = Field(default="", max_length=500)
     nivel_total_classes: int = Field(default=0, ge=0, le=800)
@@ -1052,6 +1084,8 @@ class TormentaPvPreviewResponse(BaseModel):
     mod_con: int = Field(default=0, ge=-99, le=99)
     contrib_niveis_extras: Optional[int] = Field(default=None, ge=0, le=999)
     contrib_constituicao: Optional[int] = Field(default=None, ge=-999, le=999)
+    contrib_pv_racial: int = Field(default=0, ge=0, le=999)
+    contrib_pm_racial: int = Field(default=0, ge=0, le=999)
     pv_max: Optional[int] = Field(default=None, ge=1, le=999)
     pm_por_nivel: Optional[int] = Field(default=None, ge=0, le=99)
     pm_max: Optional[int] = Field(default=None, ge=0, le=9999)

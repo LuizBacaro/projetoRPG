@@ -1,7 +1,7 @@
 {
   "_meta": {
-    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Tabela 1-21; traços p.19–31",
-    "nota": "Escala v1.3 (+2 típico em perícias/resistências). Pequeno: Furtividade +2 (Tabela 1-21)."
+    "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf — Raças p.19–31; Tabela 1-21 p.106",
+    "nota": "Tabela 1-21 afeta Furtividade/manobras, não Defesa. ca_bonus só de traço racial (Couro Rígido, Reptiliano, Chassi)."
   },
   "racas": {
     "humano": {
@@ -28,7 +28,9 @@
       "fortitude_bonus": 2,
       "reflexos_bonus": 0,
       "vontade_bonus": 2,
-      "pericias_bonus": {}
+      "pericias_bonus": {},
+      "pv_bonus_nivel1": 3,
+      "pv_bonus_por_nivel": 1
     },
     "dahllan": {
       "tamanho": "medio",
@@ -55,13 +57,14 @@
       "pericias_bonus": {
         "Misticismo": 2,
         "Percepção": 2
-      }
+      },
+      "pm_bonus_por_nivel": 1
     },
     "goblin": {
       "tamanho": "pequeno",
       "deslocamento_m": 9,
-      "ca_bonus": 1,
-      "ataque_bonus": 1,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
       "furtividade_bonus": 2,
       "fortitude_bonus": 2,
       "reflexos_bonus": 0,
@@ -86,13 +89,20 @@
       "tamanho": "medio",
       "deslocamento_m": 9,
       "ca_bonus": 1,
+      "ca_bonus_label": "Couro Rígido",
       "ataque_bonus": 0,
       "furtividade_bonus": 0,
       "fortitude_bonus": 0,
       "reflexos_bonus": 0,
       "vontade_bonus": 0,
-      "pericias_bonus": {
-        "Sobrevivência": 2
+      "pericias_bonus": {},
+      "arma_natural": {
+        "nome": "Chifres",
+        "dano": "1d6",
+        "critico": "x2",
+        "tipo_dano": "perfuracao",
+        "ataque_extra_pm": 1,
+        "notas": "1x/rodada: ao agredir com outra arma, gaste 1 PM para ataque extra com os chifres"
       }
     },
     "qareen": {
@@ -113,18 +123,20 @@
       "deslocamento_m": 6,
       "desloc_nao_reduz_armadura_carga": true,
       "ca_bonus": 2,
+      "ca_bonus_label": "Chassi",
       "ataque_bonus": 0,
       "furtividade_bonus": 0,
       "fortitude_bonus": 0,
       "reflexos_bonus": 0,
       "vontade_bonus": 0,
-      "pericias_bonus": {}
+      "pericias_bonus": {},
+      "penalidade_armadura_extra": 2
     },
     "hynne": {
       "tamanho": "pequeno",
       "deslocamento_m": 6,
-      "ca_bonus": 1,
-      "ataque_bonus": 1,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
       "furtividade_bonus": 2,
       "fortitude_bonus": 1,
       "reflexos_bonus": 1,
@@ -134,17 +146,15 @@
       }
     },
     "kliren": {
-      "tamanho": "pequeno",
-      "deslocamento_m": 6,
-      "ca_bonus": 1,
-      "ataque_bonus": 1,
-      "furtividade_bonus": 2,
+      "tamanho": "medio",
+      "deslocamento_m": 9,
+      "ca_bonus": 0,
+      "ataque_bonus": 0,
+      "furtividade_bonus": 0,
       "fortitude_bonus": 0,
       "reflexos_bonus": 0,
       "vontade_bonus": 0,
-      "pericias_bonus": {
-        "Intuição": 2
-      }
+      "pericias_bonus": {}
     },
     "medusa": {
       "tamanho": "medio",
@@ -208,12 +218,22 @@
       "tamanho": "medio",
       "deslocamento_m": 9,
       "ca_bonus": 1,
+      "ca_bonus_label": "Reptiliano",
       "ataque_bonus": 0,
-      "furtividade_bonus": 2,
+      "furtividade_bonus": 0,
+      "furtividade_sem_armadura": 5,
       "fortitude_bonus": 0,
       "reflexos_bonus": 0,
       "vontade_bonus": 0,
-      "pericias_bonus": {}
+      "pericias_bonus": {},
+      "arma_natural": {
+        "nome": "Mordida",
+        "dano": "1d6",
+        "critico": "x2",
+        "tipo_dano": "perfuracao",
+        "ataque_extra_pm": 1,
+        "notas": "1x/rodada: ao agredir com outra arma, gaste 1 PM para ataque extra com a mordida"
+      }
     }
   }
 }

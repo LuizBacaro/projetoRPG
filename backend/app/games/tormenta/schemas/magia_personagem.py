@@ -29,6 +29,18 @@ class TormentaMagiaPersonagemItem(BaseModel):
     escola: Optional[str] = Field(None, max_length=80)
     notas: Optional[str] = None
     adicionado_em: datetime
+    no_catalogo_v13: bool = Field(
+        True,
+        description="True se o slug (ou alias MB→v1.3) existe no catálogo v1.3.",
+    )
+    slug_catalogo_v13: Optional[str] = Field(
+        None,
+        description="Slug resolvido no catálogo v1.3 (após alias MB), se houver.",
+    )
+    orfao_catalogo_v13: bool = Field(
+        False,
+        description="True se o vínculo aponta para magia MB sem equivalente v1.3.",
+    )
 
 
 class TormentaMagiaLancarRequest(BaseModel):

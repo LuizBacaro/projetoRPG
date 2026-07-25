@@ -107,8 +107,8 @@ def test_clerigo_preparar_arcana_rejeita():
 def test_clerigo_lancar_truque_divino_sem_vinculo():
     ok, _ = validar_lancar_magia_preparador_mb(
         slug_classe="clerigo",
-        magia_slug="virtude",
-        circulo_magia=0,
+        magia_slug="curar_ferimentos",
+        circulo_magia=1,
         vinculos=[],
         divindade_slug="lena",
     )

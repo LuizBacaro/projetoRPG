@@ -52,7 +52,8 @@ def test_preview_tracos_anao_v13() -> None:
 
 def test_preview_tracos_goblin_v13_furtividade() -> None:
     p = preview_tracos_raciais("goblin", regra_versao="v13")
-    assert p["ca_bonus"] == 1
+    # v1.3: bônus de CA de tamanho não é modelado como ca_bonus racial genérico.
+    assert p["ca_bonus"] == 0
     assert p["furtividade_bonus"] == 2
     assert p["tamanho"] == "pequeno"
 
