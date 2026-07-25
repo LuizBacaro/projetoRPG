@@ -2,7 +2,8 @@
   "meta": {
     "fonte": "Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf",
     "referencia_paginas": "Listas arcana/divina p.174–177",
-    "nota": "Metadados curtos por magia: nome, círculo (1–5), tipo (arcana/divina), escola e descrição curta. Textos longos permanecem no livro (fonte legal)."
+    "nota": "Metadados curtos por magia: nome, círculo (1–5), tipo (arcana/divina), escola e descrição curta. Textos longos permanecem no livro (fonte legal).",
+    "nota_slugs": "Magias presentes nas listas arcana e divina usam slug com sufixo _arc ou _div."
   },
   "itens": [
     {
@@ -33,7 +34,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "arma_magica",
+      "slug": "arma_magica_arc",
       "nome": "Arma Mágica",
       "circulo": 1,
       "tipo": "arcana",
@@ -51,7 +52,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "aviso",
+      "slug": "aviso_arc",
       "nome": "Aviso",
       "circulo": 1,
       "tipo": "arcana",
@@ -60,7 +61,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "compreensao",
+      "slug": "compreensao_arc",
       "nome": "Compreensão",
       "circulo": 1,
       "tipo": "arcana",
@@ -114,7 +115,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "escuridao",
+      "slug": "escuridao_arc",
       "nome": "Escuridão",
       "circulo": 1,
       "tipo": "arcana",
@@ -159,7 +160,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "luz",
+      "slug": "luz_arc",
       "nome": "Luz",
       "circulo": 1,
       "tipo": "arcana",
@@ -168,7 +169,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "nevoa",
+      "slug": "nevoa_arc",
       "nome": "Névoa",
       "circulo": 1,
       "tipo": "arcana",
@@ -204,7 +205,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "resistencia_a_energia",
+      "slug": "resistencia_a_energia_arc",
       "nome": "Resistência a Energia",
       "circulo": 1,
       "tipo": "arcana",
@@ -267,7 +268,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "visao_mistica",
+      "slug": "visao_mistica_arc",
       "nome": "Visão Mística",
       "circulo": 1,
       "tipo": "arcana",
@@ -321,7 +322,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "arma_magica",
+      "slug": "arma_magica_div",
       "nome": "Arma Mágica",
       "circulo": 1,
       "tipo": "divina",
@@ -339,7 +340,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "aviso",
+      "slug": "aviso_div",
       "nome": "Aviso",
       "circulo": 1,
       "tipo": "divina",
@@ -375,7 +376,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "compreensao",
+      "slug": "compreensao_div",
       "nome": "Compreensão",
       "circulo": 1,
       "tipo": "divina",
@@ -447,7 +448,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "escuridao",
+      "slug": "escuridao_div",
       "nome": "Escuridão",
       "circulo": 1,
       "tipo": "divina",
@@ -465,7 +466,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "luz",
+      "slug": "luz_div",
       "nome": "Luz",
       "circulo": 1,
       "tipo": "divina",
@@ -474,7 +475,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "nevoa",
+      "slug": "nevoa_div",
       "nome": "Névoa",
       "circulo": 1,
       "tipo": "divina",
@@ -519,7 +520,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "resistencia_a_energia",
+      "slug": "resistencia_a_energia_div",
       "nome": "Resistência a Energia",
       "circulo": 1,
       "tipo": "divina",
@@ -555,7 +556,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "visao_mistica",
+      "slug": "visao_mistica_div",
       "nome": "Visão Mística",
       "circulo": 1,
       "tipo": "divina",
@@ -618,7 +619,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "conjurar_mortos_vivos",
+      "slug": "conjurar_mortos_vivos_arc",
       "nome": "Conjurar Mortos-Vivos",
       "circulo": 2,
       "tipo": "arcana",
@@ -645,7 +646,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "dissipar_magia",
+      "slug": "dissipar_magia_arc",
       "nome": "Dissipar Magia",
       "circulo": 2,
       "tipo": "arcana",
@@ -708,7 +709,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "marca_da_obediencia",
+      "slug": "marca_da_obediencia_arc",
       "nome": "Marca da Obediência",
       "circulo": 2,
       "tipo": "arcana",
@@ -753,7 +754,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "runa_de_protecao",
+      "slug": "runa_de_protecao_arc",
       "nome": "Runa de Proteção",
       "circulo": 2,
       "tipo": "arcana",
@@ -843,7 +844,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "conjurar_mortos_vivos",
+      "slug": "conjurar_mortos_vivos_div",
       "nome": "Conjurar Mortos-Vivos",
       "circulo": 2,
       "tipo": "divina",
@@ -879,7 +880,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "dissipar_magia",
+      "slug": "dissipar_magia_div",
       "nome": "Dissipar Magia",
       "circulo": 2,
       "tipo": "divina",
@@ -915,7 +916,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "marca_da_obediencia",
+      "slug": "marca_da_obediencia_div",
       "nome": "Marca da Obediência",
       "circulo": 2,
       "tipo": "divina",
@@ -978,7 +979,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "runa_de_protecao",
+      "slug": "runa_de_protecao_div",
       "nome": "Runa de Proteção",
       "circulo": 2,
       "tipo": "divina",
@@ -1104,7 +1105,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "imobilizar",
+      "slug": "imobilizar_arc",
       "nome": "Imobilizar",
       "circulo": 3,
       "tipo": "arcana",
@@ -1122,7 +1123,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "lendas_e_historias",
+      "slug": "lendas_e_historias_arc",
       "nome": "Lendas e Histórias",
       "circulo": 3,
       "tipo": "arcana",
@@ -1131,7 +1132,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "manto_de_sombras",
+      "slug": "manto_de_sombras_arc",
       "nome": "Manto de Sombras",
       "circulo": 3,
       "tipo": "arcana",
@@ -1158,7 +1159,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "pele_de_pedra",
+      "slug": "pele_de_pedra_arc",
       "nome": "Pele de Pedra",
       "circulo": 3,
       "tipo": "arcana",
@@ -1167,7 +1168,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "selo_de_mana",
+      "slug": "selo_de_mana_arc",
       "nome": "Selo de Mana",
       "circulo": 3,
       "tipo": "arcana",
@@ -1176,7 +1177,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "servo_morto_vivo",
+      "slug": "servo_morto_vivo_arc",
       "nome": "Servo Morto-Vivo",
       "circulo": 3,
       "tipo": "arcana",
@@ -1221,7 +1222,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "videncia",
+      "slug": "videncia_arc",
       "nome": "Vidência",
       "circulo": 3,
       "tipo": "arcana",
@@ -1329,7 +1330,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "imobilizar",
+      "slug": "imobilizar_div",
       "nome": "Imobilizar",
       "circulo": 3,
       "tipo": "divina",
@@ -1338,7 +1339,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "lendas_e_historias",
+      "slug": "lendas_e_historias_div",
       "nome": "Lendas e Histórias",
       "circulo": 3,
       "tipo": "divina",
@@ -1347,7 +1348,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "manto_de_sombras",
+      "slug": "manto_de_sombras_div",
       "nome": "Manto de Sombras",
       "circulo": 3,
       "tipo": "divina",
@@ -1365,7 +1366,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "pele_de_pedra",
+      "slug": "pele_de_pedra_div",
       "nome": "Pele de Pedra",
       "circulo": 3,
       "tipo": "divina",
@@ -1401,7 +1402,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "selo_de_mana",
+      "slug": "selo_de_mana_div",
       "nome": "Selo de Mana",
       "circulo": 3,
       "tipo": "divina",
@@ -1419,7 +1420,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "servo_morto_vivo",
+      "slug": "servo_morto_vivo_div",
       "nome": "Servo Morto-Vivo",
       "circulo": 3,
       "tipo": "divina",
@@ -1446,7 +1447,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "videncia",
+      "slug": "videncia_div",
       "nome": "Vidência",
       "circulo": 3,
       "tipo": "divina",
@@ -1545,7 +1546,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "libertacao",
+      "slug": "libertacao_arc",
       "nome": "Libertação",
       "circulo": 4,
       "tipo": "arcana",
@@ -1563,7 +1564,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "muralha_de_ossos",
+      "slug": "muralha_de_ossos_arc",
       "nome": "Muralha de Ossos",
       "circulo": 4,
       "tipo": "arcana",
@@ -1617,7 +1618,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "viagem_planar",
+      "slug": "viagem_planar_arc",
       "nome": "Viagem Planar",
       "circulo": 4,
       "tipo": "arcana",
@@ -1626,7 +1627,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "visao_da_verdade",
+      "slug": "visao_da_verdade_arc",
       "nome": "Visão da Verdade",
       "circulo": 4,
       "tipo": "arcana",
@@ -1689,7 +1690,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "libertacao",
+      "slug": "libertacao_div",
       "nome": "Libertação",
       "circulo": 4,
       "tipo": "divina",
@@ -1716,7 +1717,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "muralha_de_ossos",
+      "slug": "muralha_de_ossos_div",
       "nome": "Muralha de Ossos",
       "circulo": 4,
       "tipo": "divina",
@@ -1743,7 +1744,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "viagem_planar",
+      "slug": "viagem_planar_div",
       "nome": "Viagem Planar",
       "circulo": 4,
       "tipo": "divina",
@@ -1752,7 +1753,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "visao_da_verdade",
+      "slug": "visao_da_verdade_div",
       "nome": "Visão da Verdade",
       "circulo": 4,
       "tipo": "divina",
@@ -1788,7 +1789,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "buraco_negro",
+      "slug": "buraco_negro_arc",
       "nome": "Buraco Negro",
       "circulo": 5,
       "tipo": "arcana",
@@ -1842,7 +1843,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "invulnerabilidade",
+      "slug": "invulnerabilidade_arc",
       "nome": "Invulnerabilidade",
       "circulo": 5,
       "tipo": "arcana",
@@ -1869,7 +1870,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "palavra_primordial",
+      "slug": "palavra_primordial_arc",
       "nome": "Palavra Primordial",
       "circulo": 5,
       "tipo": "arcana",
@@ -1887,7 +1888,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "projetar_consciencia",
+      "slug": "projetar_consciencia_arc",
       "nome": "Projetar Consciência",
       "circulo": 5,
       "tipo": "arcana",
@@ -1896,7 +1897,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "roubar_a_alma",
+      "slug": "roubar_a_alma_arc",
       "nome": "Roubar a Alma",
       "circulo": 5,
       "tipo": "arcana",
@@ -1932,7 +1933,7 @@
       "pagina_referencia": "v1.3 p.174–175"
     },
     {
-      "slug": "toque_da_morte",
+      "slug": "toque_da_morte_arc",
       "nome": "Toque da Morte",
       "circulo": 5,
       "tipo": "arcana",
@@ -1950,7 +1951,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "buraco_negro",
+      "slug": "buraco_negro_div",
       "nome": "Buraco Negro",
       "circulo": 5,
       "tipo": "divina",
@@ -1977,7 +1978,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "invulnerabilidade",
+      "slug": "invulnerabilidade_div",
       "nome": "Invulnerabilidade",
       "circulo": 5,
       "tipo": "divina",
@@ -1995,7 +1996,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "palavra_primordial",
+      "slug": "palavra_primordial_div",
       "nome": "Palavra Primordial",
       "circulo": 5,
       "tipo": "divina",
@@ -2004,7 +2005,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "projetar_consciencia",
+      "slug": "projetar_consciencia_div",
       "nome": "Projetar Consciência",
       "circulo": 5,
       "tipo": "divina",
@@ -2022,7 +2023,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "roubar_a_alma",
+      "slug": "roubar_a_alma_div",
       "nome": "Roubar a Alma",
       "circulo": 5,
       "tipo": "divina",
@@ -2040,7 +2041,7 @@
       "pagina_referencia": "v1.3 p.176–177"
     },
     {
-      "slug": "toque_da_morte",
+      "slug": "toque_da_morte_div",
       "nome": "Toque da Morte",
       "circulo": 5,
       "tipo": "divina",

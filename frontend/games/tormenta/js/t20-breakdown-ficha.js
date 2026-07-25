@@ -198,6 +198,12 @@
         const itensTxt = montarTextoItensCa(itens);
         const arm = itens.reduce((acc, it) => acc + it.bonus, 0);
 
+        const tracos = global.__t20TracosRaciaisCache;
+        const racial = api && api.caBonusRacial ? api.caBonusRacial() : Number(tracos && tracos.ca_bonus) || 0;
+        const racialLbl =
+            (tracos && tracos.ca_bonus_label) || (racial ? 'raça' : '');
+        const racialTxt = racial ? `raça ${fmtSigned(racial)} (${racialLbl})` : '';
+
         if (isV13) {
             const desAttr = Math.trunc(Number((q('fichaDesResumo') && q('fichaDesResumo').value) || 0));
             const desFmt = fmtSigned(desAttr);
@@ -207,29 +213,29 @@
             let linha = '';
             let titulo = '';
             if (pesada) {
-                linha = itensTxt
-                    ? `10 + ${itensTxt} = ${total} (v1.3; pesada — DES ${desFmt} não aplica)`
+                const mid = [itensTxt, racialTxt].filter(Boolean).join(' + ');
+                linha = mid
+                    ? `10 + ${mid} = ${total} (v1.3; pesada — DES ${desFmt} não aplica)`
                     : `10 = ${total} (v1.3; armadura pesada — DES ${desFmt} não aplica)`;
-                titulo = `CA v1.3\n10 (base)`;
+                titulo = `Defesa v1.3\n10 (base)`;
                 if (itens.length) {
                     itens.forEach((it) => {
                         titulo += `\n${it.nome}: ${fmtSigned(it.bonus)}`;
                     });
                 }
+                if (racial) titulo += `\nRaça (${racialLbl}): ${fmtSigned(racial)}`;
                 titulo += `\nDES ${desFmt}: ignorado (armadura pesada)\n= ${total}`;
             } else {
                 const desPart = `DES ${desFmt}`;
-                if (itensTxt) {
-                    linha = `10 + ${desPart} + ${itensTxt} = ${total} (v1.3)`;
-                } else {
-                    linha = `10 + ${desPart} = ${total} (v1.3)`;
-                }
-                titulo = `CA v1.3\n10 (base)\n${desPart}`;
+                const mid = [desPart, itensTxt, racialTxt].filter(Boolean).join(' + ');
+                linha = `10 + ${mid} = ${total} (v1.3)`;
+                titulo = `Defesa v1.3\n10 (base)\n${desPart}`;
                 if (itens.length) {
                     itens.forEach((it) => {
                         titulo += `\n${it.nome}: ${fmtSigned(it.bonus)}`;
                     });
                 }
+                if (racial) titulo += `\nRaça (${racialLbl}): ${fmtSigned(racial)}`;
                 titulo += `\n= ${total}`;
             }
             caBd.textContent = linha;
@@ -238,20 +244,22 @@
         }
 
         const base = api && api.getCaBaseSemItens ? api.getCaBaseSemItens() : 10;
-        if (arm === 0) {
-            caBd.textContent = `CA salva: ${base} (sem bônus de itens)`;
-            if (caVal) caVal.title = `CA MB\nBase salva: ${base}\n= ${total}`;
+        if (arm === 0 && !racial) {
+            caBd.textContent = `Defesa salva: ${base} (sem bônus de itens)`;
+            if (caVal) caVal.title = `Defesa MB\nBase salva: ${base}\n= ${total}`;
         } else {
-            const resumoItens = itensTxt || `itens ${fmtSigned(arm)}`;
-            caBd.textContent = `Base ${base} + ${resumoItens} = ${total}`;
-            let titulo = `CA MB\nBase salva: ${base}`;
+            const resumoItens = itensTxt || (arm ? `itens ${fmtSigned(arm)}` : '');
+            const mid = [resumoItens, racialTxt].filter(Boolean).join(' + ');
+            caBd.textContent = mid ? `Base ${base} + ${mid} = ${total}` : `Base ${base} = ${total}`;
+            let titulo = `Defesa MB\nBase salva: ${base}`;
             if (itens.length) {
                 itens.forEach((it) => {
                     titulo += `\n${it.nome}: ${fmtSigned(it.bonus)}`;
                 });
-            } else {
+            } else if (arm) {
                 titulo += `\nItens: ${fmtSigned(arm)}`;
             }
+            if (racial) titulo += `\nRaça (${racialLbl}): ${fmtSigned(racial)}`;
             titulo += `\n= ${total}`;
             if (caVal) caVal.title = titulo;
         }

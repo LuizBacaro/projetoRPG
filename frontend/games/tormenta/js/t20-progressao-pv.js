@@ -95,15 +95,37 @@
         }
     }
 
+    function slugRacaFicha() {
+        const el = q('f_raca_select');
+        const v = el && el.value ? String(el.value).trim().toLowerCase() : '';
+        return v && v !== '__livre__' ? v : '';
+    }
+
     function formulaPvSimples(prev) {
         const lv = labelVersao();
         const conLbl = isV13() ? 'CON' : 'mod. CON';
-        return `${lv}: ${prev.pv_inicial} + ${prev.contrib_niveis_extras} (níveis) + ${prev.contrib_constituicao} (${conLbl}) = ${prev.pv_max}`;
+        let s = `${lv}: ${prev.pv_inicial} + ${prev.contrib_niveis_extras} (níveis) + ${prev.contrib_constituicao} (${conLbl})`;
+        if (prev.contrib_pv_racial) s += ` + ${prev.contrib_pv_racial} (raça)`;
+        s += ` = ${prev.pv_max}`;
+        return s;
     }
 
     function formulaPvMulticlasse(prev) {
         if (prev.formula) return `PV multiclasse (v1.3): ${prev.formula}`;
         return `PV multiclasse (v1.3): ${prev.pv_max}`;
+    }
+
+    function contribPvPmRacialLocal(nivel) {
+        const c = window.__t20TracosRaciaisCache;
+        const nv = Math.max(1, Math.min(40, Math.floor(Number(nivel) || 1)));
+        if (!c || c.encontrado === false) return { pv: 0, pm: 0 };
+        const n1 = Number(c.pv_bonus_nivel1) || 0;
+        const pn = Number(c.pv_bonus_por_nivel) || 0;
+        const pmPn = Number(c.pm_bonus_por_nivel) || 0;
+        return {
+            pv: n1 + Math.max(0, nv - 1) * pn,
+            pm: nv * pmPn,
+        };
     }
 
     function previewPvClasseUnicaLocal(slug, nivel, con) {
@@ -115,12 +137,15 @@
         const modCon = contribCon(con);
         const contribNiveis = Math.max(0, nv - 1) * pvPn;
         const deCon = nv * modCon;
-        const pvMax = pvIni + contribNiveis + deCon;
+        const racial = contribPvPmRacialLocal(nv);
+        const pvMax = pvIni + contribNiveis + deCon + racial.pv;
         let pmMax = null;
         let pmPn = null;
         if (isV13() && row.pm_por_nivel != null && Number(row.pm_por_nivel) > 0) {
             pmPn = Number(row.pm_por_nivel);
-            pmMax = nv * pmPn;
+            pmMax = nv * pmPn + racial.pm;
+        } else if (racial.pm) {
+            pmMax = racial.pm;
         }
         return {
             encontrado: true,
@@ -129,6 +154,8 @@
             pv_por_nivel: pvPn,
             contrib_niveis_extras: contribNiveis,
             contrib_constituicao: deCon,
+            contrib_pv_racial: racial.pv,
+            contrib_pm_racial: racial.pm,
             nivel: nv,
             mod_con: modCon,
             pm_max: pmMax,
@@ -174,14 +201,18 @@
         }
         const modCon = contribCon(con);
         const deCon = totalNv * modCon;
-        const pvMax = base + deCon;
+        const racial = contribPvPmRacialLocal(totalNv);
+        const pvMax = base + deCon + racial.pv;
         const conTxt = modCon !== 0 ? `${totalNv}×${modCon}` : `${totalNv}×CON`;
-        const formula = `${partes.join(' + ')} + ${conTxt} = ${pvMax} PV`;
+        let formula = `${partes.join(' + ')} + ${conTxt}`;
+        if (racial.pv) formula += ` + ${racial.pv} (raça)`;
+        formula += ` = ${pvMax} PV`;
         return {
             encontrado: true,
             pv_max: pvMax,
             mod_con: modCon,
             contrib_constituicao: deCon,
+            contrib_pv_racial: racial.pv,
             formula,
             nivel_total_classes: totalNv,
         };
@@ -193,6 +224,7 @@
                 classes: mcLinhas,
                 slug_primario: slug,
                 con_valor: conValor(),
+                slug_raca: slugRacaFicha() || undefined,
                 regraVersao: 'v13',
             });
         }
@@ -201,6 +233,7 @@
             classe_slug: slug,
             nivel: nivelPersonagem(),
             con_valor: conValor(),
+            slug_raca: slugRacaFicha() || undefined,
             regraVersao: rv,
             for_valor: attrCampo('for'),
             des_valor: attrCampo('des'),
@@ -276,12 +309,35 @@
         }
     }
 
+    let _debounceVitais = null;
+    let _vitaisInFlight = null;
+
     async function atualizarVitaisSugeridos() {
         const slug = classeSlug();
         if (!slug) return null;
         return calcularPvMb(true);
     }
 
+    /** Coalesce rajadas ao fechar «Editar ficha» / input de atributos (evita N POSTs 503). */
+    function atualizarVitaisSugeridosDebounced(delayMs) {
+        const wait = delayMs == null ? 280 : Number(delayMs);
+        if (_debounceVitais) clearTimeout(_debounceVitais);
+        return new Promise((resolve) => {
+            _debounceVitais = setTimeout(() => {
+                _debounceVitais = null;
+                if (_vitaisInFlight) {
+                    resolve(_vitaisInFlight);
+                    return;
+                }
+                _vitaisInFlight = atualizarVitaisSugeridos().finally(() => {
+                    _vitaisInFlight = null;
+                });
+                resolve(_vitaisInFlight);
+            }, Number.isFinite(wait) ? wait : 280);
+        });
+    }
+
     window.t20CalcularPvMb = calcularPvMb;
     window.t20AtualizarVitaisSugeridos = atualizarVitaisSugeridos;
+    window.t20AtualizarVitaisSugeridosDebounced = atualizarVitaisSugeridosDebounced;
 })();

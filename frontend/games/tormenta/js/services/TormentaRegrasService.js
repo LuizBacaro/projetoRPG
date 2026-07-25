@@ -43,6 +43,11 @@ class TormentaRegrasService {
             if (typeof AuthService.logout === 'function') AuthService.logout();
             throw new Error('Sessão expirada. Faça login novamente.');
         }
+        if (res.status === 503 || res.status === 502 || res.status === 504) {
+            throw new Error(
+                'API indisponível ou a acordar (Render). Aguarde alguns segundos e tente de novo.'
+            );
+        }
         if (!res.ok) {
             const e = await res.json().catch(() => ({}));
             const d = e.detail;
@@ -519,6 +524,7 @@ class TormentaRegrasService {
         sp.set('con_valor', String(p.con_valor != null ? p.con_valor : 10));
         if (p.regraVersao) sp.set('regra_versao', String(p.regraVersao).trim());
         if (p.arcanista_caminho) sp.set('arcanista_caminho', String(p.arcanista_caminho).trim());
+        if (p.slug_raca) sp.set('slug_raca', String(p.slug_raca).trim());
         ['for', 'des', 'int', 'sab', 'car'].forEach((k) => {
             const key = `${k}_valor`;
             if (p[key] != null) sp.set(key, String(p[key]));
@@ -532,7 +538,7 @@ class TormentaRegrasService {
 
     /**
      * PV máximos v1.3 — multiclasse (classe primária + demais, p.34).
-     * @param {{ classes: Array<{slug: string, nivel: number}>, slug_primario: string, con_valor?: number, regraVersao?: string }} p
+     * @param {{ classes: Array<{slug: string, nivel: number}>, slug_primario: string, con_valor?: number, slug_raca?: string, regraVersao?: string }} p
      */
     async obterPvPreviewMulticlasse(p) {
         const res = await fetch(window.getApiUrl('/tormenta/regras/pv-preview-multiclasse'), {
@@ -542,6 +548,7 @@ class TormentaRegrasService {
                 classes: Array.isArray(p.classes) ? p.classes : [],
                 slug_primario: String(p.slug_primario || '').trim(),
                 con_valor: p.con_valor != null ? Number(p.con_valor) : 0,
+                slug_raca: p.slug_raca ? String(p.slug_raca).trim() : undefined,
                 regra_versao: p.regraVersao || 'v13',
             }),
         });

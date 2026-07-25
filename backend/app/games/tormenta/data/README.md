@@ -14,6 +14,9 @@ preservadas apenas como legado para depuração e migração histórica.
   - Fonte: listas p.174–177 do PDF v1.3; textos longos ficam no livro.
   - Metadados por item: `slug`, `nome`, `circulo`, `tipo` (arcana/divina),
     `escola`, `descricao_curta`, `pagina_referencia`.
+  - Magias nas **duas** listas (mesmo nome) usam slug único com sufixo
+    `_arc` / `_div` (ex.: `luz_arc`, `luz_div`). O check CI
+    (`scripts/check_magias_mb_catalogo.py`) exige slugs únicos e círculos 1–5.
 - `talentos_mb_catalogo.json`
   - Total: **162** poderes — combate (40), destino (20), magia (8),
     concedidos (72), tormenta (22).

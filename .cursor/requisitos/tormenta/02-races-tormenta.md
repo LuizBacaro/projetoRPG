@@ -79,19 +79,25 @@ Persistir escolha em `ficha_json` (ex.: `humano_versatil: "duas_pericias" | "per
 | RF-T02f | Preview traços + motor `tracos_raciais_t20.py` | P0 |
 | RF-T02g | Tamanho/deslocamento automático (Tabela 1-21 + exceções) | **Feito** |
 | RF-T02h | Escolhas estruturadas (lefou, qareen, golem, kliren, osteon, sereia, sílfide…) | **Feito** |
+| RF-T02i | `ca_bonus` racial soma na Defesa (Minotauro/Trog/Golem) + breakdown | **Feito** |
+| RF-T02j | PV racial Anão (+3 1º / +1 nível) e PM racial Elfo (+1/nível) | **Feito** |
+| RF-T02k | Armas naturais (Chifres / Mordida) como linha em Ataques | **Feito** |
 
 ## Estado de implementação
 
 | Item | Estado | Notas |
 |------|--------|-------|
 | `racas_v13.json` (17 raças) | **Feito** | Tabela 1-2; API dual |
-| `tracos_mecanicos_v13.json` | **Feito** | Motor dual; escala v1.3 |
+| `tracos_mecanicos_v13.json` | **Feito** | Motor dual; escala v1.3; `arma_natural`, PV/PM |
 | Humano +1×3 + Versátil | **Feito** | UI + `humano_versatil` no JSON |
 | Lefou / Osteon / Sereia +1×3 | **Feito** | Exclusões de atributo na UI |
 | Suraggel aggelus/sulfure | **Feito** | UI + persistência |
 | Tamanho/deslocamento automático | **Feito** | Preview API + ficha + wizard; elfo 12 m, anão/golem exceções, sereia/sílfide |
 | Escolhas P2 (todas as raças com escolha v1.3) | **Feito** | lefou, qareen, golem, kliren, osteon, sereia, sílfide + dahllan fixo |
 | Traços fixos (hynne, medusa, trog…) | **Feito** | `tracos_mecanicos_v13.json` |
+| Defesa racial no total da ficha/arena | **Feito** | `ca_bonus` via `defesa_t20` + UI |
+| Anão PV / Elfo PM | **Feito** | `progressao_pv_t20` + breakdown |
+| Chifres / Mordida | **Feito** | Sync em `ficha_json.ataques` |
 | `racas_mb.json` legado | **Mantido** | Fichas MB antigas |
 
 ## Fora de escopo (habilidades raciais avançadas — backlog P2)
@@ -103,7 +109,7 @@ Regras do livro v1.3 ainda **não modeladas** no motor/UI; persistência futura 
 | RF-T02-oos1 | **Golem** | Sem origem na criação; penalidade armadura −2; armadura acoplada (1 dia vestir/remover; não conta limite de itens) |
 | RF-T02-oos2 | **Osteon** | Memória Póstuma alternativa: osteon de outra raça humanoide (+ habilidade/tamanho da raça ancestral) |
 | RF-T02-oos3 | **Hynne** | Atletismo usa DES (não FOR); Sorte Salvadora (reroll resistência, 1 PM) |
-| RF-T02-oos4 | **Trog** | Furtividade +5 sem armadura/roupas pesadas (além do +2 base em tracos) |
+| RF-T02-oos4 | **Trog** | Aplicar `furtividade_sem_armadura` (+5) só sem armadura na ficha (campo já no JSON) |
 
 ## Gap código (MB → v1.3)
 
@@ -121,6 +127,9 @@ Compat legado:      slugs MB em personagens antigos
 - Humano novo: +1 em **três** atributos distintos + Versátil registrado.
 - Anão com DES 2 após raça: Defesa base inclui **+2** (valor DES), não modificador MB.
 - Goblin/Hynne: tamanho Pequeno refletido na ficha (Furtividade +2).
+- Minotauro: Defesa total inclui **+1** (Couro Rígido); Ataques lista **Chifres 1d6**.
+- Anão Clérigo 1 CON +4: PV máx. **23** (16+4+3).
+- Elfo: PM máx. inclui **+1 × nível**.
 - Nenhum texto longo de traço racial no repo.
 
 ## Referência

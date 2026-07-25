@@ -90,12 +90,22 @@
                 const slug = escHtml(m.magia_slug || '');
                 const nome = escHtml(m.nome || m.magia_slug || '');
                 const circ = m.circulo != null ? `C${m.circulo}` : '';
-                const custo = m.circulo != null && Number(m.circulo) >= 1 ? `${m.circulo} PM` : '0 PM';
+                const circN = Number(m.circulo);
+                // Tormenta 20 v1.3 Tabela 4-1: 1/3/6/10/15 (arena usa ficha v1.3 por padrão)
+                const mapaPmV13 = { 1: 1, 2: 3, 3: 6, 4: 10, 5: 15 };
+                const custoPm =
+                    Number.isFinite(circN) && circN >= 1
+                        ? mapaPmV13[circN] != null
+                            ? mapaPmV13[circN]
+                            : circN
+                        : 0;
+                const custo = `${custoPm} PM`;
                 const pap = escHtml(m.papel || '');
                 const dur = m.duracao ? String(m.duracao) : '';
                 const concHint =
                     dur.toLowerCase().includes('concentr') ? ' · concentração' : '';
-                const disabled = pm != null && Number(m.circulo) > pm ? ' disabled title="PM insuficientes"' : '';
+                const disabled =
+                    pm != null && custoPm > pm ? ' disabled title="PM insuficientes"' : '';
                 return `<li class="t20-arena-magia-item">
                     <div class="t20-arena-magia-meta">
                         <strong>${nome}</strong>
