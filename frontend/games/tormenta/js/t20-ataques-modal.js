@@ -382,14 +382,15 @@
         $('t20AtqFormTipo').value = arma.tipo_dano || '';
         $('t20AtqFormCritico').value = arma.critico || '';
         $('t20AtqFormAlcance').value = arma.alcance || '';
-        $('t20AtqFormEmp').checked = false;
+        $('t20AtqFormEmp').checked = true;
         $('t20AtqFormCustoBase').value = String(parseCustoTs(arma.custo));
         document.querySelectorAll('#t20AtqMelhoriasChecks input').forEach((cb) => {
             cb.checked = false;
         });
         if ($('t20AtqMaterial')) $('t20AtqMaterial').value = '';
         atualizarPreviewSuperior();
-        setAba('lista');
+        // Mantém o formulário visível; inclui na lista de rascunho na hora
+        aplicarFormNaLista();
         const btn = $('t20AtqBtnAplicarForm');
         if (btn) btn.textContent = '➕ Incluir na lista';
     }
@@ -543,7 +544,7 @@
 
     function aplicarFormNaLista() {
         const atq = coletarFormComoAtaque();
-        if (!atq.nome && !atq.dano) return;
+        if (!atq.nome && !atq.dano) return false;
         if (_editIdx >= 0 && _editIdx < _draft.length) {
             const prev = _draft[_editIdx];
             atq.origem = prev.origem;
@@ -556,13 +557,34 @@
         renderDraftLista();
         limparFormulario();
         setAba('lista');
+        return true;
+    }
+
+    function formTemAtaquePendente() {
+        const nome = ($('t20AtqFormNome') && $('t20AtqFormNome').value.trim()) || '';
+        const dano = ($('t20AtqFormDano') && $('t20AtqFormDano').value.trim()) || '';
+        const armaBase = ($('t20AtqFormArmaBase') && $('t20AtqFormArmaBase').value.trim()) || '';
+        return Boolean(nome || dano || armaBase);
+    }
+
+    function toastAtq(msg, tipo) {
+        if (typeof global.Toast === 'undefined') {
+            if (tipo === 'warn' || tipo === 'error') window.alert(msg);
+            return;
+        }
+        if (tipo === 'warn' && global.Toast.warning) global.Toast.warning(msg);
+        else if (tipo === 'error' && global.Toast.error) global.Toast.error(msg);
+        else if (tipo === 'ok' && global.Toast.success) global.Toast.success(msg);
+        else if (global.Toast.info) global.Toast.info(msg);
+        else if (global.Toast.success) global.Toast.success(msg);
     }
 
     function renderDraftLista() {
         const lista = $('t20AtqDraftLista');
         if (!lista) return;
         if (!_draft.length) {
-            lista.innerHTML = '<p class="t20-hint">Nenhum ataque na lista ainda.</p>';
+            lista.innerHTML =
+                '<p class="t20-hint">Nenhum ataque na lista ainda. Escolha no catálogo/inventário, ajuste os detalhes e use «Incluir na lista» (ou «Salvar ataques», que inclui o formulário automaticamente).</p>';
             return;
         }
         lista.innerHTML = _draft
@@ -655,15 +677,34 @@
     }
 
     function salvarTudo() {
+        // Fluxo comum: usuário escolhe a arma no catálogo e clica «Salvar» sem «Incluir na lista».
+        if (formTemAtaquePendente()) {
+            const ok = aplicarFormNaLista();
+            if (!ok) {
+                toastAtq('Preencha ao menos o nome ou o dano do ataque.', 'warn');
+                return;
+            }
+        }
         const out = _draft
             .map(cloneAtaque)
             .filter((x) => x.nome || x.dano || x.bonus_ataque);
+        if (!out.length) {
+            toastAtq('Nenhum ataque na lista. Escolha uma arma e inclua antes de salvar.', 'warn');
+            setAba('lista');
+            return;
+        }
         if (typeof global.t20AplicarAtaquesDoModal === 'function') {
             global.t20AplicarAtaquesDoModal(out);
         } else {
             global.t20AtaquesLista = out;
             if (typeof global.renderT20AtaquesLista === 'function') global.renderT20AtaquesLista();
         }
+        toastAtq(
+            out.length === 1
+                ? '1 ataque aplicado na ficha. Salve a ficha para gravar no servidor.'
+                : out.length + ' ataques aplicados na ficha. Salve a ficha para gravar no servidor.',
+            'ok'
+        );
         fechar();
     }
 

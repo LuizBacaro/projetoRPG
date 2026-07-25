@@ -1911,6 +1911,353 @@
     grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
 }
 
+/* ── Diálogo Editar ficha — painel amplo e campos legíveis ─────────────── */
+#t20EditarFichaDialog.t20-ficha-dialog--editar {
+    max-width: min(96vw, 72rem);
+    width: min(96vw, 72rem);
+    margin: auto;
+    background: transparent;
+}
+
+#t20EditarFichaDialog.t20-ficha-dialog--editar .t20-ficha-dialog__panel {
+    max-height: min(94vh, 54rem);
+    background: var(--cor-pergaminho, #f4e9d0);
+    border: 3px solid var(--cor-dourada, #c9a84c);
+    border-radius: 12px;
+    box-shadow: 0 16px 48px rgba(44, 26, 14, 0.35);
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__head {
+    padding: 0.85rem 1.15rem;
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.28), rgba(139, 94, 60, 0.12));
+    border-bottom: 2px solid var(--cor-dourada, #c9a84c);
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__titulo {
+    font-size: 1.35rem;
+    color: var(--cor-madeira, #5c3a1e);
+    letter-spacing: 0.02em;
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__lead {
+    margin: 0.3rem 0 0;
+    font-size: 0.82rem;
+    color: var(--cor-tinta-suave, #4a3020);
+    font-weight: 400;
+    max-width: 42rem;
+    line-height: 1.35;
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__body {
+    padding: 0.85rem 1.15rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__body > .t20-ficha-secao {
+    margin: 0;
+    padding: 0.85rem 1rem 1rem;
+    border: 1.5px solid rgba(92, 58, 30, 0.22);
+    border-radius: 10px;
+    background: #fffdf8;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.65) inset;
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__body > .t20-ficha-secao > .t20-ficha-secao-titulo {
+    margin: 0 0 0.65rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid rgba(201, 168, 76, 0.55);
+    font-size: 0.95rem;
+    color: var(--cor-vermelho, #8b1a1a);
+    letter-spacing: 0.04em;
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__body .t20-hint {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--cor-tinta-suave, #4a3020);
+}
+
+#t20EditarFichaDialog .t20-ficha-field {
+    margin-bottom: 0.15rem;
+}
+
+#t20EditarFichaDialog .t20-ficha-field label {
+    font-size: 0.72rem;
+    margin-bottom: 0.28rem;
+    color: var(--cor-madeira, #5c3a1e);
+    letter-spacing: 0.04em;
+}
+
+#t20EditarFichaDialog .t20-ficha-field input:not([type="checkbox"]):not([type="radio"]),
+#t20EditarFichaDialog .t20-ficha-field select,
+#t20EditarFichaDialog .t20-ficha-field textarea,
+#t20EditarFichaDialog .t20-input:not([type="checkbox"]):not([type="radio"]) {
+    min-height: 2.35rem;
+    padding: 0.4rem 0.55rem;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    border: 1.5px solid rgba(92, 58, 30, 0.35);
+    background: #fff;
+    width: 100%;
+}
+
+#t20EditarFichaDialog .t20-ficha-field textarea {
+    min-height: 4rem;
+}
+
+#t20EditarFichaDialog .t20-ficha-field input:not([type="checkbox"]):not([type="radio"]):focus,
+#t20EditarFichaDialog .t20-ficha-field select:focus,
+#t20EditarFichaDialog .t20-ficha-field textarea:focus,
+#t20EditarFichaDialog .t20-input:not([type="checkbox"]):not([type="radio"]):focus {
+    outline: 2px solid rgba(139, 26, 26, 0.35);
+    outline-offset: 1px;
+    border-color: var(--cor-vermelho, #8b1a1a);
+}
+
+#t20EditarFichaDialog .t20-ficha-field input[type="checkbox"],
+#t20EditarFichaDialog .t20-ficha-field input[type="radio"] {
+    width: 1.05rem;
+    height: 1.05rem;
+    min-height: 0;
+    margin: 0.15rem 0 0;
+    padding: 0;
+    flex-shrink: 0;
+    accent-color: var(--cor-vermelho, #8b1a1a);
+    border: none;
+    background: transparent;
+}
+
+#t20EditarFichaDialog .t20-dialog-check-block {
+    grid-column: 1 / -1;
+    padding: 0.65rem 0.75rem;
+    border: 1.5px solid rgba(92, 58, 30, 0.22);
+    border-radius: 8px;
+    background: rgba(250, 243, 224, 0.55);
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+#t20EditarFichaDialog .t20-dialog-check-block__label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    cursor: pointer;
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--cor-madeira, #5c3a1e);
+    max-width: 100%;
+    min-width: 0;
+}
+
+#t20EditarFichaDialog .t20-dialog-check-block__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+#t20EditarFichaDialog .t20-dialog-check-block__sub {
+    display: inline;
+    font-weight: 500;
+    color: var(--cor-tinta-suave, #4a3020);
+}
+
+#t20EditarFichaDialog .t20-dialog-check-block__hint {
+    margin: 0.4rem 0 0 1.6rem;
+    max-width: 48rem;
+}
+
+/* Identificação: nome + jogador (+ tipo) alinhados no topo */
+#t20EditarFichaDialog .t20-dialog-ident-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.65rem 0.85rem;
+    align-items: start;
+}
+
+@media (min-width: 720px) {
+    #t20EditarFichaDialog .t20-dialog-ident-grid {
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.7fr);
+    }
+
+    #t20EditarFichaDialog .t20-dialog-ident-grid .t20-ficha-field--wide {
+        grid-column: auto;
+    }
+}
+
+/* Raça: escolha no topo, traços em bloco próprio (sem afundar o select) */
+#t20EditarFichaDialog .t20-dialog-raca-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+#t20EditarFichaDialog .t20-dialog-raca-layout__escolha {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.65rem 0.85rem;
+    align-items: start;
+    max-width: 28rem;
+}
+
+#t20EditarFichaDialog .t20-dialog-raca-layout__opcoes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+#t20EditarFichaDialog .t20-dialog-raca-layout__tracos {
+    width: 100%;
+    min-width: 0;
+}
+
+#t20EditarFichaDialog .t20-dialog-raca-layout__tracos .t20-dialog-tracos-raca {
+    max-height: 12rem;
+    margin: 0;
+}
+
+@media (min-width: 900px) {
+    #t20EditarFichaDialog .t20-dialog-raca-layout {
+        display: grid;
+        grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr);
+        grid-template-areas:
+            "escolha tracos"
+            "opcoes tracos";
+        column-gap: 1rem;
+        row-gap: 0.65rem;
+        align-items: start;
+    }
+
+    #t20EditarFichaDialog .t20-dialog-raca-layout__escolha {
+        grid-area: escolha;
+        max-width: none;
+    }
+
+    #t20EditarFichaDialog .t20-dialog-raca-layout__opcoes {
+        grid-area: opcoes;
+    }
+
+    #t20EditarFichaDialog .t20-dialog-raca-layout__tracos {
+        grid-area: tracos;
+        align-self: stretch;
+    }
+
+    #t20EditarFichaDialog .t20-dialog-raca-layout__tracos .t20-dialog-tracos-raca {
+        max-height: min(16rem, 40vh);
+        height: 100%;
+        min-height: 8rem;
+    }
+}
+
+/* Atributos / resistências: grade ampla */
+#t20EditarFichaDialog .t20-identity-grid--compact {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem 0.75rem;
+    align-items: start;
+}
+
+@media (min-width: 640px) {
+    #t20EditarFichaDialog .t20-identity-grid--compact {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 900px) {
+    #t20EditarFichaDialog .t20-identity-grid--compact {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+}
+
+#t20EditarFichaDialog .t20-identity-grid--compact .t20-ficha-field--wide,
+#t20EditarFichaDialog .t20-identity-grid--compact .t20-ficha-field--full {
+    grid-column: 1 / -1;
+}
+
+@media (min-width: 900px) {
+    #t20EditarFichaDialog .t20-identity-grid--compact .t20-ficha-field--double,
+    #t20EditarFichaDialog .t20-identity-grid--compact .t20-ficha-field--span2 {
+        grid-column: span 2;
+    }
+}
+
+/* Classe/MB: evita misturar textarea com selects curtos na mesma linha */
+#t20EditarFichaDialog .t20-dialog-classe-grid {
+    align-items: start;
+}
+
+#t20EditarFichaDialog .t20-dialog-classe-grid .t20-ficha-field {
+    min-width: 0;
+}
+
+#t20EditarFichaDialog .t20-dialog-classe-grid .t20-ficha-field label {
+    min-height: 0;
+    line-height: 1.25;
+}
+
+#t20EditarFichaDialog .t20-defesa-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.65rem 0.85rem;
+    align-items: start;
+}
+
+@media (min-width: 720px) {
+    #t20EditarFichaDialog .t20-defesa-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+#t20EditarFichaDialog .t20-dialog-tracos-raca {
+    max-height: 14rem;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid rgba(92, 58, 30, 0.2);
+    border-radius: 8px;
+    background: rgba(250, 243, 224, 0.75);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    overflow-y: auto;
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__foot {
+    padding: 0.75rem 1.15rem 0.9rem;
+    gap: 0.55rem;
+    border-top: 2px solid var(--cor-dourada, #c9a84c);
+    background: rgba(92, 58, 30, 0.06);
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__foot-hint {
+    font-size: 0.8rem;
+    color: var(--cor-tinta-suave, #4a3020);
+}
+
+#t20EditarFichaDialog .t20-ficha-dialog__foot .tormenta-btn {
+    min-height: 2.4rem;
+    padding: 0.45rem 1rem;
+    font-weight: 600;
+}
+
+@media (max-width: 640px) {
+    #t20EditarFichaDialog.t20-ficha-dialog--editar {
+        max-width: 100vw;
+        width: 100vw;
+    }
+
+    #t20EditarFichaDialog.t20-ficha-dialog--editar .t20-ficha-dialog__panel {
+        border-radius: 0;
+        max-height: 100vh;
+        border-left: none;
+        border-right: none;
+    }
+}
+
 .t20-dialog-tracos-raca {
     margin: 0;
     white-space: pre-line;
@@ -2772,75 +3119,105 @@ article.t20-dnd-source--dragging {
     white-space: nowrap;
 }
 
-/* ── Assistente Subir nível (wizard 3 passos) ─────────────────────────── */
+/* ── Assistente Subir nível (wizard 3 passos) — tema pergaminho, alto contraste ─ */
+#modalSubirNivelTormenta.equipamentos-overlay.is-open {
+    display: flex !important;
+    pointer-events: auto;
+    z-index: 2100;
+    background: rgba(44, 26, 14, 0.55);
+}
+
 .t20-subir-nivel-modal {
-    max-width: min(36rem, 96vw) !important;
+    max-width: min(40rem, 96vw) !important;
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
-    max-height: min(90vh, 720px);
+    gap: 0;
+    max-height: min(92vh, 760px);
+    padding: 0;
+    color: var(--cor-tinta, #2c1a0e);
+    background: var(--cor-pergaminho, #f4e9d0);
+}
+
+.t20-subir-nivel-modal > .equipamentos-header {
+    flex-shrink: 0;
 }
 
 .t20-subir-nivel-lead {
-    margin: 0.15rem 0 0;
-    font-size: 0.78rem;
-    color: rgba(226, 232, 240, 0.72);
+    margin: 0.2rem 0 0;
+    font-size: 0.8rem;
+    color: var(--cor-tinta-suave, #4a3020);
+    font-style: italic;
 }
 
 .t20-subir-nivel-steps {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.35rem;
-    margin: 0.15rem 0 0.35rem;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0.75rem 1rem 0.35rem;
+    flex-shrink: 0;
 }
 
 .t20-subir-nivel-step {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    border: 1px solid rgba(148, 163, 184, 0.28);
-    background: rgba(15, 23, 42, 0.55);
-    color: rgba(226, 232, 240, 0.75);
+    border: 1.5px solid rgba(92, 58, 30, 0.35);
+    background: rgba(255, 252, 245, 0.95);
+    color: var(--cor-madeira, #5c3a1e);
     border-radius: 10px;
-    padding: 0.4rem 0.5rem;
-    font-size: 0.72rem;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 600;
     cursor: default;
 }
 
+.t20-subir-nivel-step:disabled {
+    opacity: 0.55;
+}
+
 .t20-subir-nivel-step.is-active {
-    border-color: rgba(248, 113, 113, 0.65);
-    background: rgba(127, 29, 29, 0.28);
-    color: #fff;
+    border-color: var(--cor-vermelho, #8b1a1a);
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.35), rgba(139, 26, 26, 0.12));
+    color: var(--cor-tinta, #2c1a0e);
+    box-shadow: 0 0 0 1px rgba(139, 26, 26, 0.15);
 }
 
 .t20-subir-nivel-step.is-done {
-    border-color: rgba(52, 211, 153, 0.45);
-    color: rgba(167, 243, 208, 0.95);
+    border-color: rgba(22, 101, 52, 0.45);
+    background: rgba(220, 252, 231, 0.85);
+    color: #14532d;
 }
 
 .t20-subir-nivel-step__num {
     display: inline-flex;
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 1.4rem;
+    height: 1.4rem;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(92, 58, 30, 0.12);
+    color: var(--cor-madeira, #5c3a1e);
     font-weight: 700;
     flex-shrink: 0;
 }
 
 .t20-subir-nivel-step.is-active .t20-subir-nivel-step__num {
-    background: rgba(248, 113, 113, 0.85);
-    color: #111;
+    background: var(--cor-vermelho, #8b1a1a);
+    color: #fff;
+}
+
+.t20-subir-nivel-step.is-done .t20-subir-nivel-step__num {
+    background: #15803d;
+    color: #fff;
 }
 
 .t20-subir-nivel-painel {
     overflow: auto;
     flex: 1;
     min-height: 8rem;
-    padding-right: 0.15rem;
+    padding: 0.65rem 1rem 0.85rem;
 }
 
 .t20-subir-nivel-hero {
@@ -2848,22 +3225,22 @@ article.t20-dnd-source--dragging {
     align-items: baseline;
     justify-content: center;
     gap: 0.65rem;
-    margin: 0.25rem 0 0.85rem;
-    font-size: 1.35rem;
+    margin: 0.15rem 0 0.75rem;
+    font-size: 1.45rem;
     font-weight: 700;
     letter-spacing: 0.02em;
 }
 
 .t20-subir-nivel-hero__de {
-    color: rgba(226, 232, 240, 0.7);
+    color: var(--cor-madeira-clara, #8b5e3c);
 }
 
 .t20-subir-nivel-hero__seta {
-    color: rgba(248, 113, 113, 0.9);
+    color: var(--cor-vermelho, #8b1a1a);
 }
 
 .t20-subir-nivel-hero__para {
-    color: #fca5a5;
+    color: var(--cor-vermelho, #8b1a1a);
 }
 
 .t20-subir-nivel-opcoes {
@@ -2873,22 +3250,24 @@ article.t20-dnd-source--dragging {
 }
 
 .t20-subir-nivel-secao-lbl {
-    margin: 0.55rem 0 0.15rem;
+    margin: 0.55rem 0 0.2rem;
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: rgba(148, 163, 184, 0.9);
+    color: var(--cor-madeira, #5c3a1e);
+    font-weight: 700;
 }
 
 .t20-subir-nivel-card {
     display: flex;
     gap: 0.55rem;
     align-items: flex-start;
-    border: 1px solid rgba(148, 163, 184, 0.28);
+    border: 1.5px solid rgba(92, 58, 30, 0.28);
     border-radius: 12px;
-    padding: 0.65rem 0.75rem;
-    background: rgba(15, 23, 42, 0.5);
+    padding: 0.7rem 0.8rem;
+    background: #fffdf8;
     cursor: pointer;
+    color: var(--cor-tinta, #2c1a0e);
 }
 
 .t20-subir-nivel-card input {
@@ -2897,9 +3276,9 @@ article.t20-dnd-source--dragging {
 
 .t20-subir-nivel-card.is-selected,
 .t20-subir-nivel-card:has(input:checked) {
-    border-color: rgba(248, 113, 113, 0.7);
-    box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.25);
-    background: rgba(69, 10, 10, 0.28);
+    border-color: var(--cor-vermelho, #8b1a1a);
+    box-shadow: inset 0 0 0 1px rgba(139, 26, 26, 0.2);
+    background: rgba(201, 168, 76, 0.18);
 }
 
 .t20-subir-nivel-card--static {
@@ -2931,22 +3310,26 @@ article.t20-dnd-source--dragging {
 }
 
 .t20-subir-nivel-stat {
-    border: 1px solid rgba(148, 163, 184, 0.22);
+    border: 1.5px solid rgba(92, 58, 30, 0.28);
     border-radius: 12px;
-    padding: 0.65rem 0.75rem;
-    background: rgba(2, 6, 23, 0.45);
+    padding: 0.7rem 0.8rem;
+    background: #fffdf8;
+    color: var(--cor-tinta, #2c1a0e);
 }
 
 .t20-subir-nivel-stat--pv {
-    border-color: rgba(52, 211, 153, 0.35);
+    border-color: rgba(22, 101, 52, 0.45);
+    background: rgba(240, 253, 244, 0.95);
 }
 
 .t20-subir-nivel-stat--pm {
-    border-color: rgba(96, 165, 250, 0.4);
+    border-color: rgba(30, 64, 175, 0.4);
+    background: rgba(239, 246, 255, 0.95);
 }
 
 .t20-subir-nivel-stat--hab {
-    border-color: rgba(251, 191, 36, 0.4);
+    border-color: rgba(161, 98, 7, 0.45);
+    background: rgba(254, 249, 195, 0.55);
     grid-column: 1 / -1;
 }
 
@@ -2955,13 +3338,14 @@ article.t20-dnd-source--dragging {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: rgba(148, 163, 184, 0.95);
-    font-weight: 600;
+    color: var(--cor-madeira, #5c3a1e);
+    font-weight: 700;
 }
 
 .t20-subir-nivel-stat__b {
-    font-size: 0.88rem;
-    line-height: 1.4;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: var(--cor-tinta, #2c1a0e);
 }
 
 .t20-subir-nivel-stat__b p {
@@ -2969,18 +3353,21 @@ article.t20-dnd-source--dragging {
 }
 
 .t20-subir-nivel-delta {
-    font-size: 1.05rem;
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: var(--cor-tinta, #2c1a0e);
 }
 
 .t20-subir-nivel-plus {
-    color: #6ee7b7;
-    font-weight: 700;
-    margin-left: 0.25rem;
+    color: #15803d;
+    font-weight: 800;
+    margin-left: 0.3rem;
 }
 
 .t20-subir-nivel-lista {
     margin: 0;
     padding-left: 1.1rem;
+    color: var(--cor-tinta, #2c1a0e);
 }
 
 .t20-subir-nivel-lista li {
@@ -2990,25 +3377,27 @@ article.t20-dnd-source--dragging {
 .t20-subir-nivel-avisos,
 .t20-subir-nivel-erro {
     margin-top: 0.65rem;
-    padding: 0.65rem 0.75rem;
+    padding: 0.7rem 0.8rem;
     border-radius: 10px;
-    font-size: 0.82rem;
+    font-size: 0.84rem;
 }
 
 .t20-subir-nivel-avisos {
-    background: rgba(30, 41, 59, 0.65);
-    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: rgba(254, 243, 199, 0.9);
+    border: 1px solid rgba(161, 98, 7, 0.35);
+    color: #713f12;
 }
 
 .t20-subir-nivel-erro {
-    background: rgba(127, 29, 29, 0.35);
-    border: 1px solid rgba(248, 113, 113, 0.45);
-    color: #fecaca;
+    background: rgba(254, 226, 226, 0.95);
+    border: 1px solid rgba(185, 28, 28, 0.4);
+    color: #7f1d1d;
 }
 
 .t20-subir-nivel-loading {
     text-align: center;
     padding: 1.5rem 0.5rem;
+    color: var(--cor-madeira, #5c3a1e);
 }
 
 .t20-subir-nivel-check {
@@ -3016,8 +3405,9 @@ article.t20-dnd-source--dragging {
     align-items: flex-start;
     gap: 0.5rem;
     margin: 0.75rem 0;
-    font-size: 0.84rem;
-    color: rgba(226, 232, 240, 0.9);
+    font-size: 0.88rem;
+    color: var(--cor-tinta, #2c1a0e);
+    font-weight: 500;
 }
 
 .t20-subir-nivel-check input {
@@ -3025,29 +3415,31 @@ article.t20-dnd-source--dragging {
 }
 
 .t20-subir-nivel-resumo-final {
-    border: 1px solid rgba(248, 113, 113, 0.35);
+    border: 1.5px solid rgba(139, 26, 26, 0.35);
     border-radius: 12px;
-    padding: 0.75rem 0.85rem;
-    background: rgba(69, 10, 10, 0.22);
+    padding: 0.8rem 0.9rem;
+    background: rgba(201, 168, 76, 0.18);
+    color: var(--cor-tinta, #2c1a0e);
 }
 
 .t20-subir-nivel-resumo-final__titulo {
-    margin: 0 0 0.35rem;
-    font-size: 0.72rem;
+    margin: 0 0 0.4rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #fca5a5;
+    color: var(--cor-vermelho, #8b1a1a);
+    font-weight: 700;
 }
 
 .t20-subir-nivel-pos {
     margin: 0.35rem 0 0;
     padding-left: 1.15rem;
-    font-size: 0.8rem;
-    color: rgba(226, 232, 240, 0.78);
+    font-size: 0.84rem;
+    color: var(--cor-tinta-suave, #4a3020);
 }
 
 .t20-subir-nivel-pos li {
-    margin: 0.25rem 0;
+    margin: 0.3rem 0;
 }
 
 .t20-subir-nivel-footer {
@@ -3056,8 +3448,10 @@ article.t20-dnd-source--dragging {
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    padding-top: 0.35rem;
-    border-top: 1px solid rgba(148, 163, 184, 0.18);
+    padding: 0.75rem 1rem 1rem;
+    border-top: 2px solid var(--cor-dourada, #c9a84c);
+    background: rgba(92, 58, 30, 0.06);
+    flex-shrink: 0;
 }
 
 .t20-subir-nivel-footer__dir {
@@ -3065,6 +3459,11 @@ article.t20-dnd-source--dragging {
     flex-wrap: wrap;
     gap: 0.45rem;
     margin-left: auto;
+}
+
+.t20-subir-nivel-footer .tormenta-btn {
+    min-height: 2.35rem;
+    font-weight: 600;
 }
 
 #btnT20SubirNivelMb:disabled,
