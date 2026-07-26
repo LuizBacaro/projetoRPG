@@ -251,3 +251,50 @@ class TormentaBestiarioImportRequest(BaseModel):
         max_length=120,
         description="Nome customizado na mesa (ex.: Lobo #2).",
     )
+
+
+class TormentaBlocoAmeacaResponse(BaseModel):
+    """RF-T13c — texto do bloco estilo livro."""
+
+    personagem_id: int
+    texto: str
+    fonte: str = Field(description="override | gerado")
+    nd: int = 1
+    papel_combate: str = "solo"
+
+
+class TormentaConverterAmeacaRequest(BaseModel):
+    """RF-T13d — criar cópia npc/monstro a partir de personagem existente."""
+
+    tipo: str = Field(default="monstro", max_length=20)
+    papel_combate: Optional[str] = Field(
+        None,
+        max_length=20,
+        description="solo | lacaio | especial",
+    )
+    nome_override: Optional[str] = Field(None, max_length=120)
+    campanha_id: Optional[int] = Field(None, ge=1)
+
+    @field_validator("tipo")
+    @classmethod
+    def _tipo_ameaca(cls, v: str) -> str:
+        t = (v or "monstro").strip().lower()
+        if t not in ("monstro", "npc"):
+            raise ValueError("tipo deve ser monstro ou npc")
+        return t
+
+    @field_validator("papel_combate", mode="before")
+    @classmethod
+    def _papel(cls, v: Any) -> Optional[str]:
+        if v is None or str(v).strip() == "":
+            return None
+        p = str(v).strip().lower()
+        if p not in ("solo", "lacaio", "especial"):
+            raise ValueError("papel_combate deve ser solo, lacaio ou especial")
+        return p
+
+
+class TormentaRegenerarBlocoAmeacaRequest(BaseModel):
+    """Limpa texto_override e devolve bloco gerado (persistindo ficha_json)."""
+
+    limpar_override: bool = True

@@ -7,6 +7,13 @@ from typing import List, Optional
 from app.games.tormenta.models.campanha import TormentaCampanha
 from app.games.tormenta.models.personagem import TormentaPersonagem
 from app.games.tormenta.ports import TormentaPersonagemRepositoryProtocol
+from app.games.tormenta.rules.ameaca_bloco_t20 import (
+    consolidar_ameaca_de_personagem,
+    limpar_texto_override,
+    montar_bloco_ameaca,
+    obter_nd,
+    obter_papel_combate,
+)
 from app.games.tormenta.rules.atributos_t20 import (
     METODO_GERACAO_PADRAO,
     custo_total_compra_seis_atributos,
@@ -40,6 +47,8 @@ from app.games.tormenta.rules.regra_versao_t20 import (
 from app.games.tormenta.rules.tendencias_divindades_t20 import validar_devocao_v13
 from app.games.tormenta.schemas.personagem import (
     TormentaBestiarioImportRequest,
+    TormentaBlocoAmeacaResponse,
+    TormentaConverterAmeacaRequest,
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
     TormentaPersonagemUpdate,
@@ -760,6 +769,152 @@ class TormentaPersonagemService:
             nome_override=payload.nome_override,
         )
         return self.criar(usuario, create_payload)
+
+    def _snapshot_personagem(self, ent: TormentaPersonagem) -> dict:
+        return {
+            "id": ent.id,
+            "nome": ent.nome,
+            "tipo": ent.tipo,
+            "nivel": ent.nivel,
+            "ca": ent.ca,
+            "pv_max": ent.pv_max,
+            "pa_max": ent.pa_max,
+            "rd": ent.rd,
+            "iniciativa": ent.iniciativa,
+            "deslocamento": ent.deslocamento,
+            "tamanho": ent.tamanho,
+            "fort_total": ent.fort_total,
+            "ref_total": ent.ref_total,
+            "von_total": ent.von_total,
+            "for_valor": ent.for_valor,
+            "des_valor": ent.des_valor,
+            "con_valor": ent.con_valor,
+            "int_valor": ent.int_valor,
+            "sab_valor": ent.sab_valor,
+            "car_valor": ent.car_valor,
+            "ficha_json": dict(ent.ficha_json or {}),
+        }
+
+    def _magias_vinculos_resumo(self, personagem_id: int) -> list:
+        from app.games.tormenta.services.personagem_magias_service import (
+            TormentaPersonagemMagiasService,
+        )
+
+        try:
+            itens = TormentaPersonagemMagiasService(self.repo.db).listar_por_personagem(
+                personagem_id
+            )
+        except Exception:
+            return []
+        out = []
+        for it in itens or []:
+            if hasattr(it, "model_dump"):
+                d = it.model_dump()
+            elif isinstance(it, dict):
+                d = it
+            else:
+                continue
+            out.append(d)
+        return out
+
+    def obter_bloco_ameaca(self, personagem_id: int) -> TormentaBlocoAmeacaResponse:
+        ent = self.obter_por_id(personagem_id)
+        snap = self._snapshot_personagem(ent)
+        fj = dict(ent.ficha_json or {})
+        magias = self._magias_vinculos_resumo(personagem_id)
+        texto, fonte = montar_bloco_ameaca(
+            snap, ficha_json=fj, magias_vinculos=magias, preferir_override=True
+        )
+        return TormentaBlocoAmeacaResponse(
+            personagem_id=int(ent.id),
+            texto=texto,
+            fonte=fonte,
+            nd=obter_nd(snap, fj),
+            papel_combate=obter_papel_combate(snap, fj),
+        )
+
+    def regenerar_bloco_ameaca(
+        self, personagem_id: int, *, limpar_override: bool = True
+    ) -> TormentaBlocoAmeacaResponse:
+        ent = self.obter_por_id(personagem_id)
+        fj = dict(ent.ficha_json or {})
+        if limpar_override:
+            fj = limpar_texto_override(fj)
+        magias = self._magias_vinculos_resumo(personagem_id)
+        snap = self._snapshot_personagem(ent)
+        snap["ficha_json"] = fj
+        # Reconsolidar ações mínimas sem apagar campos editados do mestre
+        am = fj.get("ameaca") if isinstance(fj.get("ameaca"), dict) else {}
+        if not am:
+            fj = consolidar_ameaca_de_personagem(
+                snap, ficha_json=fj, magias_vinculos=magias
+            )
+        else:
+            fj["ameaca"] = {**am, "texto_override": None}
+        ent.ficha_json = fj
+        commit_with_rollback(self.repo.db)
+        self.repo.db.refresh(ent)
+        return self.obter_bloco_ameaca(personagem_id)
+
+    def converter_para_ameaca(
+        self,
+        usuario: Usuario,
+        personagem_id: int,
+        payload: TormentaConverterAmeacaRequest,
+    ) -> TormentaPersonagemResponse:
+        if not self._usuario_pode_mestrar_tormenta(usuario):
+            raise DadosInvalidos("Somente mestre pode converter personagem em ameaça")
+        origem = self.obter_por_id(personagem_id)
+        snap = self._snapshot_personagem(origem)
+        magias = self._magias_vinculos_resumo(personagem_id)
+        fj = consolidar_ameaca_de_personagem(
+            snap,
+            ficha_json=dict(origem.ficha_json or {}),
+            magias_vinculos=magias,
+            papel_combate=payload.papel_combate,
+        )
+        nome = (payload.nome_override or origem.nome or "").strip()
+        if not nome:
+            raise DadosInvalidos("Nome e obrigatorio")
+        campanha_id = (
+            payload.campanha_id
+            if payload.campanha_id is not None
+            else origem.campanha_id
+        )
+        create = TormentaPersonagemCreate(
+            tipo=payload.tipo,
+            nome=nome,
+            campanha_id=campanha_id,
+            jogador_nome=None,
+            raca=origem.raca or "",
+            classe_nivel=origem.classe_nivel or "",
+            sexo=origem.sexo or "",
+            idade=origem.idade or "",
+            tendencia=origem.tendencia or "",
+            divindade=origem.divindade or "",
+            for_valor=int(origem.for_valor),
+            des_valor=int(origem.des_valor),
+            con_valor=int(origem.con_valor),
+            int_valor=int(origem.int_valor),
+            sab_valor=int(origem.sab_valor),
+            car_valor=int(origem.car_valor),
+            pv_max=int(origem.pv_max or 1),
+            pv_atual=int(origem.pv_max or 1),
+            pa_max=int(origem.pa_max or 0),
+            pa_atual=int(origem.pa_max or 0),
+            ca=int(origem.ca or 10),
+            rd=origem.rd or "",
+            nivel=int(origem.nivel or 1),
+            iniciativa=int(origem.iniciativa or 0),
+            deslocamento=origem.deslocamento or "",
+            tamanho=origem.tamanho or "",
+            fort_total=int(origem.fort_total or 0),
+            ref_total=int(origem.ref_total or 0),
+            von_total=int(origem.von_total or 0),
+            ficha_json=fj,
+            foto_url=origem.foto_url,
+        )
+        return self.criar(usuario, create)
 
     def atualizar(
         self, personagem_id: int, payload: TormentaPersonagemUpdate

@@ -119,7 +119,7 @@
             parts.push(`Manobras ${sinal}${data.manobra_bonus}`);
         }
         if (data.armas_aumentadas) parts.push('Armas aumentadas');
-        if (data.ca_vs_grande_ou_maior) parts.push(`CA +${data.ca_vs_grande_ou_maior} vs Grande+`);
+        if (data.ca_vs_grande_ou_maior) parts.push(`Defesa +${data.ca_vs_grande_ou_maior} vs Grande+`);
         if (data.fortitude_bonus) parts.push(`Fort +${data.fortitude_bonus}`);
         if (data.reflexos_bonus) parts.push(`Ref +${data.reflexos_bonus}`);
         if (data.vontade_bonus) parts.push(`Von +${data.vontade_bonus}`);

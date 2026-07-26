@@ -1636,3 +1636,115 @@ def test_criar_jogador_v13_wizard_sem_pericias_rejeita(tormenta_personagens_db):
         ),
     )
     assert r.status_code == 422, r.text
+
+
+def test_bloco_ameaca_get_e_override(tormenta_personagens_db):
+    SessionLocal, _, _, u_mestre = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u_mestre))
+    created = client.post(
+        "/api/v1/tormenta/personagens",
+        json={
+            "nome": "Orc Guerreiro",
+            "tipo": "monstro",
+            "nivel": 2,
+            "ca": 15,
+            "pv_max": 20,
+            "iniciativa": 1,
+            "tamanho": "Médio",
+            "for_valor": 16,
+            "des_valor": 12,
+            "con_valor": 14,
+            "int_valor": 8,
+            "sab_valor": 10,
+            "car_valor": 8,
+            "ficha_json": {
+                "nd": 2,
+                "tipo_criatura": "Humanoide",
+                "ataques": [
+                    {
+                        "nome": "Machado",
+                        "bonus_ataque": "+5",
+                        "dano": "1d12+3",
+                    }
+                ],
+                "ameaca": {"papel_combate": "solo", "percepcao": 2},
+            },
+        },
+    )
+    assert created.status_code == 201, created.text
+    pid = created.json()["id"]
+
+    r = client.get(f"/api/v1/tormenta/personagens/{pid}/bloco-ameaca")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["fonte"] == "gerado"
+    assert body["nd"] == 2
+    assert "Orc Guerreiro ND 2" in body["texto"]
+    assert "Machado +5" in body["texto"]
+
+    patch = client.patch(
+        f"/api/v1/tormenta/personagens/{pid}",
+        json={
+            "ficha_json": {
+                **(created.json().get("ficha_json") or {}),
+                "ameaca": {
+                    **((created.json().get("ficha_json") or {}).get("ameaca") or {}),
+                    "texto_override": "Texto manual do mestre",
+                },
+            }
+        },
+    )
+    assert patch.status_code == 200, patch.text
+    r2 = client.get(f"/api/v1/tormenta/personagens/{pid}/bloco-ameaca")
+    assert r2.json()["fonte"] == "override"
+    assert r2.json()["texto"] == "Texto manual do mestre"
+
+    regen = client.post(f"/api/v1/tormenta/personagens/{pid}/bloco-ameaca/regenerar")
+    assert regen.status_code == 200, regen.text
+    assert regen.json()["fonte"] == "gerado"
+    assert "Orc Guerreiro ND 2" in regen.json()["texto"]
+
+
+def test_converter_ameaca_cria_copia(tormenta_personagens_db):
+    SessionLocal, u1, _, u_mestre = tormenta_personagens_db
+    client_j = _build_client(SessionLocal, _usuario(u1))
+    jog = client_j.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_json(
+            nome="Vilão PJ",
+            nivel=3,
+            classe_nivel="Guerreiro 3",
+            pv_max=28,
+            ca=16,
+            ficha_json={
+                "ataques": [{"nome": "Espada", "bonus_ataque": "+6", "dano": "1d8+3"}],
+            },
+        ),
+    )
+    assert jog.status_code == 201, jog.text
+    jid = jog.json()["id"]
+
+    client_m = _build_client(SessionLocal, _usuario(u_mestre))
+    conv = client_m.post(
+        f"/api/v1/tormenta/personagens/{jid}/converter-ameaca",
+        json={
+            "tipo": "monstro",
+            "papel_combate": "solo",
+            "nome_override": "Vilão Ameaça",
+        },
+    )
+    assert conv.status_code == 201, conv.text
+    body = conv.json()
+    assert body["id"] != jid
+    assert body["tipo"] == "monstro"
+    assert body["nome"] == "Vilão Ameaça"
+    am = (body.get("ficha_json") or {}).get("ameaca") or {}
+    assert am.get("nd") == 3
+    assert am.get("papel_combate") == "solo"
+    assert am.get("texto_override") is None
+
+    # Original intacto
+    orig = client_j.get(f"/api/v1/tormenta/personagens/{jid}")
+    assert orig.status_code == 200
+    assert orig.json()["tipo"] == "jogador"
+    assert orig.json()["nome"] == "Vilão PJ"

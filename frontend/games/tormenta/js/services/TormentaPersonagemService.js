@@ -132,6 +132,34 @@ class TormentaPersonagemService {
         return this._handleResponse(res, 'Erro ao importar criatura');
     }
 
+    /** RF-T13c — bloco de ameaça estilo livro. */
+    async obterBlocoAmeaca(id) {
+        const res = await fetch(this._url(`/${id}/bloco-ameaca`), {
+            headers: this._headers(false),
+        });
+        return this._handleResponse(res, 'Erro ao carregar bloco de ameaça');
+    }
+
+    /** Regenera bloco e limpa texto_override. */
+    async regenerarBlocoAmeaca(id, payload = {}) {
+        const res = await fetch(this._url(`/${id}/bloco-ameaca/regenerar`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload && typeof payload === 'object' ? payload : {}),
+        });
+        return this._handleResponse(res, 'Erro ao regenerar bloco de ameaça');
+    }
+
+    /** RF-T13d — cria cópia npc/monstro a partir do personagem. */
+    async converterAmeaca(id, payload) {
+        const res = await fetch(this._url(`/${id}/converter-ameaca`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify(payload || {}),
+        });
+        return this._handleResponse(res, 'Erro ao converter em ameaça');
+    }
+
     async atualizar(id, payload) {
         const res = await fetch(this._url(`/${id}`), {
             method: 'PATCH',
