@@ -73,6 +73,45 @@ Legenda: **T** = somente treinada; **A** = penalidade de armadura.
 | RF-T04f | Percepção passiva (derivada de Percepção) | P1 |
 | RF-T04g | Ofício: especialidades múltiplas (mesma perícia) | **Feito** |
 | RF-T04h | DCs padrão (`pericias_dc_*.json`) | P1 |
+| RF-T04i | Seletor de **uso** na rolagem (mesma perícia; não linha separada) | **P0–P3 Feito** (Atuação pendente) |
+
+### RF-T04i — Usos vs especialidades (decisão de produto)
+
+Em T20 **não** se desmembra Atletismo/Enganação em linhas com treino próprio. Isso vale só para **Ofício** (e, se o livro confirmar especialidades treinadas à parte, **Atuação** — ver nota abaixo).
+
+O que vale a pena é um **seletor de uso no momento da rolagem** (rótulo + mods situacionais), mantendo um único Tr/Atrib/Out/Σ.
+
+| Prioridade | Perícia | Usos sugeridos na UI | Por quê |
+|------------|---------|----------------------|---------|
+| **P0** (já parcial) | Atletismo | escalar · **nadar** · saltar | Único com regra distinta na ficha hoje: pen. armadura **só** em natação (`uso_atletismo_natacao` / 🏊). Seletor substitui o checkbox na rolagem. |
+| **P1** | Enganação | blefar · disfarce · fingir | Usos narrativos muito diferentes; bônus de item/poder costumam ser «só neste uso». |
+| **P1** | Acrobacia | equilíbrio · escapar · queda | Mesmo Σ; uso muda CD e leitura da mesa. |
+| **P1** | Ladinagem | fechaduras · armadilhas · pungar | Ferramenta/contexto distinto; pen. armadura já na perícia inteira. |
+| **P1** | Sobrevivência | orientar · rastrear · forragear | Rastrear vs orientar é a confusão clássica na mesa. |
+| **P1** | Cura | primeiros socorros · tratamento | Tempos/efeitos diferentes no Cap. 2. |
+| **P2** | Diplomacia | persuadir · barganhar · obter informação | «Obter Informação» sumiu do catálogo e caiu aqui / Investigação. |
+| **P2** | Investigação | buscar · analisar · obter informação | Espelha o legado MB sem perícia extra. |
+| **P2** | Adestramento | comandar · treinar | Útil se houver bônus só num uso. |
+| **P2** | Percepção | observar · ouvir | Passiva já é cartão separado; seletor só na rolagem ativa. |
+| **P3** | Cavalgar | montar · combater montado | Baixo ganho; mesma fórmula. |
+
+**Não entram no seletor** (perícia única / resistência / ataque): Fortitude, Reflexos, Vontade, Iniciativa, Luta, Pontaria, Furtividade, Intimidação, Intuição, Jogatina, Pilotagem, Misticismo, Nobreza, Religião, Guerra, Conhecimento.
+
+**Modelo Ofício (linha própria), não seletor:**
+
+| Perícia | Tratamento |
+|---------|------------|
+| Ofício | **Feito** — linha por especialidade. |
+| Atuação | **Confirmar no livro** (Cap. 2): se especialidade (instrumento/arte) for treinada à parte como Ofício → mesmo padrão de linhas; se for só rótulo de uso → seletor P2. |
+
+**Critério de aceite (quando implementar RF-T04i):**
+
+1. Rolagem de perícia com usos listados pergunta o uso (ou usa default) **sem** criar linha extra nem consumir vaga de treinada.
+2. Atletismo + uso `nadar` → mesma regra de pen. armadura que o checkbox atual; demais usos sem pen. de armadura.
+3. Resultado / toast / log contextual mostra `Enganação (disfarce)`, não só `Enganação`.
+4. Bônus «Outros» genérico da linha continua compartilhado; bônus ligados a uso (futuro) só entram se o uso selecionado bater.
+
+**Fora de escopo deste RF:** desmembrar Enganação/Atletismo em várias perícias treinadas.
 
 ## Estado de implementação
 
@@ -89,6 +128,7 @@ Legenda: **T** = somente treinada; **A** = penalidade de armadura.
 | Ofício especialidades múltiplas | **Feito** | `oficio_especialidades[]` na ficha v1.3 |
 | Ofício: linha por especialidade | **Feito** | Cada especialidade é uma linha com Tr/Atrib/Out/Σ e rolagem próprios; salva em `pericias[]` como `Ofício (x)`. Linha «Ofício» vira cabeçalho do grupo (sem treino/valores) e cada especialidade treinada consome uma vaga de treinada. Linhas filhas repetem `data-per-idx` do pai e usam `data-per-nome-canon="Ofício"` para bônus racial e lookup do backend. |
 | Atletismo penalidade só natação | **Feito** | Checkbox 🏊 na ficha + `uso_atletismo_natacao` na API |
+| Seletor de uso na rolagem (RF-T04i) | **P0–P3 Feito** | `t20-pericias-usos.js` + diálogo CD; Atletismo Nadar → `uso_atletismo_natacao`; P2 Diplomacia/Investigação/Adestramento/Percepção; P3 Cavalgar. Atuação ainda pendente (especialidade vs rótulo). |
 
 ## Gap código
 
