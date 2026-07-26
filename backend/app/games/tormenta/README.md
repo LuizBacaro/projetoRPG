@@ -60,6 +60,7 @@ Campos usados pelo frontend atual (podem crescer sem migration):
 - `dinheiro`: `{ ts, tp, to }`, `pm_max`, `pm_atual`, `idiomas`
 - `campanha`, `mestre`, `outros_jogadores`, `xp_atual`, `xp_proximo`
 - `historia`, `personalidade`, `aparencia`
+- `ameaca`: metadados de NPC/monstro (ND, papel, bloco override) — ver RF-13 e `rules/ameaca_bloco_t20.py`; endpoints `GET .../bloco-ameaca` e `POST .../converter-ameaca`
 
 Levantamento de requisitos do jogo: [docs/tormenta/README.md](../../../../docs/tormenta/README.md).
 

@@ -48,9 +48,12 @@ from app.games.tormenta.schemas.magia_personagem import (
 )
 from app.games.tormenta.schemas.personagem import (
     TormentaBestiarioImportRequest,
+    TormentaBlocoAmeacaResponse,
+    TormentaConverterAmeacaRequest,
     TormentaPersonagemCreate,
     TormentaPersonagemResponse,
     TormentaPersonagemUpdate,
+    TormentaRegenerarBlocoAmeacaRequest,
 )
 from app.games.tormenta.schemas.progressao import (
     TormentaSubirNivelAplicarRequest,
@@ -761,6 +764,63 @@ def importar_bestiario(
     except ArenaBaseException as e:
         code = getattr(e, "status_code", 400)
         raise HTTPException(status_code=code, detail=getattr(e, "message", str(e)))
+
+
+@router.get(
+    "/{personagem_id}/bloco-ameaca",
+    response_model=TormentaBlocoAmeacaResponse,
+    summary="Bloco de Ameaça estilo livro (RF-T13c)",
+)
+def obter_bloco_ameaca(
+    personagem_id: int,
+    service: TormentaPersonagemService = Depends(get_tormenta_personagem_service),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return service.obter_bloco_ameaca(personagem_id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/bloco-ameaca/regenerar",
+    response_model=TormentaBlocoAmeacaResponse,
+    summary="Limpa override e regenera bloco de Ameaça",
+)
+def regenerar_bloco_ameaca(
+    personagem_id: int,
+    payload: Optional[TormentaRegenerarBlocoAmeacaRequest] = None,
+    service: TormentaPersonagemService = Depends(get_tormenta_personagem_service),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    limpar = True if payload is None else bool(payload.limpar_override)
+    try:
+        return service.regenerar_bloco_ameaca(personagem_id, limpar_override=limpar)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/converter-ameaca",
+    response_model=TormentaPersonagemResponse,
+    status_code=201,
+    summary="Converter personagem em cópia Ameaça npc/monstro (RF-T13d)",
+)
+def converter_ameaca(
+    personagem_id: int,
+    payload: TormentaConverterAmeacaRequest,
+    service: TormentaPersonagemService = Depends(get_tormenta_personagem_service),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return service.converter_para_ameaca(usuario_atual, personagem_id, payload)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
 
 
 @router.patch("/{personagem_id}", response_model=TormentaPersonagemResponse)

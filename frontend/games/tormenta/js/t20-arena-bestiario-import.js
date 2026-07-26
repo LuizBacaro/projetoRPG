@@ -33,7 +33,7 @@
                 const nome = esc(item.nome);
                 const nd = item.nd != null ? `ND ${esc(item.nd)}` : '';
                 const tipo = item.tipo_criatura ? esc(item.tipo_criatura) : '';
-                const meta = [nd, tipo, item.pv_max != null ? `PV ${esc(item.pv_max)}` : '', item.ca != null ? `CA ${esc(item.ca)}` : '']
+                const meta = [nd, tipo, item.pv_max != null ? `PV ${esc(item.pv_max)}` : '', item.ca != null ? `Defesa ${esc(item.ca)}` : '']
                     .filter(Boolean)
                     .join(' · ');
                 const active = slugSelecionado === item.slug ? ' is-active' : '';
@@ -71,7 +71,7 @@
             : '<p class="t20-dash-hint">Sem ataques catalogados.</p>';
         host.innerHTML = `
             <h4 class="t20-bestiario-prev-nome">${esc(det.nome)}</h4>
-            <p class="t20-bestiario-prev-meta">${esc(det.tipo_criatura || '')}${det.nd != null ? ` · ND ${esc(det.nd)}` : ''} · PV ${esc(det.pv_max)} · CA ${esc(det.ca)} · Ini ${esc(det.iniciativa)}</p>
+            <p class="t20-bestiario-prev-meta">${esc(det.tipo_criatura || '')}${det.nd != null ? ` · ND ${esc(det.nd)}` : ''} · PV ${esc(det.pv_max)} · Defesa ${esc(det.ca)} · Ini ${esc(det.iniciativa)}</p>
             <p class="t20-bestiario-prev-linha">${esc(attrs)}</p>
             <p class="t20-bestiario-prev-linha">${esc(resist)}</p>
             ${det.descricao_curta ? `<p class="t20-bestiario-prev-desc">${esc(det.descricao_curta)}</p>` : ''}

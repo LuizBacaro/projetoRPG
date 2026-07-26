@@ -164,7 +164,7 @@
             }
             const val = raw === '' ? (modo === 'dc' ? 15 : null) : Number(raw);
             if (val != null && (!Number.isFinite(val) || val < 0 || val > 99)) {
-                toastError(modo === 'ca' ? 'Informe uma CA válida (0–99) ou deixe vazio.' : 'Informe uma CD válida (1–99).');
+                toastError(modo === 'ca' ? 'Informe uma Defesa válida (0–99) ou deixe vazio.' : 'Informe uma CD válida (1–99).');
                 inp?.focus();
                 return;
             }
@@ -219,7 +219,7 @@
         const temUsos = Array.isArray(o.usos) && o.usos.length > 0;
         const dlg = q('t20ModalPericiaDc');
         if (!dlg) {
-            const promptTxt = o.modo === 'ca' ? 'CA do alvo (vazio = só rolar):' : 'CD (padrão 15):';
+            const promptTxt = o.modo === 'ca' ? 'Defesa do alvo (vazio = só rolar):' : 'CD (padrão 15):';
             const raw = global.prompt(promptTxt, o.defaultVal != null ? String(o.defaultVal) : '15');
             if (raw == null) return Promise.resolve(temUsos ? null : undefined);
             if (o.modo === 'ca' && String(raw).trim() === '') {
@@ -292,7 +292,7 @@
     function exibirResultadoAtaque(nome, roll) {
         let msg = `${nome}: 1d20=${roll.d20} + ${roll.bonus} = ${roll.total}`;
         if (roll.ca_alvo != null) {
-            msg += ` vs CA ${roll.ca_alvo} → ${roll.acertou ? 'ACERTO' : 'ERRO'}`;
+            msg += ` vs Defesa ${roll.ca_alvo} → ${roll.acertou ? 'ACERTO' : 'ERRO'}`;
         }
         if (roll.falha_critica) msg += ' (falha crítica)';
         if (roll.ameaca_critica) msg += ' (ameaça crítica)';
@@ -346,8 +346,8 @@
         const ca = await pedirValorRolagem({
             modo: 'ca',
             titulo: rotulo,
-            label: 'CA do alvo (opcional)',
-            hint: 'Deixe vazio para rolar só 1d20 + bônus, sem comparar com a CA.',
+            label: 'Defesa do alvo (opcional)',
+            hint: 'Deixe vazio para rolar só 1d20 + bônus, sem comparar com a Defesa.',
             defaultVal: '',
         });
         if (ca === undefined) return;
@@ -376,7 +376,7 @@
         const ca = await pedirValorRolagem({
             modo: 'ca',
             titulo: `Ataque: ${nome}`,
-            label: 'CA do alvo (opcional)',
+            label: 'Defesa do alvo (opcional)',
             hint: 'Deixe vazio para rolar só 1d20 + bônus.',
             defaultVal: '',
         });

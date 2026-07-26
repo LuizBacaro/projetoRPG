@@ -134,3 +134,13 @@ Documento canónico: **[.cursor/requisitos/tormenta/12-inspiracao-roll20-ux-mesa
 | RF-T12f | Handouts (mestre revela para jogadores) | **P1** | |
 | RF-T12g–k | Monstro→NPC, sync ficha↔arena, layout compacto, log, convite | **P2** | |
 | RF-T12l | Mapa VTT / tokens / fog | **P3** | Escopo separado |
+
+### Ameaça (NPC / monstro — bloco estilo livro)
+
+Documento canónico: **[.cursor/requisitos/tormenta/13-construcao-npc-monstro.md](../.cursor/requisitos/tormenta/13-construcao-npc-monstro.md)**.
+
+| ID | Requisito | Prioridade | Notas |
+|----|-----------|------------|-------|
+| RF-T13a–e | `ficha_json.ameaca`, motor bloco, GET/POST API, UI ficha | **P0** | **Feito** (sem tabela nova; sem LLM) |
+| RF-T13f | Converter PJ → cópia ameaça | **P1** | **Feito** |
+| RF-T13g | Dashboard + ND na arena compacta | **P2** | **Feito** |

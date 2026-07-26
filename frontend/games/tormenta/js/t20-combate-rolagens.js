@@ -126,7 +126,7 @@
             }
             const caSpan =
                 p && p.ca != null && !mask
-                    ? `<span class="t20-arena-cb-hp">CA ${esc(String(p.ca))}</span>`
+                    ? `<span class="t20-arena-cb-hp">Defesa ${esc(String(p.ca))}</span>`
                     : '';
             const badge = tipo
                 ? `<span class="t20-arena-cb-tipo t20-arena-cb-tipo--${esc(tipo)}">${esc(tipo)}</span>`
@@ -198,14 +198,14 @@
                 : '';
         const modCa =
             r.modificador_condicoes_ca_alvo != null && r.modificador_condicoes_ca_alvo !== 0
-                ? ` <span class="t20-arena-roll-result__hint">(cond. alvo CA ${r.modificador_condicoes_ca_alvo >= 0 ? '+' : ''}${r.modificador_condicoes_ca_alvo})</span>`
+                ? ` <span class="t20-arena-roll-result__hint">(cond. alvo Defesa ${r.modificador_condicoes_ca_alvo >= 0 ? '+' : ''}${r.modificador_condicoes_ca_alvo})</span>`
                 : '';
         const caBase =
             r.ca_base_alvo != null && r.modificador_condicoes_ca_alvo
                 ? ` <span class="t20-arena-roll-result__hint">(base ${r.ca_base_alvo})</span>`
                 : '';
         box.innerHTML = `<p class="t20-arena-roll-result__tit">${esc(r.atacante_nome)} → ${esc(r.alvo_nome)}</p>
-            <p class="t20-arena-roll-result__linha"><strong>${r.d20}</strong> + ${r.bonus} = <strong>${r.total}</strong>${modAtk} vs CA <strong>${r.ca_alvo}</strong>${modCa}${caBase} → ${hit}${crit}</p>`;
+            <p class="t20-arena-roll-result__linha"><strong>${r.d20}</strong> + ${r.bonus} = <strong>${r.total}</strong>${modAtk} vs Defesa <strong>${r.ca_alvo}</strong>${modCa}${caBase} → ${hit}${crit}</p>`;
         box.hidden = false;
     }
 
@@ -489,7 +489,7 @@
             if (caAlvo != null && Number.isFinite(caAlvo)) payload.ca_alvo = caAlvo;
             const r = await combate().rolarAtaque(payload);
             renderResultadoAtaque(document.getElementById('t20ArenaAtaqueResultado'), r);
-            const msg = `${r.atacante_nome} → ${r.alvo_nome}: ${r.d20}+${r.bonus}=${r.total} vs CA ${r.ca_alvo} → ${r.acertou ? 'ACERTO' : 'ERRO'}`;
+            const msg = `${r.atacante_nome} → ${r.alvo_nome}: ${r.d20}+${r.bonus}=${r.total} vs Defesa ${r.ca_alvo} → ${r.acertou ? 'ACERTO' : 'ERRO'}`;
             logMesa('ataque', msg);
             if (typeof Toast !== 'undefined') Toast.info(msg);
         } catch (e) {

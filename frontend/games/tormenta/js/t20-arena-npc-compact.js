@@ -78,11 +78,20 @@
             const ar = arenaRef();
             const viewId = ar && ar.viewId != null ? ar.viewId : null;
             const turnId = ar && ar.ordemIds.length ? ar.ordemIds[ar.turnoIdx] : null;
+            const fj = p.ficha_json && typeof p.ficha_json === 'object' ? p.ficha_json : {};
+            const am = fj.ameaca && typeof fj.ameaca === 'object' ? fj.ameaca : {};
+            let nd = am.nd != null ? am.nd : fj.nd;
+            if (nd == null) nd = p.nivel;
+            const papel = am.papel_combate ? String(am.papel_combate) : '';
+            const parts = [];
+            if (nd != null && String(nd).trim() !== '') parts.push(`ND ${nd}`);
+            if (papel) parts.push(papel);
             if (viewId != null && turnId != null && Number(viewId) !== Number(turnId)) {
-                hint.textContent = 'Visualizando outro combatente (turno ativo destacado na iniciativa).';
+                parts.push('outro combatente (turno ativo na iniciativa)');
             } else {
-                hint.textContent = 'Clique 🎲 para rolar com o preset do ataque.';
+                parts.push('clique 🎲 para rolar com o preset');
             }
+            hint.textContent = parts.join(' · ');
         }
     }
 

@@ -3796,3 +3796,217 @@ article.t20-dnd-source--dragging {
         grid-template-columns: 1fr;
     }
 }
+
+/* ── RF-T13 Ameaça (bloco estilo livro) ───────────────────────── */
+.t20-ameaca-secao,
+.t20-ameaca-converter {
+    margin: 0.85rem 0 1rem;
+    padding: 0.75rem 0.85rem 0.9rem;
+}
+
+.t20-ameaca-secao__head {
+    margin-bottom: 0.65rem;
+}
+
+.t20-ameaca-secao__lead {
+    margin: 0.2rem 0 0;
+    max-width: 62rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: rgba(60, 40, 28, 0.78);
+}
+
+.t20-ameaca-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-bottom: 0.7rem;
+}
+
+.t20-ameaca-meta__row {
+    display: grid;
+    gap: 0.55rem 0.65rem;
+    align-items: end;
+}
+
+.t20-ameaca-meta__row--core {
+    grid-template-columns: 5.5rem 8.5rem minmax(10rem, 1.4fr) 6.5rem;
+}
+
+.t20-ameaca-meta__row:not(.t20-ameaca-meta__row--core) {
+    grid-template-columns: 1fr;
+}
+
+.t20-ameaca-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    margin: 0;
+    min-width: 0;
+}
+
+.t20-ameaca-field label {
+    margin: 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(90, 45, 30, 0.88);
+    line-height: 1.2;
+}
+
+.t20-ameaca-field .t20-input,
+.t20-ameaca-field input,
+.t20-ameaca-field select {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 2.15rem;
+    margin: 0;
+}
+
+.t20-ameaca-field--nd .t20-input,
+.t20-ameaca-field--perc .t20-input {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.t20-ameaca-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem 0.75rem;
+    margin: 0 0 0.65rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 8px;
+    background: rgba(255, 252, 245, 0.72);
+    border: 1px solid rgba(60, 35, 20, 0.14);
+}
+
+.t20-ameaca-fonte-badge {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+    color: #3d5a40;
+    background: rgba(70, 130, 80, 0.12);
+    border: 1px solid rgba(70, 130, 80, 0.28);
+}
+
+.t20-ameaca-fonte-badge--override {
+    color: #6a3a12;
+    background: rgba(180, 110, 40, 0.14);
+    border-color: rgba(160, 90, 30, 0.35);
+}
+
+.t20-ameaca-toolbar__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-left: auto;
+}
+
+.t20-ameaca-toolbar__actions .tormenta-btn {
+    font-size: 0.78rem;
+    min-height: 2rem;
+    padding: 0.28rem 0.7rem;
+}
+
+.t20-ameaca-bloco-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.t20-ameaca-bloco-panel__label {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(90, 45, 30, 0.88);
+}
+
+.t20-ameaca-bloco-texto {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 16rem;
+    margin: 0;
+    padding: 0.85rem 1rem;
+    resize: vertical;
+    font-family: "IBM Plex Mono", "Cascadia Mono", "Segoe UI Mono", ui-monospace, monospace;
+    font-size: 0.84rem;
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+    color: #2a1c14;
+    background:
+        linear-gradient(180deg, rgba(255, 252, 245, 0.96) 0%, rgba(244, 236, 220, 0.92) 100%);
+    border: 1px solid rgba(60, 35, 20, 0.28);
+    border-radius: 8px;
+    box-shadow: inset 0 1px 2px rgba(40, 24, 12, 0.06);
+    white-space: pre-wrap;
+}
+
+.t20-ameaca-bloco-texto:focus {
+    outline: 2px solid rgba(163, 22, 22, 0.35);
+    outline-offset: 1px;
+    border-color: rgba(163, 22, 22, 0.45);
+}
+
+.t20-ameaca-converter__row {
+    display: grid;
+    grid-template-columns: minmax(8rem, 11rem) minmax(8rem, 11rem) auto;
+    gap: 0.55rem 0.75rem;
+    align-items: end;
+}
+
+.t20-ameaca-converter__cta {
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 1px;
+}
+
+@media (max-width: 900px) {
+    .t20-ameaca-meta__row--core {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .t20-ameaca-toolbar {
+        align-items: stretch;
+    }
+
+    .t20-ameaca-toolbar__actions {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .t20-ameaca-toolbar__actions .tormenta-btn {
+        flex: 1 1 auto;
+    }
+
+    .t20-ameaca-converter__row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .t20-ameaca-converter__cta {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 560px) {
+    .t20-ameaca-meta__row--core {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .t20-ameaca-field--tipo {
+        grid-column: 1 / -1;
+    }
+
+    .t20-ameaca-converter__row {
+        grid-template-columns: 1fr;
+    }
+}

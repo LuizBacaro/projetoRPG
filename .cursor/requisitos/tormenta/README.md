@@ -45,6 +45,7 @@ Principais mudanças v1.3 (sem copiar texto do livro):
 | [10-suplementos-opcionais.md](10-suplementos-opcionais.md) | Heróis, Atlas, regras opcionais | Heróis + Atlas + Deuses |
 | [11-herois-de-arton-plano-implementacao.md](11-herois-de-arton-plano-implementacao.md) | Plano Heróis de Arton | Suplemento HA |
 | [12-inspiracao-roll20-ux-mesa.md](12-inspiracao-roll20-ux-mesa.md) | Benchmark Roll20 — UX ficha/mesa (sem VTT mapa) | Referência externa |
+| [13-construcao-npc-monstro.md](13-construcao-npc-monstro.md) | Ameaça (NPC/monstro) — bloco estilo livro + CRUD | Bestiário / Reforma Monstrográfica |
 
 ## Direitos autorais
 
