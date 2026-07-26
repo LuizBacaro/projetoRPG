@@ -1,5 +1,6 @@
 /**
  * RF-T12c — rolagem contextual na ficha (perícias, ataques, iniciativa).
+ * RF-T04i — diálogo de CD também aceita seletor de uso (lista vertical).
  */
 (function (global) {
     'use strict';
@@ -36,6 +37,102 @@
         if (el) el.textContent = texto;
     }
 
+    function usosFieldset() {
+        return q('t20PericiaDcUsos');
+    }
+
+    function usosListEl() {
+        return q('t20PericiaDcUsosList');
+    }
+
+    function limparUsosUi() {
+        const fs = usosFieldset();
+        const list = usosListEl();
+        if (fs) {
+            fs.hidden = true;
+            fs.setAttribute('aria-hidden', 'true');
+        }
+        if (list) list.innerHTML = '';
+        const dlg = q('t20ModalPericiaDc');
+        if (dlg) {
+            dlg.classList.remove('t20-dialog-pericia-dc--com-usos');
+            delete dlg.dataset.t20TemUsos;
+        }
+    }
+
+    function usoSelecionadoId() {
+        const checked = usosListEl()?.querySelector('input[name="t20PericiaDcUso"]:checked');
+        return checked ? String(checked.value) : null;
+    }
+
+    function montarUsosUi(usos, usoDefaultId) {
+        const fs = usosFieldset();
+        const list = usosListEl();
+        const dlg = q('t20ModalPericiaDc');
+        if (!fs || !list || !dlg || !Array.isArray(usos) || !usos.length) {
+            limparUsosUi();
+            return;
+        }
+        const def =
+            usoDefaultId && usos.some((u) => u.id === usoDefaultId)
+                ? usoDefaultId
+                : usos[0].id;
+        list.innerHTML = usos
+            .map((u) => {
+                const id = `t20PericiaDcUso_${u.id}`;
+                const checked = u.id === def ? ' checked' : '';
+                const hint = u.hint
+                    ? `<span class="t20-pericia-dc-uso__hint">${escapeHtml(u.hint)}</span>`
+                    : '';
+                return `<label class="t20-pericia-dc-uso" for="${id}">
+                    <input type="radio" name="t20PericiaDcUso" id="${id}" value="${escapeAttr(u.id)}"${checked} />
+                    <span class="t20-pericia-dc-uso__body">
+                        <span class="t20-pericia-dc-uso__rotulo">${escapeHtml(u.rotulo)}</span>
+                        ${hint}
+                    </span>
+                </label>`;
+            })
+            .join('');
+        fs.hidden = false;
+        fs.setAttribute('aria-hidden', 'false');
+        dlg.classList.add('t20-dialog-pericia-dc--com-usos');
+        dlg.dataset.t20TemUsos = '1';
+        syncUsoHighlight();
+        list.querySelectorAll('input[name="t20PericiaDcUso"]').forEach((inp) => {
+            inp.addEventListener('change', syncUsoHighlight);
+        });
+    }
+
+    function syncUsoHighlight() {
+        const list = usosListEl();
+        if (!list) return;
+        list.querySelectorAll('.t20-pericia-dc-uso').forEach((lab) => {
+            const on = Boolean(lab.querySelector('input:checked'));
+            lab.classList.toggle('is-selected', on);
+            lab.setAttribute('aria-checked', on ? 'true' : 'false');
+        });
+    }
+
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(text) {
+        return escapeHtml(text).replace(/'/g, '&#39;');
+    }
+
+    function resolverRetornoConfirmacao(val) {
+        const dlg = q('t20ModalPericiaDc');
+        if (dlg && dlg.dataset.t20TemUsos === '1') {
+            return { valor: val, usoId: usoSelecionadoId() };
+        }
+        return val;
+    }
+
     function bindDialogoRolagem() {
         if (dialogBound) return;
         const dlg = q('t20ModalPericiaDc');
@@ -57,12 +154,12 @@
             fechar(null);
         });
 
-        q('t20PericiaDcRolar')?.addEventListener('click', () => {
+        const confirmar = () => {
             const inp = q('t20PericiaDcInput');
             const modo = dlg.dataset.t20RollModo || 'dc';
             const raw = inp ? String(inp.value).trim() : '';
             if (modo === 'ca' && raw === '') {
-                fechar(null);
+                fechar(resolverRetornoConfirmacao(null));
                 return;
             }
             const val = raw === '' ? (modo === 'dc' ? 15 : null) : Number(raw);
@@ -76,20 +173,69 @@
                 inp?.focus();
                 return;
             }
-            fechar(val == null ? null : Math.round(val));
+            if (dlg.dataset.t20TemUsos === '1' && !usoSelecionadoId()) {
+                toastError('Escolha o uso da perícia.');
+                usosListEl()?.querySelector('input')?.focus();
+                return;
+            }
+            const num = val == null ? null : Math.round(val);
+            fechar(resolverRetornoConfirmacao(num));
+        };
+
+        q('t20PericiaDcRolar')?.addEventListener('click', confirmar);
+
+        q('t20PericiaDcInput')?.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                confirmar();
+            }
+        });
+
+        usosListEl()?.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                confirmar();
+            }
         });
     }
 
+    /**
+     * @param {object} opts
+     * @param {'dc'|'ca'} [opts.modo]
+     * @param {string} [opts.titulo]
+     * @param {string} [opts.label]
+     * @param {string} [opts.hint]
+     * @param {string|number} [opts.defaultVal]
+     * @param {{ id: string, rotulo: string, hint?: string }[]} [opts.usos]
+     * @param {string} [opts.usoDefault]
+     * @param {string} [opts.usoLegend]
+     * @returns {Promise<number|null|{ valor: number|null, usoId: string|null }|undefined>}
+     *   Sem usos: número (CD/CA) ou null (cancelar / CA vazia).
+     *   Com usos: { valor, usoId } ou null (cancelar).
+     */
     function pedirValorRolagem(opts) {
         bindDialogoRolagem();
         const o = opts || {};
+        const temUsos = Array.isArray(o.usos) && o.usos.length > 0;
         const dlg = q('t20ModalPericiaDc');
         if (!dlg) {
             const promptTxt = o.modo === 'ca' ? 'CA do alvo (vazio = só rolar):' : 'CD (padrão 15):';
             const raw = global.prompt(promptTxt, o.defaultVal != null ? String(o.defaultVal) : '15');
-            if (raw == null) return Promise.resolve(undefined);
-            if (o.modo === 'ca' && String(raw).trim() === '') return Promise.resolve(null);
-            return Promise.resolve(Number(raw) || 15);
+            if (raw == null) return Promise.resolve(temUsos ? null : undefined);
+            if (o.modo === 'ca' && String(raw).trim() === '') {
+                return Promise.resolve(temUsos ? { valor: null, usoId: o.usoDefault || null } : null);
+            }
+            const num = Number(raw) || 15;
+            if (!temUsos) return Promise.resolve(num);
+            let usoId = o.usoDefault || (o.usos[0] && o.usos[0].id) || null;
+            if (o.usos.length > 1) {
+                const labels = o.usos.map((u, i) => `${i + 1}=${u.rotulo}`).join(', ');
+                const escolha = global.prompt(`Uso (${labels}):`, '1');
+                if (escolha == null) return Promise.resolve(null);
+                const idx = Number(escolha) - 1;
+                if (Number.isFinite(idx) && o.usos[idx]) usoId = o.usos[idx].id;
+            }
+            return Promise.resolve({ valor: num, usoId });
         }
 
         dlg.dataset.t20RollModo = o.modo === 'ca' ? 'ca' : 'dc';
@@ -98,22 +244,32 @@
         const hint = q('t20PericiaDcHint');
         const inp = q('t20PericiaDcInput');
         const btn = q('t20PericiaDcRolar');
+        const legend = q('t20PericiaDcUsosLegend');
         if (titulo) titulo.textContent = o.titulo || 'Rolagem';
         if (label) label.textContent = o.label || 'Valor';
         if (hint) hint.textContent = o.hint || '';
+        if (legend) legend.textContent = o.usoLegend || 'Uso do teste';
         if (inp) {
             inp.min = o.modo === 'ca' ? '0' : '1';
             inp.value = o.defaultVal != null ? String(o.defaultVal) : o.modo === 'ca' ? '' : '15';
         }
-        if (btn) btn.textContent = o.modo === 'ca' ? 'Rolar ataque' : '🎲 Rolar teste';
+        if (btn) btn.textContent = o.modo === 'ca' ? 'Rolar ataque' : 'Rolar teste';
+
+        if (temUsos) montarUsosUi(o.usos, o.usoDefault);
+        else limparUsosUi();
 
         return new Promise((resolve) => {
             dialogResolve = resolve;
             if (typeof dlg.showModal === 'function') dlg.showModal();
             else dlg.setAttribute('open', '');
             setTimeout(() => {
-                inp?.focus();
-                inp?.select?.();
+                if (temUsos) {
+                    const sel = usosListEl()?.querySelector('input:checked') || usosListEl()?.querySelector('input');
+                    sel?.focus();
+                } else {
+                    inp?.focus();
+                    inp?.select?.();
+                }
             }, 40);
         });
     }

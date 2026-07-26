@@ -1,5 +1,6 @@
 /**
  * Calculadora e rolador de perícias MB (API `/tormenta/regras/pericias/*`).
+ * RF-T04i — seletor de uso no momento da rolagem (via T20PericiasUsos + diálogo contextual).
  */
 (function () {
     const regras = () => new TormentaRegrasService();
@@ -58,22 +59,45 @@
         });
     }
 
-    function pedirDcPericia(nome) {
+    /**
+     * @returns {Promise<{ valor: number, usoId: string|null }|null>}
+     */
+    function pedirDcPericia(nome, opts) {
+        const o = opts || {};
+        const usos = Array.isArray(o.usos) ? o.usos : [];
+        const usoDefault = o.usoDefault || null;
+        const normalizar = (v) => {
+            if (v == null) return null;
+            if (typeof v === 'object' && v.valor != null) {
+                return { valor: v.valor, usoId: v.usoId || null };
+            }
+            if (typeof v === 'number') return { valor: v, usoId: usoDefault };
+            return null;
+        };
+
         if (window.T20RolagemContextual && window.T20RolagemContextual.pedirValorRolagem) {
+            const hintBase =
+                'Informe a Classe de Dificuldade (CD) do teste. O resultado será 1d20 + bônus da perícia.';
+            const hintUsos = usos.length
+                ? 'Escolha o uso e a CD. O nome do uso aparece no resultado da rolagem.'
+                : hintBase;
             return window.T20RolagemContextual.pedirValorRolagem({
                 modo: 'dc',
                 titulo: `Teste: ${nome}`,
                 label: `CD para ${nome} (padrão 15)`,
-                hint: 'Informe a Classe de Dificuldade (CD) do teste. O resultado será 1d20 + bônus da perícia.',
+                hint: hintUsos,
                 defaultVal: 15,
-            }).then((v) => (v === undefined ? null : v));
+                usos: usos.length ? usos : undefined,
+                usoDefault: usoDefault || undefined,
+                usoLegend: 'Uso do teste',
+            }).then(normalizar);
         }
         bindDcDialog();
         const dlg = q('t20ModalPericiaDc');
         if (!dlg) {
             const dcInp = window.prompt(`DC para ${nome} (padrão 15):`, '15');
             if (dcInp == null) return Promise.resolve(null);
-            return Promise.resolve(Number(dcInp) || 15);
+            return Promise.resolve({ valor: Number(dcInp) || 15, usoId: usoDefault });
         }
 
         const titulo = q('t20PericiaDcTitulo');
@@ -91,7 +115,7 @@
         }
 
         return new Promise((resolve) => {
-            dcResolve = resolve;
+            dcResolve = (v) => resolve(v == null ? null : { valor: v, usoId: usoDefault });
             if (typeof dlg.showModal === 'function') {
                 dlg.showModal();
             } else {
@@ -154,8 +178,25 @@
         return nomeExibidoLinha(tr);
     }
 
-    function buildBonusBody(tr) {
+    function slugLinha(tr) {
+        const slug = tr && tr.getAttribute ? tr.getAttribute('data-per-slug') : '';
+        if (slug && slug.trim()) return slug.trim().toLowerCase();
+        const usos = window.T20PericiasUsos;
+        if (usos && usos.normalizarSlug) {
+            return usos.normalizarSlug(nomeCanonLinha(tr));
+        }
+        return '';
+    }
+
+    /**
+     * @param {HTMLElement} tr
+     * @param {{ usoId?: string|null }} [opts]
+     * Preview Σ: sem uso → uso_atletismo_natacao false (pen. de natação só na rolagem com Nadar).
+     */
+    function buildBonusBody(tr, opts) {
+        const o = opts || {};
         const nome = nomeCanonLinha(tr);
+        const slug = slugLinha(tr);
         const treinado = Boolean(tr.querySelector('.p-treinado')?.checked);
         const modAt = Number(tr.querySelector('.p-mod')?.value || 0);
         const outros = Number(tr.querySelector('.p-out')?.value || 0);
@@ -163,7 +204,19 @@
         const deClasse = tr.classList.contains('t20-pericia-de-classe-row');
         const rv = getRegraVersaoRolador();
         const isV13 = window.T20RegraVersao && window.T20RegraVersao.isV13(rv);
-        const usoNat = Boolean(tr.querySelector('.p-pen-natacao')?.checked);
+        const usosApi = window.T20PericiasUsos;
+        const temSeletorUso = Boolean(usosApi && usosApi.temUsos(slug || nome));
+
+        let usoNat = false;
+        if (o.usoId != null && o.usoId !== '') {
+            usoNat = usosApi
+                ? usosApi.usoAtletismoNatacao(slug || nome, o.usoId)
+                : String(o.usoId) === 'nadar';
+        } else if (!temSeletorUso) {
+            // Legado: checkbox 🏊 só se não houver seletor RF-T04i.
+            usoNat = Boolean(tr.querySelector('.p-pen-natacao')?.checked);
+        }
+
         const body = {
             nivel: nivelPersonagem(),
             mod_atributo: modAt,
@@ -192,8 +245,8 @@
         return body;
     }
 
-    async function calcularBonusLinha(tr) {
-        const res = await regras().calcularBonusPericia(buildBonusBody(tr));
+    async function calcularBonusLinha(tr, opts) {
+        const res = await regras().calcularBonusPericia(buildBonusBody(tr, opts));
         return res;
     }
 
@@ -205,21 +258,38 @@
     }
 
     async function rolarPericia(tr) {
-        const nome = nomeExibidoLinha(tr) || 'Perícia';
+        const nomeExibido = nomeExibidoLinha(tr) || 'Perícia';
+        const nomeCanon = nomeCanonLinha(tr) || nomeExibido;
+        const slug = slugLinha(tr);
         const treinado = Boolean(tr.querySelector('.p-treinado')?.checked);
         const soTreina = Boolean(tr.querySelector('.p-so-treina')?.checked);
         if (soTreina && !treinado) {
-            const msg = `${nome}: perícia somente treinada — marque «Treinado» antes de rolar.`;
+            const msg = `${nomeExibido}: perícia somente treinada — marque «Treinado» antes de rolar.`;
             if (typeof Toast !== 'undefined' && Toast.error) Toast.error(msg);
             else alert(msg);
             return;
         }
-        const dc = await pedirDcPericia(nome);
-        if (dc == null) return;
+
+        const usosApi = window.T20PericiasUsos;
+        const usos = usosApi ? usosApi.usosDaPericia(slug || nomeCanon) : [];
+        const usoDefault = usosApi && usos.length ? usosApi.usoDefault(slug || nomeCanon) : null;
+
+        const pedida = await pedirDcPericia(nomeExibido, { usos, usoDefault });
+        if (pedida == null || pedida.valor == null) return;
+        const dc = pedida.valor;
+        const usoId = pedida.usoId || null;
+
+        if (usosApi && usoId) usosApi.lembrarUso(slug || nomeCanon, usoId);
+
+        const nomeResultado =
+            usosApi && usoId
+                ? usosApi.formatarNomeComUso(nomeExibido, slug || nomeCanon, usoId)
+                : nomeExibido;
+
         try {
-            const calc = await calcularBonusLinha(tr);
+            const calc = await calcularBonusLinha(tr, { usoId });
             if (calc.pode_usar === false) {
-                const msg = calc.motivo_bloqueio || `${nome}: não pode usar sem treino.`;
+                const msg = calc.motivo_bloqueio || `${nomeResultado}: não pode usar sem treino.`;
                 if (typeof Toast !== 'undefined' && Toast.error) Toast.error(msg);
                 else alert(msg);
                 return;
@@ -229,9 +299,9 @@
                 dc,
             });
             if (window.T20RolagemContextual && window.T20RolagemContextual.exibirResultadoPericia) {
-                window.T20RolagemContextual.exibirResultadoPericia(nome, roll, calc);
+                window.T20RolagemContextual.exibirResultadoPericia(nomeResultado, roll, calc);
             } else {
-                let msg = `${nome}: 1d20=${roll.d20} + ${roll.bonus} = ${roll.total} vs DC ${dc} → `;
+                let msg = `${nomeResultado}: 1d20=${roll.d20} + ${roll.bonus} = ${roll.total} vs DC ${dc} → `;
                 msg += roll.sucesso ? 'SUCESSO' : 'FALHA';
                 if (calc.penalidade_armadura_aplicada > 0) {
                     msg += ` (pen. armadura −${calc.penalidade_armadura_aplicada})`;
