@@ -87,6 +87,7 @@ Legenda: **T** = somente treinada; **A** = penalidade de armadura.
 | Misticismo | **Feito** | Substitui Identificar Magia |
 | Percepção passiva (UI) | **Feito** | Cartão «Pass.» na coluna esquerda; atualiza com perícias/equipamento |
 | Ofício especialidades múltiplas | **Feito** | `oficio_especialidades[]` na ficha v1.3 |
+| Ofício: linha por especialidade | **Feito** | Cada especialidade é uma linha com Tr/Atrib/Out/Σ e rolagem próprios; salva em `pericias[]` como `Ofício (x)`. Linha «Ofício» vira cabeçalho do grupo (sem treino/valores) e cada especialidade treinada consome uma vaga de treinada. Linhas filhas repetem `data-per-idx` do pai e usam `data-per-nome-canon="Ofício"` para bônus racial e lookup do backend. |
 | Atletismo penalidade só natação | **Feito** | Checkbox 🏊 na ficha + `uso_atletismo_natacao` na API |
 
 ## Gap código

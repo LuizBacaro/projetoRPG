@@ -6,7 +6,7 @@
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260725editarCheckFix" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260629s47" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260725oficioLinhas" />
 </head>
 <body class="tormenta-ficha-body">
 <div class="tormenta-ficha-wrap ficha-layout-dnd">
@@ -1715,7 +1715,7 @@
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260711pericias"></script>
-<script src="/games/tormenta/js/t20-oficio-especialidades.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-oficio-especialidades.js?v=20260725oficioLinhas"></script>
 <script src="/games/tormenta/js/t20-carga-v13.js?v=20260629s46"></script>
 <script src="/games/tormenta/js/t20-proficiencia-arma.js?v=20260629s49"></script>
 <script src="/games/tormenta/js/t20-limites-equipamento-v13.js?v=20260629s48"></script>
@@ -1734,7 +1734,7 @@
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
-<script src="/games/tormenta/js/t20-origens-v13.js?v=20260714origem"></script>
+<script src="/games/tormenta/js/t20-origens-v13.js?v=20260725origemLabel"></script>
 <script src="/games/tormenta/js/t20-origem-trocas-ficha-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-duende-v13.js?v=20260704trocas"></script>
@@ -7031,7 +7031,8 @@
                     : `<span class="t20-p-nome t20-p-nome--rolavel" title="Clique para rolar 1d20 + bônus">${escHtml(nome)}</span>`;
             const cellNome = `<td class="t20-p-nome-cell">${extras.armInput}${extras.natCtrl}<span class="t20-p-nome-wrap">${extras.armBadge}${cellNomeInner}</span></td>`;
             const slugAttr = row.slug ? ` data-per-slug="${escHtml(String(row.slug))}"` : '';
-            return `<tr data-per-idx="${i}"${dataAttr}${slugAttr}>
+            const canonAttr = nome !== '—' ? ` data-per-nome-canon="${escHtml(nome)}"` : '';
+            return `<tr data-per-idx="${i}"${dataAttr}${slugAttr}${canonAttr}>
                 <td><input type="checkbox" class="p-treinado" /></td>
                 ${cellNome}
                 <td><input type="number" class="p-total t20-input" value="0" /></td>
@@ -7073,7 +7074,7 @@
             }
         }
         document.querySelectorAll('#tblPericias tbody tr').forEach((tr, i) => {
-            const meta = PERICIAS_META[i] || {};
+            const meta = metaPericiaDaLinha(tr, i);
             const usoNat = Boolean(tr.querySelector('.p-pen-natacao')?.checked);
             const pen = penApi.penalidadeArmaduraPericia(meta, itens, usoNat, slugClasse);
             const badge = tr.querySelector('.t20-pen-arm-badge--nome');
@@ -7222,12 +7223,27 @@
         if (empty) empty.remove();
     }
 
+    /**
+     * Meta da perícia pela linha. Usa data-per-idx (não a posição), porque
+     * especialidades de Ofício inserem linhas extras que compartilham a meta-pai.
+     */
+    function metaPericiaDaLinha(tr, idxFallback) {
+        if (tr) {
+            const raw = tr.getAttribute('data-per-idx');
+            if (raw != null && raw !== '') {
+                const n = Number(raw);
+                if (Number.isFinite(n) && PERICIAS_META[n]) return PERICIAS_META[n];
+            }
+        }
+        return (idxFallback != null && PERICIAS_META[idxFallback]) || {};
+    }
+
     function coletarPericias() {
         const rows = document.querySelectorAll('#tblPericias tbody tr');
         const out = [];
         rows.forEach((tr, i) => {
             const livre = tr.querySelector('.nome-livre');
-            const metaNome = (PERICIAS_META[i] && PERICIAS_META[i].nome) || '';
+            const metaNome = metaPericiaDaLinha(tr, i).nome || '';
             const spanNome = tr.querySelector('.t20-p-nome');
             let nome = livre ? (livre.value || '').trim() : '';
             if (!nome && spanNome) nome = spanNome.textContent.trim();
@@ -7288,7 +7304,7 @@
         if (thTotal) thTotal.style.display = isV13 ? 'none' : '';
         if (thMod) thMod.textContent = isV13 ? 'Atrib.' : 'Mod';
         document.querySelectorAll('#tblPericias tbody tr').forEach((tr, idx) => {
-            const meta = PERICIAS_META[idx] || {};
+            const meta = metaPericiaDaLinha(tr, idx);
             const totInp = tr.querySelector('.p-total');
             if (totInp) {
                 const td = totInp.closest('td');
@@ -7331,7 +7347,7 @@
         if (ou) ou.value = String(p.outros ?? 0);
         const st = tr.querySelector('.p-so-treina');
         if (st) {
-            const meta = PERICIAS_META[idxFallback];
+            const meta = metaPericiaDaLinha(tr, idxFallback);
             const padraoRegra = meta && meta.somente_treinado === true;
             const saved = p.somente_treinado;
             st.checked =
@@ -7339,7 +7355,7 @@
         }
         const pa = tr.querySelector('.p-pen-arm');
         if (pa) {
-            const meta = PERICIAS_META[idxFallback];
+            const meta = metaPericiaDaLinha(tr, idxFallback);
             const padraoArm = meta && meta.penalidade_armadura === true;
             const savedArm = p.penalidade_armadura;
             pa.checked =
@@ -7371,7 +7387,11 @@
                     }
                 });
             }
-            if (!tr && rows[i]) {
+            // «Ofício (x)» só existe se a especialidade tiver linha própria (v1.3).
+            // Sem linha (ex.: ficha voltou para MB), descartar — o fallback
+            // posicional gravaria os valores em outra perícia.
+            const ehEspecialidadeOficio = /^Of[íi]cio\s*\(.+\)\s*$/i.test(nomeCanon || '');
+            if (!tr && !ehEspecialidadeOficio && rows[i]) {
                 tr = rows[i];
                 idx = i;
             }
@@ -7792,10 +7812,17 @@
         q('f_pers').value = j.personalidade || '';
         q('f_apar').value = j.aparencia || '';
         q('f_notas').value = j.notas || '';
-        preencherPericias(j.pericias);
-        if (window.T20OficioEspecialidadesV13 && j.oficio_especialidades) {
-            window.T20OficioEspecialidadesV13.aplicarLista(j.oficio_especialidades);
+        // Especialidades de Ofício criam linhas próprias: aplicar ANTES de preencher,
+        // senão os valores salvos de «Ofício (x)» não encontram linha para restaurar.
+        if (window.T20OficioEspecialidadesV13) {
+            const espMod = window.T20OficioEspecialidadesV13;
+            let esp = Array.isArray(j.oficio_especialidades) ? j.oficio_especialidades : [];
+            if (!esp.length && espMod.derivarDePericias) {
+                esp = espMod.derivarDePericias(j.pericias);
+            }
+            espMod.aplicarLista(esp);
         }
+        preencherPericias(j.pericias);
         t20AplicarPericiasOrigemBeneficios();
         if (typeof window.t20AplicarPericiasClasseV13 === 'function') {
             window.t20AplicarPericiasClasseV13();
@@ -8223,6 +8250,10 @@
     window.getClasseMbRowPorSlug = getClasseMbRowPorSlug;
     window.coletarPericias = coletarPericias;
     window.preencherPericias = preencherPericias;
+    // Usados pelas linhas de especialidade de Ofício após inserir/remover linhas
+    window.atualizarMeioNivelColuna = atualizarMeioNivelColuna;
+    window.atualizarModsPericiasDasHabilidades = atualizarModsPericiasDasHabilidades;
+    window.t20AtualizarPenalidadesPericias = t20AtualizarPenalidadesPericias;
     window.t20AplicarPericiasOrigemBeneficios = t20AplicarPericiasOrigemBeneficios;
     window.t20AplicarPoderesAutomaticosNaLista = t20AplicarPoderesAutomaticosNaLista;
     window.t20AplicarEquipamentosAutomaticosNaLista = t20AplicarEquipamentosAutomaticosNaLista;

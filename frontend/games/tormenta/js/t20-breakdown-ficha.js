@@ -270,7 +270,9 @@
         const outrosInp = Number(tr.querySelector('.p-out')?.value || 0);
         const grad = Number(tr.querySelector('.p-total')?.value || 0);
         const nome = tr.querySelector('.t20-p-nome')?.textContent?.trim() || '';
-        const racial = bonusRacialPericia(nome);
+        // Especialidades de Ofício exibem «Ofício (x)»; o bônus racial é da perícia-pai.
+        const nomeCanon = (tr.getAttribute('data-per-nome-canon') || '').trim() || nome;
+        const racial = bonusRacialPericia(nomeCanon);
         const treinado = Boolean(tr.querySelector('.p-treinado')?.checked);
         const parts = [];
 
