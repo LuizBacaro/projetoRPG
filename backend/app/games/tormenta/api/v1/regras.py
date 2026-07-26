@@ -542,7 +542,9 @@ def _bestiario_resumo_de_row(row: dict) -> TormentaBestiarioResumoItem:
             "slug": row.get("slug"),
             "nome": row.get("nome"),
             "nd": row.get("nd"),
+            "nd_rotulo": row.get("nd_rotulo"),
             "tipo_criatura": row.get("tipo_criatura"),
+            "grupo": row.get("grupo"),
             "pv_max": row.get("pv_max"),
             "ca": row.get("ca"),
             "descricao_curta": row.get("descricao_curta"),
@@ -564,12 +566,43 @@ def _bestiario_detalhe_de_row(row: dict) -> TormentaBestiarioDetalheResponse:
                     else raw.get("teste") or "+0"
                 ),
                 "dano": str(raw.get("dano") or ""),
+                "critico": (
+                    str(raw.get("critico")).strip() if raw.get("critico") else None
+                ),
             }
         )
+    nulos = row.get("atributos_nulos")
+    if not isinstance(nulos, list):
+        nulos = []
     return TormentaBestiarioDetalheResponse.model_validate(
         {
-            **{k: row.get(k) for k in row if k != "ataques"},
+            "slug": row.get("slug"),
+            "nome": row.get("nome"),
+            "nd": row.get("nd"),
+            "nd_rotulo": row.get("nd_rotulo"),
+            "tipo_criatura": row.get("tipo_criatura"),
+            "grupo": row.get("grupo"),
+            "nivel": row.get("nivel") if row.get("nivel") is not None else 1,
+            "for_valor": row.get("for_valor", 10),
+            "des_valor": row.get("des_valor", 10),
+            "con_valor": row.get("con_valor", 10),
+            "int_valor": row.get("int_valor", 10),
+            "sab_valor": row.get("sab_valor", 10),
+            "car_valor": row.get("car_valor", 10),
+            "atributos_nulos": [str(x) for x in nulos if str(x).strip()],
+            "pv_max": row.get("pv_max", 1),
+            "pa_max": row.get("pa_max", 0),
+            "ca": row.get("ca", 10),
+            "iniciativa": row.get("iniciativa", 0),
+            "deslocamento": row.get("deslocamento") or "",
+            "tamanho": row.get("tamanho") or "",
+            "fort_total": row.get("fort_total", 0),
+            "ref_total": row.get("ref_total", 0),
+            "von_total": row.get("von_total", 0),
+            "rd": row.get("rd") or "",
             "ataques": ataques,
+            "descricao_curta": row.get("descricao_curta"),
+            "pagina_referencia": row.get("pagina_referencia"),
         }
     )
 
@@ -577,16 +610,23 @@ def _bestiario_detalhe_de_row(row: dict) -> TormentaBestiarioDetalheResponse:
 @router.get(
     "/bestiario",
     response_model=TormentaBestiarioPaginaResponse,
-    summary="Catálogo stub MB de criaturas (busca e paginação)",
+    summary="Catálogo Tormenta 20 de criaturas (busca e paginação)",
 )
 def listar_catalogo_bestiario(
     q: Optional[str] = None,
+    tipo: Optional[str] = Query(
+        None, max_length=80, description="Filtro por tipo_criatura ou grupo"
+    ),
+    nd_min: Optional[float] = Query(None, ge=0, le=50),
+    nd_max: Optional[float] = Query(None, ge=0, le=50),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=200),
     response: Response = None,
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaBestiarioPaginaResponse:
-    slice_rows, total = filtrar_bestiario_mb(q, skip, limit)
+    slice_rows, total = filtrar_bestiario_mb(
+        q, skip, limit, tipo=tipo, nd_min=nd_min, nd_max=nd_max
+    )
     if response is not None:
         response.headers["X-Total-Count"] = str(total)
         response.headers["X-Skip"] = str(skip)
@@ -598,7 +638,7 @@ def listar_catalogo_bestiario(
 @router.get(
     "/bestiario/{slug}",
     response_model=TormentaBestiarioDetalheResponse,
-    summary="Detalhe de uma criatura do bestiário stub",
+    summary="Detalhe de uma criatura do bestiário Tormenta 20",
 )
 def obter_catalogo_bestiario(
     slug: str,

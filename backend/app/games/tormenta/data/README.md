@@ -28,6 +28,23 @@ preservadas apenas como legado para depuração e migração histórica.
 - `itens_superiores_v13.json`
   - Tabelas 3-7 / 3-8 / 3-9 (melhorias + materiais especiais).
   - API: `GET /tormenta/regras/itens-superiores`.
+- `bestiario_v13.json`
+  - ~80 criaturas da Tabela 7-1 (v1.3 p.284–316): stats mecânicos +
+    `descricao_curta` + `pagina_referencia` (sem prosa longa do livro).
+  - ND numérico (`0.25`, `0.5`, …) + `nd_rotulo` (`1/4`, `1/2`); aliases
+    de stubs (`goblin` → `goblin-salteador`).
+  - API: `GET /tormenta/regras/bestiario` (`q`, `skip`, `limit`, `tipo`,
+    `nd_min`, `nd_max`) e detalhe por slug; import via
+    `POST /tormenta/personagens/importar-bestiario`.
+  - Extração local: `scripts/extrair_bestiario_t20_v13.py` (PDF em `livros/`,
+    não versionado).
+- `bestiario_dda_v11.json`
+  - ~56 criaturas do Cap. 4 *Deuses de Arton* v1.1 (pp. impressas 252–315):
+    Abissais, Aspectos, Celestiais, Fadas, Gênios, Gigantes.
+  - Mesmo shape mecânico; `fonte: dda_v11`; ND especiais `S`/`S+`/`?` via
+    `nd_rotulo` (sem `nd` numérico).
+  - Merge automático em `catalogo_t20._carregar_bestiario_mb`.
+  - Extração: `scripts/extrair_bestiario_dda_v11.py` (PDF DdA em `livros/`).
 - `armas_v13_overlay.json` + `equipamentos_mb_catalogo.json`
   - Stats de combate (Tabela 3-3) e autocomplete de inventário.
 

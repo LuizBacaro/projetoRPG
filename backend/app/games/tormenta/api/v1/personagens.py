@@ -750,7 +750,7 @@ def criar(
     "/importar-bestiario",
     response_model=TormentaPersonagemResponse,
     status_code=201,
-    summary="Importar criatura do catálogo stub para combatente (RF-T12g)",
+    summary="Importar criatura do bestiário T20 v1.3 para combatente (RF-T12g)",
 )
 def importar_bestiario(
     payload: TormentaBestiarioImportRequest,
