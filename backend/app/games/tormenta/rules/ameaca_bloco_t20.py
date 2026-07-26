@@ -48,17 +48,42 @@ def _ameaca_raw(ficha_json: Mapping[str, Any] | None) -> Dict[str, Any]:
     return _as_dict(nested)
 
 
-def obter_nd(snapshot: Mapping[str, Any], ficha_json: Mapping[str, Any] | None) -> int:
+def obter_nd(
+    snapshot: Mapping[str, Any], ficha_json: Mapping[str, Any] | None
+) -> float:
     am = _ameaca_raw(ficha_json)
     fj = _as_dict(ficha_json)
     for src in (am.get("nd"), fj.get("nd"), snapshot.get("nivel")):
         if src is None or src == "":
             continue
         try:
-            return max(0, int(src))
+            if isinstance(src, str) and "/" in src:
+                a, b = src.split("/", 1)
+                return max(0.0, float(a) / float(b))
+            return max(0.0, float(src))
         except (TypeError, ValueError):
             continue
-    return 1
+    return 1.0
+
+
+def formatar_nd(nd: Any, ficha_json: Mapping[str, Any] | None = None) -> str:
+    am = _ameaca_raw(ficha_json)
+    rot = str(
+        am.get("nd_rotulo") or _as_dict(ficha_json).get("nd_rotulo") or ""
+    ).strip()
+    if rot:
+        return rot
+    try:
+        n = float(nd)
+    except (TypeError, ValueError):
+        return str(nd)
+    if abs(n - 0.25) < 1e-9:
+        return "1/4"
+    if abs(n - 0.5) < 1e-9:
+        return "1/2"
+    if n == int(n):
+        return str(int(n))
+    return str(n).rstrip("0").rstrip(".")
 
 
 def obter_papel_combate(
@@ -381,8 +406,9 @@ def montar_bloco_ameaca(
     if not equip:
         equip = str(fj.get("equipamento_texto") or "").strip() or "—"
 
+    nd_txt = formatar_nd(nd, fj)
     linhas: List[str] = [
-        f"{nome} ND {nd}",
+        f"{nome} ND {nd_txt}",
         tipo_tam,
         f"Iniciativa {ini}, Percepção {formatar_bonus(percepcao) if not isinstance(percepcao, str) else percepcao}, Sentidos {sentidos}",
         f"Defesa {ca}, Fort {fort}, Ref {ref}, Von {von}, RD {rd}",
@@ -522,10 +548,18 @@ def limpar_texto_override(ficha_json: MutableMapping[str, Any]) -> Dict[str, Any
     return fj
 
 
-def ameaca_minima(*, nd: int = 1, papel_combate: str = "solo") -> Dict[str, Any]:
+def ameaca_minima(
+    *, nd: float | int = 1, papel_combate: str = "solo"
+) -> Dict[str, Any]:
     papel = papel_combate if papel_combate in PAPEIS_COMBATE else "solo"
+    try:
+        nd_val: float | int = max(0.0, float(nd))
+        if nd_val == int(nd_val):
+            nd_val = int(nd_val)
+    except (TypeError, ValueError):
+        nd_val = 1
     return {
-        "nd": max(0, int(nd)),
+        "nd": nd_val,
         "papel_combate": papel,
         "tipo_criatura": "Humanoide",
         "percepcao": 0,

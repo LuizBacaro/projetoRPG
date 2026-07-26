@@ -1,8 +1,31 @@
 /**
- * RF-T12g — importar criatura do bestiário stub → combatente na arena.
+ * RF-T12g — importar criatura do bestiário T20 v1.3 → combatente na arena.
+ *
+ * A API pagina (skip/limit); o modal busca o resultado filtrado completo
+ * (até LIST_LIMIT) para a barra de rolagem listar todas as criaturas.
  */
 (function (global) {
     'use strict';
+
+    /** Limite da API (max 200); cobre o catálogo v1.3 (~80). */
+    const LIST_LIMIT = 200;
+    const TIPOS = [
+        '',
+        'Animal',
+        'Construto',
+        'Criatura',
+        'Dragão',
+        'Espírito',
+        'Humanoide',
+        'Monstro',
+        'Morto-vivo',
+        'Abissais',
+        'Aspectos',
+        'Celestiais',
+        'Fadas',
+        'Gênios',
+        'Gigantes',
+    ];
 
     function q(id) {
         return document.getElementById(id);
@@ -17,23 +40,65 @@
             .replace(/"/g, '&quot;');
     }
 
+    function rotuloNd(item) {
+        if (item && item.nd_rotulo) return String(item.nd_rotulo);
+        if (item && item.nd != null) return String(item.nd);
+        return '';
+    }
+
     let slugSelecionado = null;
     let debounceTimer = null;
+    let total = 0;
+    let lastTermo = '';
+    let carregando = false;
+
+    function filtrosAtuais() {
+        const tipo = q('t20BestiarioFiltroTipo')?.value?.trim() || '';
+        const ndMinRaw = q('t20BestiarioNdMin')?.value;
+        const ndMaxRaw = q('t20BestiarioNdMax')?.value;
+        const ndMin = ndMinRaw !== '' && ndMinRaw != null ? Number(ndMinRaw) : undefined;
+        const ndMax = ndMaxRaw !== '' && ndMaxRaw != null ? Number(ndMaxRaw) : undefined;
+        return {
+            tipo: tipo || undefined,
+            nd_min: Number.isFinite(ndMin) ? ndMin : undefined,
+            nd_max: Number.isFinite(ndMax) ? ndMax : undefined,
+        };
+    }
+
+    function atualizarContagem(visiveis) {
+        const info = q('t20BestiarioPagerInfo');
+        if (!info) return;
+        if (!total) {
+            info.textContent = '0 criaturas';
+            return;
+        }
+        if (visiveis < total) {
+            info.textContent = `${visiveis} de ${total} (role a lista · filtros ativos)`;
+        } else {
+            info.textContent = `${total} criatura${total === 1 ? '' : 's'} — role a lista`;
+        }
+    }
 
     function renderLista(itens) {
         const host = q('t20BestiarioLista');
         if (!host) return;
         if (!itens.length) {
             host.innerHTML = '<p class="t20-dash-hint">Nenhuma criatura encontrada.</p>';
+            atualizarContagem(0);
             return;
         }
         host.innerHTML = itens
             .map((item) => {
                 const slug = esc(item.slug);
                 const nome = esc(item.nome);
-                const nd = item.nd != null ? `ND ${esc(item.nd)}` : '';
+                const nd = rotuloNd(item) ? `ND ${esc(rotuloNd(item))}` : '';
                 const tipo = item.tipo_criatura ? esc(item.tipo_criatura) : '';
-                const meta = [nd, tipo, item.pv_max != null ? `PV ${esc(item.pv_max)}` : '', item.ca != null ? `Defesa ${esc(item.ca)}` : '']
+                const meta = [
+                    nd,
+                    tipo,
+                    item.pv_max != null ? `PV ${esc(item.pv_max)}` : '',
+                    item.ca != null ? `Defesa ${esc(item.ca)}` : '',
+                ]
                     .filter(Boolean)
                     .join(' · ');
                 const active = slugSelecionado === item.slug ? ' is-active' : '';
@@ -47,6 +112,8 @@
                 void selecionarCriatura(btn.getAttribute('data-slug'));
             });
         });
+        atualizarContagem(itens.length);
+        host.scrollTop = 0;
     }
 
     function renderPreview(det) {
@@ -58,6 +125,7 @@
             if (btn) btn.disabled = true;
             return;
         }
+        const ndLabel = rotuloNd(det);
         const attrs = `FOR ${det.for_valor} · DES ${det.des_valor} · CON ${det.con_valor} · INT ${det.int_valor} · SAB ${det.sab_valor} · CAR ${det.car_valor}`;
         const resist = `Fort ${det.fort_total} · Ref ${det.ref_total} · Von ${det.von_total}`;
         const ataques = Array.isArray(det.ataques) ? det.ataques : [];
@@ -71,24 +139,35 @@
             : '<p class="t20-dash-hint">Sem ataques catalogados.</p>';
         host.innerHTML = `
             <h4 class="t20-bestiario-prev-nome">${esc(det.nome)}</h4>
-            <p class="t20-bestiario-prev-meta">${esc(det.tipo_criatura || '')}${det.nd != null ? ` · ND ${esc(det.nd)}` : ''} · PV ${esc(det.pv_max)} · Defesa ${esc(det.ca)} · Ini ${esc(det.iniciativa)}</p>
+            <p class="t20-bestiario-prev-meta">${esc(det.tipo_criatura || '')}${ndLabel ? ` · ND ${esc(ndLabel)}` : ''} · PV ${esc(det.pv_max)} · Defesa ${esc(det.ca)} · Ini ${esc(det.iniciativa)}</p>
             <p class="t20-bestiario-prev-linha">${esc(attrs)}</p>
             <p class="t20-bestiario-prev-linha">${esc(resist)}</p>
             ${det.descricao_curta ? `<p class="t20-bestiario-prev-desc">${esc(det.descricao_curta)}</p>` : ''}
+            ${det.pagina_referencia ? `<p class="t20-bestiario-prev-linha">${esc(det.pagina_referencia)}</p>` : ''}
             ${atqHtml}
         `;
         if (btn) btn.disabled = false;
     }
 
     async function buscarLista(termo) {
+        if (carregando) return;
+        carregando = true;
+        lastTermo = termo || '';
         const host = q('t20BestiarioLista');
         if (host) host.innerHTML = '<p class="t20-dash-hint">Buscando…</p>';
         try {
+            const filtros = filtrosAtuais();
             const data = await new global.TormentaRegrasService().listarBestiarioCatalogo({
-                q: termo || undefined,
-                limit: 50,
+                q: lastTermo || undefined,
+                skip: 0,
+                limit: LIST_LIMIT,
+                tipo: filtros.tipo,
+                nd_min: filtros.nd_min,
+                nd_max: filtros.nd_max,
             });
             const itens = data && Array.isArray(data.itens) ? data.itens : [];
+            total = data && data.total != null ? Number(data.total) : itens.length;
+            if (!Number.isFinite(total)) total = itens.length;
             renderLista(itens);
             if (slugSelecionado && !itens.some((x) => x.slug === slugSelecionado)) {
                 slugSelecionado = null;
@@ -96,6 +175,10 @@
             }
         } catch (e) {
             if (host) host.innerHTML = `<p class="t20-dash-hint">${esc(e.message || 'Erro na busca')}</p>`;
+            total = 0;
+            atualizarContagem(0);
+        } finally {
+            carregando = false;
         }
     }
 
@@ -118,14 +201,42 @@
         }
     }
 
+    function popularFiltroTipo() {
+        const sel = q('t20BestiarioFiltroTipo');
+        if (!sel || sel.dataset.ready) return;
+        sel.innerHTML = TIPOS.map((t) => {
+            if (!t) return '<option value="">Todos os tipos/grupos</option>';
+            return `<option value="${esc(t)}">${esc(t)}</option>`;
+        }).join('');
+        sel.dataset.ready = '1';
+    }
+
+    function limparCamposExtras() {
+        const nomeInp = q('t20BestiarioNomeOverride');
+        const fotoUrl = q('t20BestiarioFotoUrl');
+        const fotoFile = q('t20BestiarioFotoFile');
+        const fotoHint = q('t20BestiarioFotoFileHint');
+        if (nomeInp) nomeInp.value = '';
+        if (fotoUrl) fotoUrl.value = '';
+        if (fotoFile) fotoFile.value = '';
+        if (fotoHint) fotoHint.textContent = '';
+    }
+
     function abrirModal() {
         const dlg = q('t20DialogBestiario');
         if (!dlg || typeof dlg.showModal !== 'function') return;
         slugSelecionado = null;
-        const nomeInp = q('t20BestiarioNomeOverride');
+        total = 0;
+        popularFiltroTipo();
+        limparCamposExtras();
         const busca = q('t20BestiarioBusca');
-        if (nomeInp) nomeInp.value = '';
+        const tipo = q('t20BestiarioFiltroTipo');
+        const ndMin = q('t20BestiarioNdMin');
+        const ndMax = q('t20BestiarioNdMax');
         if (busca) busca.value = '';
+        if (tipo) tipo.value = '';
+        if (ndMin) ndMin.value = '';
+        if (ndMax) ndMax.value = '';
         renderPreview(null);
         void buscarLista('');
         dlg.showModal();
@@ -166,6 +277,20 @@
                 }, 280);
             });
 
+            ['t20BestiarioFiltroTipo', 't20BestiarioNdMin', 't20BestiarioNdMax'].forEach((id) => {
+                q(id)?.addEventListener('change', () => {
+                    void buscarLista(busca?.value?.trim() || '');
+                });
+            });
+
+            q('t20BestiarioFotoFile')?.addEventListener('change', () => {
+                const file = q('t20BestiarioFotoFile')?.files?.[0];
+                const hint = q('t20BestiarioFotoFileHint');
+                if (hint) {
+                    hint.textContent = file ? `Selecionado: ${file.name}` : '';
+                }
+            });
+
             q('t20BestiarioBtnImportar')?.addEventListener('click', async () => {
                 const slug = slugSelecionado;
                 const cid = getCampanhaId ? Number(getCampanhaId()) : null;
@@ -179,7 +304,10 @@
                 }
                 const btn = q('t20BestiarioBtnImportar');
                 const nomeOverride = q('t20BestiarioNomeOverride')?.value?.trim() || undefined;
+                const fotoUrl = q('t20BestiarioFotoUrl')?.value?.trim() || undefined;
+                const fotoFile = q('t20BestiarioFotoFile')?.files?.[0] || null;
                 if (btn) btn.disabled = true;
+                const svc = new global.TormentaPersonagemService();
                 try {
                     const payload = {
                         slug,
@@ -187,7 +315,20 @@
                         campanha_id: cid,
                     };
                     if (nomeOverride) payload.nome_override = nomeOverride;
-                    const criado = await new global.TormentaPersonagemService().importarBestiario(payload);
+                    // Arquivo tem prioridade; URL só se não houver arquivo
+                    if (!fotoFile && fotoUrl) payload.foto_url = fotoUrl;
+                    let criado = await svc.importarBestiario(payload);
+                    if (fotoFile && criado && criado.id != null) {
+                        try {
+                            criado = await svc.enviarFoto(criado.id, fotoFile);
+                        } catch (upErr) {
+                            if (Toast && Toast.warning) {
+                                Toast.warning(
+                                    `Criatura adicionada, mas o retrato falhou: ${upErr.message || 'erro no upload'}`
+                                );
+                            }
+                        }
+                    }
                     fecharModal();
                     if (Toast && Toast.success) {
                         Toast.success(`«${criado.nome || slug}» adicionado à mesa.`);

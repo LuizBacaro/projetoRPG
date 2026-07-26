@@ -237,7 +237,7 @@ class TormentaPersonagemResponse(TormentaPersonagemBase):
 
 
 class TormentaBestiarioImportRequest(BaseModel):
-    """RF-T12g — importar criatura do catálogo stub para combatente na mesa."""
+    """RF-T12g — importar criatura do catálogo para combatente na mesa."""
 
     slug: str = Field(..., max_length=80)
     tipo: str = Field(default="monstro", max_length=20)
@@ -251,6 +251,11 @@ class TormentaBestiarioImportRequest(BaseModel):
         max_length=120,
         description="Nome customizado na mesa (ex.: Lobo #2).",
     )
+    foto_url: Optional[str] = Field(
+        None,
+        max_length=2048,
+        description="URL de retrato opcional (ex.: imagem externa). Upload de arquivo via POST /foto após o import.",
+    )
 
 
 class TormentaBlocoAmeacaResponse(BaseModel):
@@ -259,7 +264,7 @@ class TormentaBlocoAmeacaResponse(BaseModel):
     personagem_id: int
     texto: str
     fonte: str = Field(description="override | gerado")
-    nd: int = 1
+    nd: float = 1
     papel_combate: str = "solo"
 
 

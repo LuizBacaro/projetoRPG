@@ -113,6 +113,16 @@ def test_obter_nd_legado_e_ameaca():
     assert obter_nd({"nivel": 5}, {"ameaca": {"nd": 4}}) == 4
     assert obter_nd({"nivel": 5}, {"nd": 2}) == 2
     assert obter_nd({"nivel": 7}, {}) == 7
+    assert obter_nd({"nivel": 1}, {"ameaca": {"nd": 0.25}}) == 0.25
+    assert obter_nd({}, {"ameaca": {"nd": "1/2"}}) == 0.5
+
+
+def test_formatar_nd_fracionario():
+    from app.games.tormenta.rules.ameaca_bloco_t20 import formatar_nd
+
+    assert formatar_nd(0.25) == "1/4"
+    assert formatar_nd(0.5, {"ameaca": {"nd_rotulo": "1/2"}}) == "1/2"
+    assert formatar_nd(2) == "2"
 
 
 def test_consolidar_ameaca_de_personagem():

@@ -532,14 +532,61 @@ def test_importar_bestiario_cria_monstro_com_ataques(tormenta_personagens_db):
     assert r.status_code == 201, r.text
     body = r.json()
     assert body["tipo"] == "monstro"
-    assert body["nome"] == "Goblin"
+    assert body["nome"] == "Goblin salteador"
     assert body["pv_max"] == 4
     assert body["ca"] == 14
+    assert body["nivel"] == 1
     fj = body.get("ficha_json") or {}
-    assert fj.get("bestiario_slug") == "goblin"
+    assert fj.get("bestiario_slug") == "goblin-salteador"
+    assert fj.get("bestiario_fonte") == "t20_v13"
+    assert fj.get("nd") == 0.25
+    am = fj.get("ameaca") or {}
+    assert am.get("nd") == 0.25
+    assert am.get("nd_rotulo") == "1/4"
     ataques = fj.get("ataques") or []
     assert len(ataques) == 2
     assert ataques[0]["nome"] == "Machado"
+
+
+def test_importar_bestiario_com_foto_url(tormenta_personagens_db):
+    SessionLocal, _, _, u_mestre = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u_mestre))
+    url = "https://example.com/retratos/lobo.png"
+    r = client.post(
+        "/api/v1/tormenta/personagens/importar-bestiario",
+        json={
+            "slug": "lobo",
+            "tipo": "monstro",
+            "nome_override": "Lobo da Matilha",
+            "foto_url": url,
+        },
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["nome"] == "Lobo da Matilha"
+    assert body["foto_url"] == url
+
+
+def test_importar_bestiario_dda_aucharai(tormenta_personagens_db):
+    SessionLocal, _, _, u_mestre = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u_mestre))
+    r = client.post(
+        "/api/v1/tormenta/personagens/importar-bestiario",
+        json={"slug": "aucharai", "tipo": "monstro"},
+    )
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["tipo"] == "monstro"
+    assert body["nome"] == "Aucharai"
+    assert body["pv_max"] == 240
+    assert body["ca"] == 26
+    fj = body.get("ficha_json") or {}
+    assert fj.get("bestiario_slug") == "aucharai"
+    assert fj.get("bestiario_fonte") == "dda_v11"
+    assert fj.get("nd") == 6 or fj.get("nd") == 6.0
+    am = fj.get("ameaca") or {}
+    assert am.get("nd") == 6 or am.get("nd") == 6.0
+    assert fj.get("ataques") or am.get("acoes", {}).get("corpo_a_corpo") or []
 
 
 def test_importar_bestiario_jogador_rejeita(tormenta_personagens_db):
