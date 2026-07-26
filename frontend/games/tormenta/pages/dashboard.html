@@ -9,7 +9,7 @@
     <title>Tormenta 20 — Dashboard · Arena TTRPG</title>
     <link rel="stylesheet" href="/games/dnd35/css/variables.css" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511f" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260726bestiario13b" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-dashboard.css?v=20260726bestiariomodal" />
 </head>
 <body class="tormenta-app">
 <header class="tormenta-header">
@@ -763,20 +763,20 @@
     </div>
 </dialog>
 
-<dialog id="t20DialogBestiario" class="t20-arena-modal t20-arena-modal--wide">
+<dialog id="t20DialogBestiario" class="t20-arena-modal t20-arena-modal--wide t20-arena-modal--bestiario">
     <div class="t20-arena-modal__hd">
         <h3 class="t20-arena-modal__titulo">Importar do bestiário</h3>
         <button type="button" class="t20-arena-modal__x" id="t20BestiarioFechar" aria-label="Fechar">×</button>
     </div>
     <div class="t20-arena-modal__bd t20-bestiario-modal-bd">
-        <p class="t20-dash-hint" style="margin-top:0">Catálogo Tormenta 20 v1.3 (Tabela 7-1) — cria um combatente <strong>monstro</strong> com PV, Defesa e ataques para a arena.</p>
+        <p class="t20-dash-hint" style="margin-top:0">Catálogo Tormenta 20 v1.3 + Deuses de Arton Cap. 4 — cria um combatente <strong>monstro</strong> com PV, Defesa e ataques para a arena.</p>
         <div class="t20-bestiario-filtros">
             <div class="t20-dash-field t20-bestiario-filtros__busca">
                 <label for="t20BestiarioBusca">Buscar</label>
                 <input id="t20BestiarioBusca" type="search" class="t20-input" placeholder="Nome ou grupo (ex.: lobo, masmorras)…" autocomplete="off" />
             </div>
             <div class="t20-dash-field">
-                <label for="t20BestiarioFiltroTipo">Tipo</label>
+                <label for="t20BestiarioFiltroTipo">Tipo / grupo</label>
                 <select id="t20BestiarioFiltroTipo" class="t20-input"></select>
             </div>
             <div class="t20-dash-field">
@@ -802,6 +802,18 @@
         <div class="t20-dash-field" style="margin-top:0.65rem">
             <label for="t20BestiarioNomeOverride">Nome na mesa (opcional)</label>
             <input id="t20BestiarioNomeOverride" type="text" class="t20-input" maxlength="120" placeholder="Ex.: Goblin #2" />
+        </div>
+        <div class="t20-bestiario-foto-fields">
+            <div class="t20-dash-field">
+                <label for="t20BestiarioFotoFile">Retrato — arquivo (opcional)</label>
+                <input id="t20BestiarioFotoFile" type="file" class="t20-input" accept="image/jpeg,image/png,image/webp,image/gif" />
+                <p id="t20BestiarioFotoFileHint" class="t20-dash-hint" style="margin:0.25rem 0 0"></p>
+            </div>
+            <div class="t20-dash-field">
+                <label for="t20BestiarioFotoUrl">Retrato — URL (opcional)</label>
+                <input id="t20BestiarioFotoUrl" type="url" class="t20-input" maxlength="2048" placeholder="https://…" autocomplete="off" />
+                <p class="t20-dash-hint" style="margin:0.25rem 0 0">Se enviar arquivo, ele tem prioridade sobre a URL.</p>
+            </div>
         </div>
     </div>
     <div class="t20-arena-modal__ft">
@@ -1294,7 +1306,7 @@
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
 <script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260726ameaca"></script>
-<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260726bestiario13b"></script>
+<script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260726bestiariodda"></script>
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260710handouts"></script>
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
 <script src="/games/tormenta/js/t20-dashboard-campanhas.js?v=20260710handouts"></script>
@@ -1306,7 +1318,7 @@
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260710ini"></script>
 <script src="/games/tormenta/js/t20-arena-log-mesa.js?v=20260710ini"></script>
 <script src="/games/tormenta/js/t20-arena-handouts.js?v=20260710handouts"></script>
-<script src="/games/tormenta/js/t20-arena-bestiario-import.js?v=20260726bestiario13b"></script>
+<script src="/games/tormenta/js/t20-arena-bestiario-import.js?v=20260726bestiariofoto"></script>
 <script src="/games/tormenta/js/t20-arena-npc-compact.js?v=20260726ameaca"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260710i"></script>
 <script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260726defesa"></script>

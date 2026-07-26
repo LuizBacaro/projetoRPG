@@ -369,7 +369,7 @@ def test_get_regras_bestiario_paginacao_e_filtros_nd(client_regras_tormenta):
     )
     assert r_all.status_code == 200, r_all.text
     body = r_all.json()
-    assert body["total"] >= 80
+    assert body["total"] >= 130
     assert len(body["itens"]) == 20
 
     r_page2 = client_regras_tormenta.get(
@@ -398,6 +398,33 @@ def test_get_regras_bestiario_paginacao_e_filtros_nd(client_regras_tormenta):
     r_alias = client_regras_tormenta.get("/api/v1/tormenta/regras/bestiario/goblin")
     assert r_alias.status_code == 200, r_alias.text
     assert r_alias.json()["slug"] == "goblin-salteador"
+
+
+def test_get_regras_bestiario_dda_cap4(client_regras_tormenta):
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/bestiario",
+        params={"tipo": "Abissais", "limit": 50},
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["total"] >= 8
+    assert any(x["slug"] == "aucharai" for x in body["itens"])
+
+    r2 = client_regras_tormenta.get("/api/v1/tormenta/regras/bestiario/aucharai")
+    assert r2.status_code == 200, r2.text
+    det = r2.json()
+    assert det["nome"] == "Aucharai"
+    assert det["grupo"] == "Abissais"
+    assert det["pv_max"] == 240
+    assert det["ca"] == 26
+    assert det.get("nd") == 6 or det.get("nd") == 6.0
+    assert len(det["ataques"]) >= 1
+
+    r_s = client_regras_tormenta.get("/api/v1/tormenta/regras/bestiario/abahddon")
+    assert r_s.status_code == 200, r_s.text
+    ab = r_s.json()
+    assert ab.get("nd_rotulo") == "S"
+    assert ab.get("nd") is None
 
 
 def test_get_regras_equipamentos_armadura_v13(client_regras_tormenta):

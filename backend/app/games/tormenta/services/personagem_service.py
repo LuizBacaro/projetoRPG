@@ -769,6 +769,7 @@ class TormentaPersonagemService:
             tipo=payload.tipo,
             campanha_id=payload.campanha_id,
             nome_override=payload.nome_override,
+            foto_url=payload.foto_url,
         )
         return self.criar(usuario, create_payload)
 

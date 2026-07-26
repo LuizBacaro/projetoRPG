@@ -2741,21 +2741,39 @@
     max-width: 52rem;
 }
 
+.t20-arena-modal--bestiario {
+    width: min(64rem, 97vw);
+    max-width: 64rem;
+    max-height: min(94vh, 56rem);
+}
+
+.t20-arena-modal--bestiario .t20-arena-modal__bd {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
 .t20-bestiario-modal-bd {
-    max-height: min(70vh, 36rem);
-    overflow: auto;
+    max-height: min(82vh, 48rem);
+    overflow: hidden;
 }
 
 .t20-bestiario-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     gap: 0.65rem;
-    min-height: 14rem;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 @media (max-width: 720px) {
     .t20-bestiario-layout {
         grid-template-columns: 1fr;
+    }
+
+    .t20-bestiario-modal-bd {
+        max-height: min(78vh, 44rem);
+        overflow: auto;
     }
 }
 
@@ -2764,6 +2782,7 @@
     grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 0.7fr));
     gap: 0.5rem;
     margin-bottom: 0.55rem;
+    flex-shrink: 0;
 }
 
 @media (max-width: 720px) {
@@ -2780,13 +2799,16 @@
     flex-direction: column;
     gap: 0.4rem;
     min-height: 0;
+    height: min(36rem, 54vh);
 }
 
 .t20-bestiario-lista {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    max-height: min(28rem, 52vh);
+    flex: 1 1 auto;
+    max-height: none;
+    height: 100%;
     overflow: auto;
     overscroll-behavior: contain;
     border: 1px solid var(--t20-grid-line, rgba(120, 72, 48, 0.22));
@@ -2806,6 +2828,20 @@
     font-size: 0.82rem;
     color: var(--t20-muted, #6b5344);
     text-align: center;
+}
+
+.t20-bestiario-foto-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.55rem;
+    margin-top: 0.55rem;
+    flex-shrink: 0;
+}
+
+@media (max-width: 720px) {
+    .t20-bestiario-foto-fields {
+        grid-template-columns: 1fr;
+    }
 }
 
 .t20-bestiario-item {
@@ -2852,6 +2888,8 @@
     background: rgba(255, 252, 248, 0.85);
     font-size: 0.82rem;
     overflow: auto;
+    height: min(36rem, 54vh);
+    min-height: 0;
 }
 
 .t20-bestiario-prev-nome {

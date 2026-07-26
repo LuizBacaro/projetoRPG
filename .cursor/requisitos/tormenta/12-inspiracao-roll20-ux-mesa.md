@@ -55,7 +55,7 @@ Objetivo: mesa mais fluida (menos digitação manual, mais regras aplicadas na U
 | RF-T12d | **Condições alteram rolagens** na arena (ataque, CA, perícias afetadas) conforme p.394 v1.3 | P1 | Condition toggles |
 | RF-T12e | **Ficha NPC compacta** na arena (PV, CA, ataques, iniciativa; sem wizard) | P1 | NPC Compact view |
 | RF-T12f | **Handouts** — mestre cria/revela notas ou imagem para jogador(es) da campanha | P1 | Journal handouts + Show to players |
-| RF-T12g | **Import monstro/catálogo → combatente** na arena a partir do bestiário T20 v1.3 (JSON, sem tabela SQL) | P2 | Drag monster to tabletop |
+| RF-T12g | **Import monstro/catálogo → combatente** na arena (T20 v1.3 + DdA Cap.4; JSON, sem tabela SQL) | P2 | Drag monster to tabletop |
 | RF-T12h | **Sincronização ficha ↔ arena** (PV/PM/condições) via `BroadcastChannel` ou WebSocket leve | P2 | Token HP sync |
 | RF-T12i | **Layout ficha compacto** (toggle vista resumida vs completa) | P2 | Condensed player sheet |
 | RF-T12j | **Log de mesa** — histórico de rolagens e ações na sessão de combate | P2 | Chat log |
@@ -117,7 +117,7 @@ Objetivo: mesa mais fluida (menos digitação manual, mais regras aplicadas na U
 | RF-T12h Sync ficha↔arena | **Feito** | `BroadcastChannel` `tormenta-t20-sync`; PV/PM/condições arena→ficha e ficha→arena |
 | RF-T12i Layout compacto | **Feito** | Toggle «Vista compacta» + `localStorage`; oculta equipamento, grimório, retrato, etc. |
 | RF-T12k Convite campanha | **Feito** | Token em `tormenta_campanhas`; link `dashboard.html?convite=`; entrada automática |
-| RF-T12g Import bestiário → arena | **Feito** | Catálogo `bestiario_v13.json` (~80, Tabela 7-1 p.284–316); API `q`/`skip`/`limit`/`tipo`/`nd_*`; modal paginado (20) + filtros; import → `ficha_json.ameaca` |
+| RF-T12g Import bestiário → arena | **Feito** | `bestiario_v13.json` (~81) + `bestiario_dda_v11.json` (~56 Cap.4 DdA); merge em `catalogo_t20`; filtros tipo/grupo/ND; modal lista completa; import → `ameaca` |
 | RF-T12l Mapa VTT | **Fora de escopo** |
 
 ## Gap código / dependências

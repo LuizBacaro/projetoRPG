@@ -38,6 +38,13 @@ preservadas apenas como legado para depuração e migração histórica.
     `POST /tormenta/personagens/importar-bestiario`.
   - Extração local: `scripts/extrair_bestiario_t20_v13.py` (PDF em `livros/`,
     não versionado).
+- `bestiario_dda_v11.json`
+  - ~56 criaturas do Cap. 4 *Deuses de Arton* v1.1 (pp. impressas 252–315):
+    Abissais, Aspectos, Celestiais, Fadas, Gênios, Gigantes.
+  - Mesmo shape mecânico; `fonte: dda_v11`; ND especiais `S`/`S+`/`?` via
+    `nd_rotulo` (sem `nd` numérico).
+  - Merge automático em `catalogo_t20._carregar_bestiario_mb`.
+  - Extração: `scripts/extrair_bestiario_dda_v11.py` (PDF DdA em `livros/`).
 - `armas_v13_overlay.json` + `equipamentos_mb_catalogo.json`
   - Stats de combate (Tabela 3-3) e autocomplete de inventário.
 

@@ -56,6 +56,7 @@ def mapear_bestiario_para_create(
     tipo: str = "monstro",
     campanha_id: Optional[int] = None,
     nome_override: Optional[str] = None,
+    foto_url: Optional[str] = None,
 ) -> TormentaPersonagemCreate:
     t = (tipo or "monstro").strip().lower()
     if t not in ("monstro", "npc"):
@@ -75,6 +76,7 @@ def mapear_bestiario_para_create(
     ).strip()
     if fonte in ("stub_mb", ""):
         fonte = "t20_v13"
+    # Preservar dda_v11 / t20_v13 / outras fontes explícitas
 
     nd_num = _nd_numerico(entrada.get("nd"))
     nd_rotulo = str(entrada.get("nd_rotulo") or "").strip() or None
@@ -108,6 +110,9 @@ def mapear_bestiario_para_create(
         nd=nd_num if nd_num is not None else float(nivel),
         papel_combate="solo",
     )
+    if nd_num is None and nd_rotulo:
+        # ND simbólico (S, S+, ?) — manter rótulo; sem valor numérico enganoso
+        am["nd"] = None
     if nd_rotulo:
         am["nd_rotulo"] = nd_rotulo
     if tipo_criatura:
@@ -130,6 +135,8 @@ def mapear_bestiario_para_create(
             for a in ataques
         ]
     ficha_json["ameaca"] = am
+
+    foto = (foto_url or "").strip() or None
 
     return TormentaPersonagemCreate(
         tipo=t,
@@ -154,6 +161,7 @@ def mapear_bestiario_para_create(
         fort_total=_int_field(entrada, "fort_total", 0),
         ref_total=_int_field(entrada, "ref_total", 0),
         von_total=_int_field(entrada, "von_total", 0),
+        foto_url=foto,
         ficha_json=ficha_json,
     )
 
@@ -164,6 +172,7 @@ def criar_payload_import_bestiario(
     tipo: str = "monstro",
     campanha_id: Optional[int] = None,
     nome_override: Optional[str] = None,
+    foto_url: Optional[str] = None,
 ) -> TormentaPersonagemCreate:
     entrada = obter_bestiario_mb_por_slug(slug)
     if not entrada:
@@ -173,4 +182,5 @@ def criar_payload_import_bestiario(
         tipo=tipo,
         campanha_id=campanha_id,
         nome_override=nome_override,
+        foto_url=foto_url,
     )

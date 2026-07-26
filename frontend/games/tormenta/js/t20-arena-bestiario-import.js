@@ -19,6 +19,12 @@
         'Humanoide',
         'Monstro',
         'Morto-vivo',
+        'Abissais',
+        'Aspectos',
+        'Celestiais',
+        'Fadas',
+        'Gênios',
+        'Gigantes',
     ];
 
     function q(id) {
@@ -198,10 +204,22 @@
     function popularFiltroTipo() {
         const sel = q('t20BestiarioFiltroTipo');
         if (!sel || sel.dataset.ready) return;
-        sel.innerHTML = TIPOS.map((t) =>
-            t ? `<option value="${esc(t)}">${esc(t)}</option>` : '<option value="">Todos os tipos</option>'
-        ).join('');
+        sel.innerHTML = TIPOS.map((t) => {
+            if (!t) return '<option value="">Todos os tipos/grupos</option>';
+            return `<option value="${esc(t)}">${esc(t)}</option>`;
+        }).join('');
         sel.dataset.ready = '1';
+    }
+
+    function limparCamposExtras() {
+        const nomeInp = q('t20BestiarioNomeOverride');
+        const fotoUrl = q('t20BestiarioFotoUrl');
+        const fotoFile = q('t20BestiarioFotoFile');
+        const fotoHint = q('t20BestiarioFotoFileHint');
+        if (nomeInp) nomeInp.value = '';
+        if (fotoUrl) fotoUrl.value = '';
+        if (fotoFile) fotoFile.value = '';
+        if (fotoHint) fotoHint.textContent = '';
     }
 
     function abrirModal() {
@@ -210,12 +228,11 @@
         slugSelecionado = null;
         total = 0;
         popularFiltroTipo();
-        const nomeInp = q('t20BestiarioNomeOverride');
+        limparCamposExtras();
         const busca = q('t20BestiarioBusca');
         const tipo = q('t20BestiarioFiltroTipo');
         const ndMin = q('t20BestiarioNdMin');
         const ndMax = q('t20BestiarioNdMax');
-        if (nomeInp) nomeInp.value = '';
         if (busca) busca.value = '';
         if (tipo) tipo.value = '';
         if (ndMin) ndMin.value = '';
@@ -266,6 +283,14 @@
                 });
             });
 
+            q('t20BestiarioFotoFile')?.addEventListener('change', () => {
+                const file = q('t20BestiarioFotoFile')?.files?.[0];
+                const hint = q('t20BestiarioFotoFileHint');
+                if (hint) {
+                    hint.textContent = file ? `Selecionado: ${file.name}` : '';
+                }
+            });
+
             q('t20BestiarioBtnImportar')?.addEventListener('click', async () => {
                 const slug = slugSelecionado;
                 const cid = getCampanhaId ? Number(getCampanhaId()) : null;
@@ -279,7 +304,10 @@
                 }
                 const btn = q('t20BestiarioBtnImportar');
                 const nomeOverride = q('t20BestiarioNomeOverride')?.value?.trim() || undefined;
+                const fotoUrl = q('t20BestiarioFotoUrl')?.value?.trim() || undefined;
+                const fotoFile = q('t20BestiarioFotoFile')?.files?.[0] || null;
                 if (btn) btn.disabled = true;
+                const svc = new global.TormentaPersonagemService();
                 try {
                     const payload = {
                         slug,
@@ -287,7 +315,20 @@
                         campanha_id: cid,
                     };
                     if (nomeOverride) payload.nome_override = nomeOverride;
-                    const criado = await new global.TormentaPersonagemService().importarBestiario(payload);
+                    // Arquivo tem prioridade; URL só se não houver arquivo
+                    if (!fotoFile && fotoUrl) payload.foto_url = fotoUrl;
+                    let criado = await svc.importarBestiario(payload);
+                    if (fotoFile && criado && criado.id != null) {
+                        try {
+                            criado = await svc.enviarFoto(criado.id, fotoFile);
+                        } catch (upErr) {
+                            if (Toast && Toast.warning) {
+                                Toast.warning(
+                                    `Criatura adicionada, mas o retrato falhou: ${upErr.message || 'erro no upload'}`
+                                );
+                            }
+                        }
+                    }
                     fecharModal();
                     if (Toast && Toast.success) {
                         Toast.success(`«${criado.nome || slug}» adicionado à mesa.`);

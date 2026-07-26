@@ -14,6 +14,7 @@ _TALENT_JSON = _DATA_DIR / "talentos_mb_catalogo.json"
 _MAGIAS_JSON = _DATA_DIR / "magias_mb_catalogo.json"
 _MAGIAS_ALIASES_MB_V13 = _DATA_DIR / "magias_mb_v13_slug_aliases.json"
 _BESTIARIO_JSON = _DATA_DIR / "bestiario_v13.json"
+_BESTIARIO_DDA_JSON = _DATA_DIR / "bestiario_dda_v11.json"
 _BESTIARIO_STUB_JSON = _DATA_DIR / "bestiario_mb_stub.json"
 
 _MAGIA_FIELD_LIMITS: Dict[str, int] = {
@@ -698,37 +699,59 @@ def _nd_rotulo_de_row(row: Dict[str, Any]) -> Optional[str]:
 
 @lru_cache(maxsize=1)
 def _carregar_bestiario_mb() -> List[Dict[str, Any]]:
-    path = _BESTIARIO_JSON if _BESTIARIO_JSON.is_file() else _BESTIARIO_STUB_JSON
-    if not path.is_file():
+    """Catálogo unificado: T20 v1.3 + Deuses de Arton Cap.4 (se presentes)."""
+    paths: List[Path] = []
+    if _BESTIARIO_JSON.is_file():
+        paths.append(_BESTIARIO_JSON)
+    elif _BESTIARIO_STUB_JSON.is_file():
+        paths.append(_BESTIARIO_STUB_JSON)
+    if _BESTIARIO_DDA_JSON.is_file():
+        paths.append(_BESTIARIO_DDA_JSON)
+    if not paths:
         return []
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return []
-    rows = raw.get("criaturas") if isinstance(raw, dict) else raw
-    if not isinstance(rows, list):
-        return []
+
     out: List[Dict[str, Any]] = []
-    for row in rows:
-        if not isinstance(row, dict):
+    seen_slugs: set[str] = set()
+    for path in paths:
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
             continue
-        slug = str(row.get("slug") or "").strip()
-        nome = str(row.get("nome") or "").strip()
-        if not slug or not nome:
+        rows = raw.get("criaturas") if isinstance(raw, dict) else raw
+        if not isinstance(rows, list):
             continue
-        item = dict(row)
-        item["slug"] = slug
-        item["nome"] = nome
-        nd_num = _nd_numerico(item.get("nd"))
-        if nd_num is not None:
-            item["nd"] = nd_num
-        item["nd_rotulo"] = _nd_rotulo_de_row(item)
-        out.append(item)
+        fonte_arquivo = (
+            str(raw.get("fonte") or "").strip() if isinstance(raw, dict) else ""
+        )
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            slug = str(row.get("slug") or "").strip()
+            nome = str(row.get("nome") or "").strip()
+            if not slug or not nome:
+                continue
+            slug_l = slug.lower()
+            if slug_l in seen_slugs:
+                # Preferir primeira fonte (v13); DdA com colisão seria -dda
+                continue
+            seen_slugs.add(slug_l)
+            item = dict(row)
+            item["slug"] = slug
+            item["nome"] = nome
+            if not item.get("fonte") and fonte_arquivo:
+                item["fonte"] = fonte_arquivo
+            nd_num = _nd_numerico(item.get("nd"))
+            if nd_num is not None:
+                item["nd"] = nd_num
+            elif item.get("nd") is not None and str(item.get("nd")).strip() == "":
+                item["nd"] = None
+            item["nd_rotulo"] = _nd_rotulo_de_row(item)
+            out.append(item)
     return out
 
 
 def lista_bestiario_mb_catalogo() -> List[Dict[str, Any]]:
-    """Lista completa do bestiário Tormenta (v1.3 ou stub legado)."""
+    """Lista completa do bestiário Tormenta (v1.3 + DdA Cap.4, ou stub legado)."""
     return [dict(r) for r in _carregar_bestiario_mb()]
 
 

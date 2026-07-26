@@ -35,7 +35,7 @@ Se no futuro um catálogo precisar de **CRUD administrativo**, **multi-ambiente 
 |------|----------|
 | Router regras | `backend/app/games/tormenta/api/v1/regras.py` — inclui **`GET .../magias`** |
 | Router personagens | `backend/app/games/tormenta/api/v1/personagens.py` |
-| Catálogos MB (filtro, merge JSON + classes) | `backend/app/games/tormenta/rules/catalogo_t20.py` — `equipamentos_mb_catalogo.json`, `talentos_mb_catalogo.json`, **`magias_mb_catalogo.json`**, **`bestiario_v13.json`** (RF-T12g; stub legado só fallback) |
+| Catálogos MB (filtro, merge JSON + classes) | `backend/app/games/tormenta/rules/catalogo_t20.py` — `equipamentos_mb_catalogo.json`, `talentos_mb_catalogo.json`, **`magias_mb_catalogo.json`**, **`bestiario_v13.json`** + **`bestiario_dda_v11.json`** (RF-T12g) |
 | Tendências (alinhamento) e divindades (Os Vinte) | `data/tendencias_divindades_mb.json` (`divindades`: `slug` + `rotulo`), `rules/tendencias_divindades_t20.py`, `GET /tormenta/regras/identidade-mb` (ficha: combos; MB p.116–119 e p.120–126) |
 | Classes / BBA / PV MB | `backend/app/games/tormenta/rules/classes_t20.py`, `data/classes_mb.json`, `beneficios_nivel_mb.json` |
 | **Conjuração MB (PM, chave, custo/círculo)** | `data/conjuracao_classe_mb.json`, `rules/conjuracao_t20.py`, **`GET /tormenta/regras/conjuracao-mb`** |
