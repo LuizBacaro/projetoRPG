@@ -13,7 +13,8 @@ _EQUIP_JSON = _DATA_DIR / "equipamentos_mb_catalogo.json"
 _TALENT_JSON = _DATA_DIR / "talentos_mb_catalogo.json"
 _MAGIAS_JSON = _DATA_DIR / "magias_mb_catalogo.json"
 _MAGIAS_ALIASES_MB_V13 = _DATA_DIR / "magias_mb_v13_slug_aliases.json"
-_BESTIARIO_JSON = _DATA_DIR / "bestiario_mb_stub.json"
+_BESTIARIO_JSON = _DATA_DIR / "bestiario_v13.json"
+_BESTIARIO_STUB_JSON = _DATA_DIR / "bestiario_mb_stub.json"
 
 _MAGIA_FIELD_LIMITS: Dict[str, int] = {
     "slug": 80,
@@ -659,12 +660,49 @@ def filtrar_magias_mb(
     return rows[s : s + lim], total
 
 
+def _nd_numerico(raw: Any) -> Optional[float]:
+    if raw is None or raw == "":
+        return None
+    if isinstance(raw, (int, float)):
+        return float(raw)
+    s = str(raw).strip().replace(",", ".")
+    if "/" in s:
+        parts = s.split("/", 1)
+        try:
+            a, b = float(parts[0]), float(parts[1])
+            if b:
+                return a / b
+        except (TypeError, ValueError):
+            return None
+    try:
+        return float(s)
+    except (TypeError, ValueError):
+        return None
+
+
+def _nd_rotulo_de_row(row: Dict[str, Any]) -> Optional[str]:
+    rot = str(row.get("nd_rotulo") or "").strip()
+    if rot:
+        return rot
+    nd = _nd_numerico(row.get("nd"))
+    if nd is None:
+        return None
+    if abs(nd - 0.25) < 1e-9:
+        return "1/4"
+    if abs(nd - 0.5) < 1e-9:
+        return "1/2"
+    if nd == int(nd):
+        return str(int(nd))
+    return str(nd).rstrip("0").rstrip(".")
+
+
 @lru_cache(maxsize=1)
 def _carregar_bestiario_mb() -> List[Dict[str, Any]]:
-    if not _BESTIARIO_JSON.is_file():
+    path = _BESTIARIO_JSON if _BESTIARIO_JSON.is_file() else _BESTIARIO_STUB_JSON
+    if not path.is_file():
         return []
     try:
-        raw = json.loads(_BESTIARIO_JSON.read_text(encoding="utf-8"))
+        raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return []
     rows = raw.get("criaturas") if isinstance(raw, dict) else raw
@@ -681,12 +719,16 @@ def _carregar_bestiario_mb() -> List[Dict[str, Any]]:
         item = dict(row)
         item["slug"] = slug
         item["nome"] = nome
+        nd_num = _nd_numerico(item.get("nd"))
+        if nd_num is not None:
+            item["nd"] = nd_num
+        item["nd_rotulo"] = _nd_rotulo_de_row(item)
         out.append(item)
     return out
 
 
 def lista_bestiario_mb_catalogo() -> List[Dict[str, Any]]:
-    """Lista completa do bestiário stub MB."""
+    """Lista completa do bestiário Tormenta (v1.3 ou stub legado)."""
     return [dict(r) for r in _carregar_bestiario_mb()]
 
 
@@ -697,6 +739,11 @@ def obter_bestiario_mb_por_slug(slug: str) -> Optional[Dict[str, Any]]:
     for row in _carregar_bestiario_mb():
         if str(row.get("slug", "")).strip().lower() == s:
             return dict(row)
+        aliases = row.get("aliases")
+        if isinstance(aliases, list):
+            for alias in aliases:
+                if str(alias or "").strip().lower() == s:
+                    return dict(row)
     return None
 
 
@@ -704,24 +751,62 @@ def _score_busca_bestiario(qn: str, row: Dict[str, Any]) -> tuple[int, str]:
     nome = str(row.get("nome", "")).lower()
     slug = str(row.get("slug", "")).lower()
     tipo = str(row.get("tipo_criatura", "")).lower()
+    grupo = str(row.get("grupo", "")).lower()
     if nome == qn or slug == qn:
         return (0, nome)
     if nome.startswith(qn) or slug.startswith(qn):
         return (1, nome)
-    if qn in nome or qn in slug or qn in tipo:
+    if qn in nome or qn in slug or qn in tipo or qn in grupo:
         return (2, nome)
     return (99, nome)
 
 
 def filtrar_bestiario_mb(
-    q: str | None, skip: int, limit: int
+    q: str | None,
+    skip: int,
+    limit: int,
+    *,
+    tipo: str | None = None,
+    nd_min: float | None = None,
+    nd_max: float | None = None,
 ) -> Tuple[List[Dict[str, Any]], int]:
     rows = [dict(r) for r in lista_bestiario_mb_catalogo()]
     qn = (q or "").strip().lower()
+    tipo_n = (tipo or "").strip().lower()
+    if tipo_n:
+        rows = [
+            r
+            for r in rows
+            if tipo_n in str(r.get("tipo_criatura") or "").lower()
+            or tipo_n in str(r.get("grupo") or "").lower()
+        ]
+    if nd_min is not None:
+        rows = [
+            r
+            for r in rows
+            if (nd := _nd_numerico(r.get("nd"))) is not None and nd >= float(nd_min)
+        ]
+    if nd_max is not None:
+        rows = [
+            r
+            for r in rows
+            if (nd := _nd_numerico(r.get("nd"))) is not None and nd <= float(nd_max)
+        ]
     if qn:
         filtrados = [r for r in rows if _score_busca_bestiario(qn, r)[0] < 99]
         filtrados.sort(key=lambda r: _score_busca_bestiario(qn, r))
         rows = filtrados
+    else:
+        rows.sort(
+            key=lambda r: (
+                (
+                    _nd_numerico(r.get("nd"))
+                    if _nd_numerico(r.get("nd")) is not None
+                    else 999.0
+                ),
+                str(r.get("nome") or "").lower(),
+            )
+        )
     for i, item in enumerate(rows, start=1):
         item["id"] = i
     total = len(rows)

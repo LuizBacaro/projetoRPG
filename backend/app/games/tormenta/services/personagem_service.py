@@ -276,7 +276,9 @@ class TormentaPersonagemService:
         ent.pa_atual = min(max(0, cur), new_max)
 
     def _sincronizar_ca_v13(self, ent: TormentaPersonagem) -> None:
-        """v1.3: CA base = 10 + DES (valor); armaduras da lista somam na UI."""
+        """v1.3: CA base de jogador = 10 + DES; monstro/NPC mantém Defesa explícita (bestiário)."""
+        if (ent.tipo or "").lower() != "jogador":
+            return
         fj = dict(ent.ficha_json or {})
         if regra_versao_de_ficha(fj) != REGRA_VERSAO_V13:
             return

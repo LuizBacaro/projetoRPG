@@ -532,11 +532,17 @@ def test_importar_bestiario_cria_monstro_com_ataques(tormenta_personagens_db):
     assert r.status_code == 201, r.text
     body = r.json()
     assert body["tipo"] == "monstro"
-    assert body["nome"] == "Goblin"
+    assert body["nome"] == "Goblin salteador"
     assert body["pv_max"] == 4
     assert body["ca"] == 14
+    assert body["nivel"] == 1
     fj = body.get("ficha_json") or {}
-    assert fj.get("bestiario_slug") == "goblin"
+    assert fj.get("bestiario_slug") == "goblin-salteador"
+    assert fj.get("bestiario_fonte") == "t20_v13"
+    assert fj.get("nd") == 0.25
+    am = fj.get("ameaca") or {}
+    assert am.get("nd") == 0.25
+    assert am.get("nd_rotulo") == "1/4"
     ataques = fj.get("ataques") or []
     assert len(ataques) == 2
     assert ataques[0]["nome"] == "Machado"

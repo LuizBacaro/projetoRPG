@@ -160,14 +160,17 @@ class TormentaRegrasService {
     }
 
     /**
-     * Catálogo stub MB de criaturas (RF-T12g).
-     * @param {{ q?: string, skip?: number, limit?: number }} params
+     * Catálogo bestiário T20 v1.3 (RF-T12g).
+     * @param {{ q?: string, skip?: number, limit?: number, tipo?: string, nd_min?: number, nd_max?: number }} params
      */
     async listarBestiarioCatalogo(params = {}) {
         const q = new URLSearchParams();
         if (params.q) q.set('q', params.q);
         if (params.skip != null) q.set('skip', String(params.skip));
         if (params.limit != null) q.set('limit', String(params.limit));
+        if (params.tipo) q.set('tipo', params.tipo);
+        if (params.nd_min != null) q.set('nd_min', String(params.nd_min));
+        if (params.nd_max != null) q.set('nd_max', String(params.nd_max));
         const qs = q.toString();
         const res = await fetch(this._urlBestiario() + (qs ? `?${qs}` : ''), {
             headers: this._headers(),

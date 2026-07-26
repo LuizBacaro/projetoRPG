@@ -1,7 +1,7 @@
 {
   "versao": 1,
   "fonte": "stub_mb",
-  "nota": "Entradas ilustrativas para RF-T12g; substituir por bestiário completo quando licenciado.",
+  "nota": "Fixture mínima / fallback se bestiario_v13.json ausente. Produção usa bestiario_v13.json (Tabela 7-1).",
   "criaturas": [
     {
       "slug": "lobo",

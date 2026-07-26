@@ -357,8 +357,47 @@ def test_get_regras_bestiario_pagina_e_detalhe(client_regras_tormenta):
     det = r2.json()
     assert det["nome"] == "Lobo"
     assert det["pv_max"] == 13
+    assert det["nd"] == 0.5 or det.get("nd_rotulo") == "1/2"
     assert len(det["ataques"]) >= 1
     assert det["ataques"][0]["nome"] == "Mordida"
+
+
+def test_get_regras_bestiario_paginacao_e_filtros_nd(client_regras_tormenta):
+    r_all = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/bestiario",
+        params={"limit": 20, "skip": 0},
+    )
+    assert r_all.status_code == 200, r_all.text
+    body = r_all.json()
+    assert body["total"] >= 80
+    assert len(body["itens"]) == 20
+
+    r_page2 = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/bestiario",
+        params={"limit": 20, "skip": 20},
+    )
+    assert r_page2.status_code == 200, r_page2.text
+    page2 = r_page2.json()
+    assert page2["total"] == body["total"]
+    assert len(page2["itens"]) == 20
+    slugs_p1 = {x["slug"] for x in body["itens"]}
+    slugs_p2 = {x["slug"] for x in page2["itens"]}
+    assert slugs_p1.isdisjoint(slugs_p2)
+
+    r_nd = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/bestiario",
+        params={"nd_min": 0.25, "nd_max": 0.25, "limit": 50},
+    )
+    assert r_nd.status_code == 200, r_nd.text
+    nd_body = r_nd.json()
+    assert nd_body["total"] >= 1
+    for item in nd_body["itens"]:
+        assert item["nd"] == 0.25
+        assert item.get("nd_rotulo") in (None, "1/4", "0.25")
+
+    r_alias = client_regras_tormenta.get("/api/v1/tormenta/regras/bestiario/goblin")
+    assert r_alias.status_code == 200, r_alias.text
+    assert r_alias.json()["slug"] == "goblin-salteador"
 
 
 def test_get_regras_equipamentos_armadura_v13(client_regras_tormenta):

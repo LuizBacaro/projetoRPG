@@ -259,7 +259,7 @@ class TormentaBlocoAmeacaResponse(BaseModel):
     personagem_id: int
     texto: str
     fonte: str = Field(description="override | gerado")
-    nd: int = 1
+    nd: float = 1
     papel_combate: str = "solo"
 
 
