@@ -136,9 +136,26 @@
         return raw;
     }
 
-    function buildBonusBody(tr) {
+    /**
+     * Nome exibido na linha (ex.: «Ofício (alquimia)»).
+     */
+    function nomeExibidoLinha(tr) {
         const nomeEl = tr.querySelector('.t20-p-nome');
-        const nome = nomeEl ? nomeEl.textContent.trim() : '';
+        return nomeEl ? nomeEl.textContent.trim() : '';
+    }
+
+    /**
+     * Nome canônico do catálogo — usado no bônus racial e no lookup do backend.
+     * Especialidades de Ofício exibem «Ofício (x)» mas resolvem como «Ofício».
+     */
+    function nomeCanonLinha(tr) {
+        const canon = tr && tr.getAttribute ? tr.getAttribute('data-per-nome-canon') : '';
+        if (canon && canon.trim()) return canon.trim();
+        return nomeExibidoLinha(tr);
+    }
+
+    function buildBonusBody(tr) {
+        const nome = nomeCanonLinha(tr);
         const treinado = Boolean(tr.querySelector('.p-treinado')?.checked);
         const modAt = Number(tr.querySelector('.p-mod')?.value || 0);
         const outros = Number(tr.querySelector('.p-out')?.value || 0);
@@ -188,8 +205,7 @@
     }
 
     async function rolarPericia(tr) {
-        const nomeEl = tr.querySelector('.t20-p-nome');
-        const nome = nomeEl ? nomeEl.textContent.trim() : 'Perícia';
+        const nome = nomeExibidoLinha(tr) || 'Perícia';
         const treinado = Boolean(tr.querySelector('.p-treinado')?.checked);
         const soTreina = Boolean(tr.querySelector('.p-so-treina')?.checked);
         if (soTreina && !treinado) {
