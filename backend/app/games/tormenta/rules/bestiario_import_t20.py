@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from app.games.tormenta.rules.ameaca_bloco_t20 import ameaca_minima
 from app.games.tormenta.rules.catalogo_t20 import obter_bestiario_mb_por_slug
 from app.games.tormenta.schemas.personagem import TormentaPersonagemCreate
 from app.shared.exceptions.custom_exceptions import DadosInvalidos
@@ -73,11 +74,31 @@ def mapear_bestiario_para_create(
         ficha_json["ataques"] = ataques
 
     nd = entrada.get("nd")
+    nd_int = None
     if nd is not None:
-        ficha_json["nd"] = _int_field(entrada, "nd", 0) or None
+        nd_int = _int_field(entrada, "nd", 0) or None
+        ficha_json["nd"] = nd_int
     tipo_criatura = str(entrada.get("tipo_criatura") or "").strip()
     if tipo_criatura:
         ficha_json["tipo_criatura"] = tipo_criatura
+
+    am = ameaca_minima(
+        nd=nd_int if nd_int is not None else max(0, _int_field(entrada, "nivel", 1)),
+        papel_combate="solo",
+    )
+    if tipo_criatura:
+        am["tipo_criatura"] = tipo_criatura
+    if ataques:
+        am["acoes"]["corpo_a_corpo"] = [
+            {
+                "nome": a.get("nome") or "Ataque",
+                "ataque": a.get("bonus_ataque") or "+0",
+                "dano": a.get("dano") or "—",
+                "critico": "",
+            }
+            for a in ataques
+        ]
+    ficha_json["ameaca"] = am
 
     return TormentaPersonagemCreate(
         tipo=t,

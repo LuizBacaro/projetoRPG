@@ -152,7 +152,7 @@
         if (mods) {
             const parts = [];
             if (mods.ataque) parts.push(`Atq ${mods.ataque > 0 ? '+' : ''}${mods.ataque}`);
-            if (mods.ca) parts.push(`CA ${mods.ca > 0 ? '+' : ''}${mods.ca}`);
+            if (mods.ca) parts.push(`Defesa ${mods.ca > 0 ? '+' : ''}${mods.ca}`);
             if (mods.pericia_geral) parts.push(`Perícias ${mods.pericia_geral > 0 ? '+' : ''}${mods.pericia_geral}`);
             if (parts.length) {
                 body.innerHTML += `<p class="t20-ficha-cond-mods">${parts.map((x) => escHtml(x)).join(' · ')}</p>`;

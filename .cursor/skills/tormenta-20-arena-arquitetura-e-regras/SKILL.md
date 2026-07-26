@@ -62,6 +62,7 @@ Se no futuro um catálogo precisar de **CRUD administrativo**, **multi-ambiente 
 - **Tendência e divindade (MB):** listas em `tendencias_divindades_mb.json` (divindades com **`slug`** estável + **`rotulo`** persistido em `divindade`); endpoint **`GET /tormenta/regras/identidade-mb`**; na ficha, `<select>` com `option.value = rotulo` e `data-slug` para uso futuro no cliente.
 - **Talentos na ficha:** vínculo em SQL (`tormenta_talentos` + `tormenta_talentos_personagem`); autocomplete de catálogo MB vem de **`/tormenta/regras/talentos`** (lista enriquecida, não obrigatório duplicar em BD).
 - **Magias / grimório:** seguir doc 07; conjuração MB difere de D&D 3.5 (**PM**, **círculos**, preparação/espontâneo por classe); não assumir slots D&D sem mapear para T20. **PM máximos e custo por círculo:** `conjuracao_t20.py` + `GET /tormenta/regras/conjuracao-mb`.
+- **Ameaça (NPC/monstro):** metadados em `ficha_json.ameaca` (ND, papel Solo/Lacaio/Especial, ações); motor determinístico `rules/ameaca_bloco_t20.py`; `GET .../bloco-ameaca`, `POST .../converter-ameaca`; UI na ficha (`t20-ameaca-bloco.js`). Ver RF-13.
 
 ## UI Tormenta (padrões)
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260725usoPer" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260726ameaca" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260725oficioLinhas" />
 </head>
 <body class="tormenta-ficha-body">
@@ -115,8 +115,8 @@
                 </div>
                 <div class="ficha-defesa-row ficha-defesa-row--col-esq" style="margin-top:0.45rem">
                     <div class="ficha-defesa-box ficha-ca-box">
-                        <span class="ficha-defesa-label">CA</span>
-                        <span id="fichaCa" class="ficha-defesa-valor" title="Total exibido = CA salva na ficha + soma dos bônus de CA dos itens na lista de armaduras/proteção (à direita)." role="text" aria-label="Classe de armadura total">10</span>
+                        <span class="ficha-defesa-label">Defesa</span>
+                        <span id="fichaCa" class="ficha-defesa-valor" title="Total exibido = Defesa salva na ficha + soma dos bônus de Defesa dos itens na lista de armaduras/proteção (à direita)." role="text" aria-label="Defesa total">10</span>
                         <span id="fichaCaBreakdown" class="ficha-res-breakdown">Base salva + itens: —</span>
                     </div>
                     <div class="ficha-defesa-box ficha-pv-box">
@@ -299,7 +299,7 @@
                         <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">🛡️ Armadura/Item de Proteção</h3>
                         <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="t20BtnAdicionarArmaduraProtecao" title="Adicionar armadura/item de proteção">➕ Adicionar</button>
                     </div>
-                    <p class="t20-hint" style="margin:0 0 0.35rem;font-size:0.68rem">Itens equipados (catálogo T20). Os <strong>bônus na Defesa</strong> desta lista somam no cartão <strong>CA/Defesa</strong> (com DES e Defesa racial, se houver). Armadura só em <strong>Equipamentos</strong> <em>não</em> conta — adicione-a aqui.</p>
+                    <p class="t20-hint" style="margin:0 0 0.35rem;font-size:0.68rem">Itens equipados (catálogo T20). Os <strong>bônus na Defesa</strong> desta lista somam no cartão <strong>Defesa</strong> (com DES e Defesa racial, se houver). Armadura só em <strong>Equipamentos</strong> <em>não</em> conta — adicione-a aqui.</p>
                     <p class="t20-hint" id="t20ArmadurasSomaCa" style="margin:0 0 0.35rem;font-size:0.72rem">Soma dos itens: +0</p>
                     <p class="t20-hint" id="t20ArmadurasLimitesHint" style="margin:0 0 0.35rem;font-size:0.68rem"></p>
                     <div id="t20FichaArmadurasProtecao" class="ficha-equipamentos-lista"><span class="ficha-vazio">Nenhuma armadura/item de proteção cadastrado</span></div>
@@ -397,6 +397,101 @@
             </aside>
         </main>
 
+        <section id="t20SecaoAmeaca" class="t20-ficha-secao t20-ameaca-secao" hidden>
+            <header class="t20-ameaca-secao__head">
+                <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Ameaça (bloco estilo livro)</h3>
+                <p class="t20-ameaca-secao__lead">
+                    Valores finais para a mesa. Edite o texto e use «Salvar texto» para override; «Regenerar» recalcula pelo motor.
+                </p>
+            </header>
+
+            <div class="t20-ameaca-meta" role="group" aria-label="Metadados da ameaça">
+                <div class="t20-ameaca-meta__row t20-ameaca-meta__row--core">
+                    <div class="t20-ficha-field t20-ameaca-field t20-ameaca-field--nd">
+                        <label for="f_ameaca_nd">ND</label>
+                        <input id="f_ameaca_nd" type="number" min="0" max="40" class="t20-input" value="1" />
+                    </div>
+                    <div class="t20-ficha-field t20-ameaca-field t20-ameaca-field--papel">
+                        <label for="f_ameaca_papel">Papel</label>
+                        <select id="f_ameaca_papel" class="t20-input">
+                            <option value="solo">Solo</option>
+                            <option value="lacaio">Lacaio</option>
+                            <option value="especial">Especial</option>
+                        </select>
+                    </div>
+                    <div class="t20-ficha-field t20-ameaca-field t20-ameaca-field--tipo">
+                        <label for="f_ameaca_tipo_criatura">Tipo de criatura</label>
+                        <input id="f_ameaca_tipo_criatura" type="text" class="t20-input" maxlength="80" placeholder="Humanoide" />
+                    </div>
+                    <div class="t20-ficha-field t20-ameaca-field t20-ameaca-field--perc">
+                        <label for="f_ameaca_percepcao">Percepção</label>
+                        <input id="f_ameaca_percepcao" type="number" min="-99" max="99" class="t20-input" value="0" />
+                    </div>
+                </div>
+                <div class="t20-ameaca-meta__row">
+                    <div class="t20-ficha-field t20-ameaca-field t20-ameaca-field--full">
+                        <label for="f_ameaca_sentidos">Sentidos</label>
+                        <input id="f_ameaca_sentidos" type="text" class="t20-input" maxlength="160" placeholder="visão na penumbra" />
+                    </div>
+                </div>
+                <div class="t20-ameaca-meta__row">
+                    <div class="t20-ficha-field t20-ameaca-field t20-ameaca-field--full">
+                        <label for="f_ameaca_equip">Equipamento e tesouro</label>
+                        <input id="f_ameaca_equip" type="text" class="t20-input" maxlength="240" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="t20-ameaca-toolbar">
+                <span id="t20AmeacaFonteBadge" class="t20-ameaca-fonte-badge">Gerado pelo motor</span>
+                <input type="hidden" id="f_ameaca_fonte" value="gerado" />
+                <div class="t20-ameaca-toolbar__actions">
+                    <button type="button" class="tormenta-btn" id="btnAmeacaRecarregar">Atualizar</button>
+                    <button type="button" class="tormenta-btn" id="btnAmeacaCopiar">Copiar</button>
+                    <button type="button" class="tormenta-btn" id="btnAmeacaRegenerar">Regenerar</button>
+                    <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnAmeacaSalvarOverride">Salvar texto</button>
+                </div>
+            </div>
+
+            <div class="t20-ameaca-bloco-panel">
+                <label for="f_ameaca_bloco" class="t20-ameaca-bloco-panel__label">Bloco de ameaça</label>
+                <textarea
+                    id="f_ameaca_bloco"
+                    class="t20-input t20-ameaca-bloco-texto"
+                    rows="14"
+                    spellcheck="false"
+                    aria-describedby="t20AmeacaFonteBadge"
+                ></textarea>
+            </div>
+        </section>
+
+        <div id="t20AmeacaConverterWrap" class="t20-ficha-secao t20-ameaca-converter" hidden>
+            <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Converter em Ameaça</h3>
+            <p class="t20-ameaca-secao__lead">
+                Cria uma cópia npc/monstro com stats consolidados. O personagem jogador original não é alterado.
+            </p>
+            <div class="t20-ameaca-converter__row">
+                <div class="t20-ficha-field t20-ameaca-field">
+                    <label for="f_ameaca_converter_tipo">Tipo da cópia</label>
+                    <select id="f_ameaca_converter_tipo" class="t20-input">
+                        <option value="monstro">Monstro</option>
+                        <option value="npc">NPC</option>
+                    </select>
+                </div>
+                <div class="t20-ficha-field t20-ameaca-field">
+                    <label for="f_ameaca_converter_papel">Papel</label>
+                    <select id="f_ameaca_converter_papel" class="t20-input">
+                        <option value="solo">Solo</option>
+                        <option value="lacaio">Lacaio</option>
+                        <option value="especial">Especial</option>
+                    </select>
+                </div>
+                <div class="t20-ameaca-converter__cta">
+                    <button type="button" class="tormenta-btn tormenta-btn--primary" id="btnAmeacaConverter">Converter em Ameaça</button>
+                </div>
+            </div>
+        </div>
+
         <footer class="t20-ficha-footer-dndlike ficha-footer" role="contentinfo">
             <div class="t20-ficha-footer__bar">
                 <h3 class="t20-ficha-footer__titulo ficha-secao-titulo">Descrição &amp; narrativa</h3>
@@ -490,7 +585,7 @@
                 <div class="ficha-modal-header">
                     <div>
                         <h3>XP &amp; Módulo Básico (referência)</h3>
-                        <p>Benefícios por nível, experiência e textos de apoio do MB. Os campos da ficha principal permanecem na coluna da esquerda (CA, PV, PM somente leitura — PM = Pontos de Magia). <span class="t20-hint">Esc fecha.</span></p>
+                        <p>Benefícios por nível, experiência e textos de apoio do MB. Os campos da ficha principal permanecem na coluna da esquerda (Defesa, PV, PM somente leitura — PM = Pontos de Magia). <span class="t20-hint">Esc fecha.</span></p>
                     </div>
                     <button id="t20BtnFecharModalMbXp" class="ficha-modal-close" type="button">✕</button>
                 </div>
@@ -509,7 +604,7 @@
                                 <div class="t20-ficha-field"><label for="f_mb_bonus_meio">Bônus meio de nível (MB)</label><input id="f_mb_bonus_meio" type="text" readonly tabindex="-1" class="t20-input" /></div>
                             </div>
                             <p class="t20-hint" id="hintMbMeioNv" style="margin:0.25rem 0 0;font-size:0.58rem">
-                                O MB soma meio de nível em CA (planilha de ataques), resistências e dano. O cartão <strong>CA</strong> soma também os itens da lista de armaduras; o valor <strong>salvo</strong> na ficha é a base sem essa lista.
+                                O MB soma meio de nível em Defesa (planilha de ataques), resistências e dano. O cartão <strong>Defesa</strong> soma também os itens da lista de armaduras; o valor <strong>salvo</strong> na ficha é a base sem essa lista.
                             </p>
                             <div style="margin-top:0.35rem">
                                 <button type="button" class="tormenta-btn" id="btnMbMeioNvForcar">Aplicar bônus MB em Fort/Ref/Von (sobrescreve)</button>
@@ -539,7 +634,7 @@
                         <span class="equipamentos-icone">🛡️</span>
                         <div>
                             <h2 class="equipamentos-titulo">Gerenciar Armadura/Item de Proteção</h2>
-                            <p class="equipamentos-subtitulo">Itens que impactam a Classe de Armadura (catálogo Tormenta 20). <span class="t20-hint">Esc fecha.</span></p>
+                            <p class="equipamentos-subtitulo">Itens que impactam a Defesa (catálogo Tormenta 20). <span class="t20-hint">Esc fecha.</span></p>
                         </div>
                     </div>
                     <button type="button" class="equipamentos-fechar" id="t20BtnFecharModalArmadurasProtecao">✕</button>
@@ -569,7 +664,7 @@
                                 <input type="text" id="t20CriarProtecaoTipo" class="equipamentos-form-input" placeholder="Ex: Armadura leve" required />
                             </div>
                             <div class="equipamentos-form-grupo">
-                                <label class="equipamentos-form-label" for="t20CriarProtecaoBonusCa">Bônus na CA</label>
+                                <label class="equipamentos-form-label" for="t20CriarProtecaoBonusCa">Bônus na Defesa</label>
                                 <input type="number" id="t20CriarProtecaoBonusCa" class="equipamentos-form-input" value="0" min="-20" max="30" />
                             </div>
                             <div class="equipamentos-form-grupo">
@@ -1709,7 +1804,8 @@
 </script>
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260707solic"></script>
 <script src="/games/tormenta/js/t20-ficha-campanha-solicitacao.js?v=20260710solic"></script>
-<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260710g"></script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260726ameaca"></script>
+<script src="/games/tormenta/js/t20-ameaca-bloco.js?v=20260726ameaca2"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-ui.js?v=20260707v13attr"></script>
@@ -1717,7 +1813,7 @@
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260725ataques"></script>
 <script src="/games/tormenta/js/services/TormentaGrimorioService.js?v=20260614grimorioPolish"></script>
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
-<script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260726defesa"></script>
 <script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260711pericias"></script>
 <script src="/games/tormenta/js/t20-oficio-especialidades.js?v=20260725oficioLinhas"></script>
 <script src="/games/tormenta/js/t20-carga-v13.js?v=20260629s46"></script>
@@ -1726,7 +1822,7 @@
 <script src="/games/tormenta/js/t20-penalidade-armadura.js?v=20260629s47"></script>
 <script src="/games/tormenta/js/t20-pericias-usos.js?v=20260725usoP23"></script>
 <script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260725usoPer"></script>
-<script src="/games/tormenta/js/t20-rolagem-contextual.js?v=20260725usoPer"></script>
+<script src="/games/tormenta/js/t20-rolagem-contextual.js?v=20260726defesa"></script>
 <script src="/games/tormenta/js/t20-percepcao-passiva.js?v=20260710c"></script>
 <script src="/games/tormenta/js/t20-breakdown-ficha.js?v=20260710lote"></script>
 <script src="/games/tormenta/js/t20-compendium-dnd.js?v=20260710f"></script>
@@ -1744,7 +1840,7 @@
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-duende-v13.js?v=20260704trocas"></script>
 <script src="/games/tormenta/js/t20-kit-inicial-v13.js?v=20260629"></script>
-<script src="/games/tormenta/js/t20-sync-ficha-arena.js?v=20260710sync"></script>
+<script src="/games/tormenta/js/t20-sync-ficha-arena.js?v=20260726defesa"></script>
 <script src="/games/tormenta/js/t20-ficha-layout-compacto.js?v=20260710sync"></script>
 <script>
 (function () {
@@ -2878,7 +2974,7 @@
         if (lblMeio) {
             lblMeio.textContent =
                 window.T20RegraVersao && window.T20RegraVersao.isV13(getRegraVersaoAtiva())
-                    ? 'Bônus meio de nível (CA / resist / dano)'
+                    ? 'Bônus meio de nível (Defesa / resist / dano)'
                     : 'Bônus meio de nível (MB)';
         }
         const v13 =
@@ -4748,7 +4844,7 @@
         lista.innerHTML = `
             <div class="ficha-equipamentos-tabela">
                 <div class="ficha-equipamento-header">
-                    <span>Item</span><span>Tipo</span><span>Bônus CA</span><span>Det.</span><span>Ação</span>
+                    <span>Item</span><span>Tipo</span><span>Bônus Defesa</span><span>Det.</span><span>Ação</span>
                 </div>
                 <div class="ficha-equipamentos-lista-items">
                     ${t20ArmadurasEquipadas
@@ -4813,7 +4909,7 @@
                     </div>
                     <div class="equipamento-spec-grid equipamento-spec-grid--duas">
                         <div class="equipamento-spec-col" role="list">
-                            <div class="equipamento-spec-par"><span class="equipamento-spec-lbl">Bônus CA</span><span class="equipamento-spec-val">${Number(row.bonus_ca || 0)}</span></div>
+                            <div class="equipamento-spec-par"><span class="equipamento-spec-lbl">Bônus Defesa</span><span class="equipamento-spec-val">${Number(row.bonus_ca || 0)}</span></div>
                             <div class="equipamento-spec-par"><span class="equipamento-spec-lbl">Penalidade</span><span class="equipamento-spec-val">${Number(row.penalidade || 0)}</span></div>
                         </div>
                         <div class="equipamento-spec-col" role="list">
@@ -5381,7 +5477,7 @@
         const esp = _fmtEspacosEquipV13(it.espacos);
         if (esp != null) parts.push(_eqSpecPar('Espaços', esp));
         if (it.bonus_ca != null && it.bonus_ca !== '') {
-            parts.push(_eqSpecPar('Bônus CA', it.bonus_ca));
+            parts.push(_eqSpecPar('Bônus Defesa', it.bonus_ca));
         }
         if (it.penalidade != null && it.penalidade !== '') {
             parts.push(_eqSpecPar('Penalidade', it.penalidade));
@@ -7620,7 +7716,7 @@
     function extrairFichaJson() {
         const rv = getRegraVersaoAtiva();
         const caminhoArc = q('f_arcanista_caminho') && q('f_arcanista_caminho').value;
-        return {
+        const out = {
             regra_versao: rv,
             ...(window.T20OrigensV13
                 ? window.T20OrigensV13.lerOrigemPayload()
@@ -7729,7 +7825,13 @@
                 window.T20MulticlasseV13 && typeof window.T20MulticlasseV13.lerPayload === 'function'
                     ? window.T20MulticlasseV13.lerPayload()
                     : null,
+            ameaca:
+                window.T20AmeacaBloco && typeof window.T20AmeacaBloco.lerAmeacaParaFichaJson === 'function'
+                    ? window.T20AmeacaBloco.lerAmeacaParaFichaJson()
+                    : undefined,
         };
+        if (out.ameaca === undefined) delete out.ameaca;
+        return out;
     }
 
     function aplicarFichaJson(j) {
@@ -7847,6 +7949,9 @@
         destacarPericiasClasseMb();
         atualizarResistenciasBreakdownTormenta();
         t20AtualizarResumoBotaoXpMb();
+        if (window.T20AmeacaBloco && typeof window.T20AmeacaBloco.aplicarPayload === 'function') {
+            window.T20AmeacaBloco.aplicarPayload(j);
+        }
     }
 
     function t20PrecisaMigrarInventarioLegado(p) {
@@ -8980,6 +9085,11 @@
 
         if (window.T20SyncFichaArena && typeof window.T20SyncFichaArena.initFicha === 'function') {
             window.T20SyncFichaArena.initFicha();
+        }
+
+        if (window.T20AmeacaBloco && typeof window.T20AmeacaBloco.bind === 'function') {
+            window.T20AmeacaBloco.bind();
+            window.T20AmeacaBloco.atualizarUiPorTipo();
         }
 
         q('btnSalvar').addEventListener('click', async () => {

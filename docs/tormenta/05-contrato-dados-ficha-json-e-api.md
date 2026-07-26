@@ -25,6 +25,8 @@ Documentado também em `backend/app/games/tormenta/README.md`. Resumo:
 - `dinheiro`, `carga`, `idiomas`, `campanha`, `mestre`, `outros_jogadores`, `xp_atual`, `xp_proximo`
 - `historia`, `personalidade`, `aparencia`, `notas`
 - **Grimório / conjuração MB:** `tormenta_classe_mb_slug`, `tormenta_conjuracao_manual_mb`, `tormenta_nivel_conjurador_mb` (opcional), `tormenta_niveis_classe_mb` (opcional, lista `{slug, nivel}` — editável na ficha em «Multiclasse — classes conjuradoras» ou no JSON), `tormenta_grimorio_sessao_mb` (`pm_gastos_sessao`, `preparadas_anotacao` — lembretes de sessão)
+- **Ameaça (NPC/monstro):** `ameaca` — objeto com `nd`, `papel_combate` (`solo`|`lacaio`|`especial`), `tipo_criatura`, `percepcao`, `sentidos`, `atributos_nulos[]`, `pericias_fortes[]`, `pericias_fracas_bonus`, `acoes` (`corpo_a_corpo`|`distancia`|`especiais`|`magias`), `equipamento_tesouro`, `texto_override`. Legado do bestiário: `nd` / `tipo_criatura` na raiz do JSON ainda são lidos pelo motor. Ver `.cursor/requisitos/tormenta/13-construcao-npc-monstro.md`.
+- **API Ameaça:** `GET /api/v1/tormenta/personagens/{id}/bloco-ameaca`; `POST /api/v1/tormenta/personagens/{id}/converter-ameaca`.
 
 Novas chaves devem ser **aditivas** (nunca remover silenciosamente) para compatibilidade com fichas já salvas.
 

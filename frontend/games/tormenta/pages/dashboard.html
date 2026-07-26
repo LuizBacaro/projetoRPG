@@ -64,7 +64,7 @@
                         <th>Classe</th>
                         <th>Nível</th>
                         <th>PV máx.</th>
-                        <th>CA</th>
+                        <th>Defesa</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -252,7 +252,7 @@
                                     <th>Classe</th>
                                     <th>Nível</th>
                                     <th>PV máx.</th>
-                                    <th>CA</th>
+                                    <th>Defesa</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -287,7 +287,7 @@
             <div class="t20-arena-active-bar">
                 <span class="t20-arena-round">Rodada <strong id="t20ArenaRodada">1</strong> · Turno <strong id="t20ArenaTurnoIdx">1</strong></span>
                 <div class="t20-arena-active-bar-acoes">
-                    <button type="button" class="tormenta-btn" id="t20ArenaBtnToggleStats" title="Mostrar ou ocultar números (PV, PM, CA, iniciativa) na mesa">Revelar stats</button>
+                    <button type="button" class="tormenta-btn" id="t20ArenaBtnToggleStats" title="Mostrar ou ocultar números (PV, PM, Defesa, iniciativa) na mesa">Revelar stats</button>
                     <button type="button" class="tormenta-btn" id="t20ArenaBtnEncerrar">Encerrar combate</button>
                 </div>
             </div>
@@ -339,13 +339,13 @@
                                 <div id="t20ArenaCondStatusBody" class="t20-arena-cond-status-body" aria-live="polite"></div>
                             </div>
                         </div>
-                        <div class="t20-arena-stat-pills" role="group" aria-label="Iniciativa e CA">
+                        <div class="t20-arena-stat-pills" role="group" aria-label="Iniciativa e Defesa">
                             <div class="t20-arena-stat-pill t20-arena-stat-pill--ini" title="Iniciativa">
                                 <span class="t20-arena-stat-pill__lab">Iniciativa</span>
                                 <span id="t20ArenaCharIni" class="t20-arena-stat-pill__val">—</span>
                             </div>
                             <div class="t20-arena-stat-pill t20-arena-stat-pill--ca" title="Classe de armadura">
-                                <span class="t20-arena-stat-pill__lab">CA</span>
+                                <span class="t20-arena-stat-pill__lab">Defesa</span>
                                 <span id="t20ArenaCharCa" class="t20-arena-stat-pill__val">—</span>
                             </div>
                         </div>
@@ -505,7 +505,7 @@
                 </div>
             </div>
             <div class="t20-dash-field">
-                <label for="t20ArenaAtaqueCa">CA do alvo (vazio = usa a CA da ficha)</label>
+                <label for="t20ArenaAtaqueCa">Defesa do alvo (vazio = usa a Defesa da ficha)</label>
                 <input id="t20ArenaAtaqueCa" type="number" min="0" max="99" class="t20-input" placeholder="automático" />
             </div>
             <div id="t20ArenaAtaqueResultado" class="t20-arena-roll-result" hidden aria-live="polite"></div>
@@ -656,7 +656,7 @@
                 <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Enredado" data-tip="Enredado: lento, vulnerável, −2 em ataques." /> Enredado</label>
                 <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Agarrado" data-tip="Agarrado: desprevenido, imóvel, −2 em ataques." /> Agarrado</label>
                 <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Atordoado" data-tip="Atordoado: desprevenido; não pode fazer ações." /> Atordoado</label>
-                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Caído" data-tip="Caído: −5 em ataques corpo a corpo; +5 CA vs corpo a corpo." /> Caído</label>
+                <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Caído" data-tip="Caído: −5 em ataques corpo a corpo; +5 Defesa vs corpo a corpo." /> Caído</label>
                 <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Cego" data-tip="Cego: desprevenido, lento; alvos com camuflagem total." /> Cego</label>
                 <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Ofuscado" data-tip="Ofuscado: −2 em ataques e Percepção." /> Ofuscado</label>
                 <label class="t20-arena-cb"><input type="checkbox" data-cond-rotulo="Surpreendido" data-tip="Surpreendido: desprevenido; só reações." /> Surpreendido</label>
@@ -676,7 +676,7 @@
                     <legend>O alvo está…</legend>
                     <label class="t20-arena-cb"><input type="checkbox" data-tip="Caído (alvo): modificadores para acertá-lo conforme tabela (ex.: corpo a corpo vs distância)." /> Caído</label>
                     <label class="t20-arena-cb"><input type="checkbox" data-tip="Cego (alvo): não aplica alguns bônus de precisão; veja interação com +4 na jogada de ataque." /> Cego</label>
-                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Desprevenido (alvo): perde bônus na CA vindos de DES (e outros efeitos no livro)." /> Desprevenido</label>
+                    <label class="t20-arena-cb"><input type="checkbox" data-tip="Desprevenido (alvo): perde bônus na Defesa vindos de DES (e outros efeitos no livro)." /> Desprevenido</label>
                     <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob camuflagem (alvo): −2 na jogada de ataque (conforme MB)." /> Sob camuflagem</label>
                     <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob camuflagem total (alvo): chance de falha na jogada de ataque (ver MB)." /> Sob camuflagem total</label>
                     <label class="t20-arena-cb"><input type="checkbox" data-tip="Sob cobertura (alvo): −4 na jogada de ataque à distância (conforme MB)." /> Sob cobertura</label>
@@ -686,7 +686,7 @@
             <fieldset class="t20-arena-fs t20-arena-fs--inline">
                 <legend>Tipo de ataque (contexto)</legend>
                 <label class="t20-arena-cb"><input type="radio" name="t20condTipoAtq" value="cc" checked data-tip="Ataque corpo a corpo selecionado (para linhas que citam corpo a corpo)." /> Corpo a corpo</label>
-                <label class="t20-arena-cb"><input type="radio" name="t20condTipoAtq" value="dist" data-tip="Ataque à distância selecionado (cobertura, CA +4 vs distância etc.)." /> À distância</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condTipoAtq" value="dist" data-tip="Ataque à distância selecionado (cobertura, Defesa +4 vs distância etc.)." /> À distância</label>
             </fieldset>
             <fieldset class="t20-arena-fs">
                 <legend>Modificador extra na jogada de ataque (escolha um, se aplicável)</legend>
@@ -700,14 +700,14 @@
                 <label class="t20-arena-cb"><input type="radio" name="t20condModAtq" value="m1" data-tip="Modificador na jogada de ataque: −1." /> −1</label>
             </fieldset>
             <fieldset class="t20-arena-fs">
-                <legend>Modificador na CA do alvo / efeito (escolha um, se aplicável)</legend>
-                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="" checked data-tip="Sem entrada extra desta linha na CA." /> Nenhum desta lista</label>
-                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="meleeR" data-tip="CA: −4 contra ataques corpo a corpo, +4 contra ataques à distância (conforme situação no MB)." /> −4 contra corpo a corpo, +4 contra à distância</label>
-                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="m8" data-tip="Modificador na CA: −8." /> −8</label>
-                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="m4" data-tip="Modificador na CA: −4." /> −4</label>
-                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="f20" data-tip="CA: 20% de chance de falha no ataque (conforme MB)." /> 20% de chance de falha</label>
-                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="f50" data-tip="CA: 50% de chance de falha no ataque (conforme MB)." /> 50% de chance de falha</label>
-                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="p4" data-tip="Modificador na CA: +4." /> +4</label>
+                <legend>Modificador na Defesa do alvo / efeito (escolha um, se aplicável)</legend>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="" checked data-tip="Sem entrada extra desta linha na Defesa." /> Nenhum desta lista</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="meleeR" data-tip="Defesa: −4 contra ataques corpo a corpo, +4 contra ataques à distância (conforme situação no MB)." /> −4 contra corpo a corpo, +4 contra à distância</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="m8" data-tip="Modificador na Defesa: −8." /> −8</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="m4" data-tip="Modificador na Defesa: −4." /> −4</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="f20" data-tip="Defesa: 20% de chance de falha no ataque (conforme MB)." /> 20% de chance de falha</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="f50" data-tip="Defesa: 50% de chance de falha no ataque (conforme MB)." /> 50% de chance de falha</label>
+                <label class="t20-arena-cb"><input type="radio" name="t20condModCa" value="p4" data-tip="Modificador na Defesa: +4." /> +4</label>
             </fieldset>
             <label class="t20-arena-cb t20-arena-cb--destaque"><input type="checkbox" id="t20CondNaoAtac" data-tip="O alvo não pode ser atacado (situações descritas na p. 220 do Módulo Básico)." /> O alvo não pode ser atacado (p. 220)</label>
             <div id="t20ArenaCondResumo" class="t20-arena-cond-resumo" aria-live="polite"></div>
@@ -769,7 +769,7 @@
         <button type="button" class="t20-arena-modal__x" id="t20BestiarioFechar" aria-label="Fechar">×</button>
     </div>
     <div class="t20-arena-modal__bd t20-bestiario-modal-bd">
-        <p class="t20-dash-hint" style="margin-top:0">Catálogo stub MB — cria um combatente <strong>monstro</strong> na campanha ativa com PV, CA e ataques prontos para a arena.</p>
+        <p class="t20-dash-hint" style="margin-top:0">Catálogo stub MB — cria um combatente <strong>monstro</strong> na campanha ativa com PV, Defesa e ataques prontos para a arena.</p>
         <div class="t20-dash-field">
             <label for="t20BestiarioBusca">Buscar</label>
             <input id="t20BestiarioBusca" type="search" class="t20-input" placeholder="Nome ou tipo (ex.: lobo, morto-vivo)…" autocomplete="off" />
@@ -1274,7 +1274,7 @@
 <script>
     if (!AuthService.exigirJogo('tormenta')) {}
 </script>
-<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260710bestiario2"></script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260726ameaca"></script>
 <script src="/games/tormenta/js/services/TormentaRegrasService.js?v=20260710bestiario2"></script>
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260710handouts"></script>
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
@@ -1287,20 +1287,20 @@
 <script src="/games/tormenta/js/services/TormentaCombateService.js?v=20260710ini"></script>
 <script src="/games/tormenta/js/t20-arena-log-mesa.js?v=20260710ini"></script>
 <script src="/games/tormenta/js/t20-arena-handouts.js?v=20260710handouts"></script>
-<script src="/games/tormenta/js/t20-arena-bestiario-import.js?v=20260710bestiario2"></script>
-<script src="/games/tormenta/js/t20-arena-npc-compact.js?v=20260710i"></script>
+<script src="/games/tormenta/js/t20-arena-bestiario-import.js?v=20260726defesa"></script>
+<script src="/games/tormenta/js/t20-arena-npc-compact.js?v=20260726ameaca"></script>
 <script src="/games/tormenta/js/t20-arena-condicoes.js?v=20260710i"></script>
-<script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260710ini"></script>
+<script src="/games/tormenta/js/t20-combate-rolagens.js?v=20260726defesa"></script>
 <script src="/games/tormenta/js/t20-arena-pericias.js?v=20260710i"></script>
 <script src="/games/tormenta/js/t20-arena-magias.js?v=20260710sync"></script>
-<script src="/games/tormenta/js/t20-sync-ficha-arena.js?v=20260710sync"></script>
+<script src="/games/tormenta/js/t20-sync-ficha-arena.js?v=20260726defesa"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-ha-preferencias.js?v=20260704ha"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-ui.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-dashboard-pericias-v13.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260711pericias"></script>
-<script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260629"></script>
+<script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260726defesa"></script>
 <script src="/games/tormenta/js/t20-dashboard-step2-v13.js?v=20260703racial"></script>
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704ma"></script>
 <script src="/games/tormenta/js/t20-duende-v13.js?v=20260704du"></script>
@@ -2166,7 +2166,7 @@
         const modsTxt = [];
         if (mods) {
             if (mods.ataque) modsTxt.push(`Atq ${mods.ataque > 0 ? '+' : ''}${mods.ataque}`);
-            if (mods.ca) modsTxt.push(`CA ${mods.ca > 0 ? '+' : ''}${mods.ca}`);
+            if (mods.ca) modsTxt.push(`Defesa ${mods.ca > 0 ? '+' : ''}${mods.ca}`);
             if (mods.pericia_geral) modsTxt.push(`Perícias ${mods.pericia_geral > 0 ? '+' : ''}${mods.pericia_geral}`);
             if (mods.reflexos) modsTxt.push(`Ref ${mods.reflexos > 0 ? '+' : ''}${mods.reflexos}`);
             if (mods.iniciativa) modsTxt.push(`Ini ${mods.iniciativa > 0 ? '+' : ''}${mods.iniciativa}`);
@@ -2247,7 +2247,7 @@
                 const maskPick = t20Arena.ativo && !t20Arena.statsVisiveis;
                 const caDisp = maskPick ? '?' : ca;
                 const iniDisp = maskPick ? '?' : ini;
-                return `<label class="t20-arena-pick-card"><input type="checkbox" class="t20-arena-pick-cb" value="${p.id}" /><span class="t20-arena-pick-body">${foto}<span class="t20-arena-pick-name">${escapeHtml(p.nome)}</span><span class="t20-arena-pick-meta">Nv ${escapeHtml(String(p.nivel ?? '—'))} · CA ${caDisp} · Ini ${iniDisp} · ${escapeHtml(p.tipo || '')}</span></span></label>`;
+                return `<label class="t20-arena-pick-card"><input type="checkbox" class="t20-arena-pick-cb" value="${p.id}" /><span class="t20-arena-pick-body">${foto}<span class="t20-arena-pick-name">${escapeHtml(p.nome)}</span><span class="t20-arena-pick-meta">Nv ${escapeHtml(String(p.nivel ?? '—'))} · Defesa ${caDisp} · Ini ${iniDisp} · ${escapeHtml(p.tipo || '')}</span></span></label>`;
             })
             .join('');
         document.querySelectorAll('.t20-arena-pick-card').forEach((lab) => {
@@ -3008,6 +3008,25 @@
             if (window.T20DashPoderesHaV13 && T20DashPoderesHaV13.lerPayload) {
                 Object.assign(fichaBase, T20DashPoderesHaV13.lerPayload());
             }
+        } else if (t === 'npc' || t === 'monstro') {
+            fichaBase.ameaca = {
+                nd: Math.max(0, Number(nivel) || 1),
+                papel_combate: 'solo',
+                tipo_criatura: 'Humanoide',
+                percepcao: 0,
+                sentidos: '',
+                atributos_nulos: [],
+                pericias_fortes: [],
+                pericias_fracas_bonus: 0,
+                acoes: {
+                    corpo_a_corpo: [],
+                    distancia: [],
+                    especiais: [],
+                    magias: [],
+                },
+                equipamento_tesouro: '',
+                texto_override: null,
+            };
         }
 
         const topWizard =
