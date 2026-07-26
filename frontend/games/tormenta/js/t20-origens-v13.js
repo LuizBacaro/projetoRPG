@@ -238,7 +238,13 @@
         if (wrapDev) wrapDev.style.display = v13 ? '' : 'none';
         if (wrapHint) wrapHint.style.display = v13 ? '' : 'none';
         const leg = q('f_origem');
-        if (leg) leg.style.display = v13 ? 'none' : '';
+        if (leg) {
+            leg.style.display = v13 ? 'none' : '';
+            // Em v1.3 a origem vem do select (wrapOrigemSlug); esconder o campo
+            // legado inteiro (label + input) para não sobrar o rótulo "Origem" órfão.
+            const legWrap = leg.closest('.t20-ficha-field');
+            if (legWrap) legWrap.style.display = v13 ? 'none' : '';
+        }
         if (v13) {
             preencherSelectOrigens();
             renderBeneficiosOrigem();
