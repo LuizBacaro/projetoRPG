@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260725editarCheckFix" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260725usoPer" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260725oficioLinhas" />
 </head>
 <body class="tormenta-ficha-body">
@@ -335,7 +335,7 @@
 
                 <div class="t20-ficha-secao t20-ficha-secao--pericias">
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Perícias</h3>
-                    <p class="t20-hint" id="fichaPericiasHint" style="margin-top:0">Clique no <strong>nome</strong> ou em <strong>Σ</strong> para rolar perícia. Passe o mouse em <strong>Σ</strong> para a fórmula.</p>
+                    <p class="t20-hint" id="fichaPericiasHint" style="margin-top:0">Clique no <strong>nome</strong> ou em <strong>Σ</strong> para rolar perícia. Passe o mouse em <strong>Σ</strong> para a fórmula. Em algumas perícias, escolha o <strong>uso</strong> no diálogo da rolagem.</p>
                     <p class="t20-hint" id="fichaUltimaRolagem" style="margin-top:0.2rem;font-size:0.68rem;font-style:italic" aria-live="polite"></p>
                     <p class="t20-hint" id="fichaPericiasOrcamento" style="margin-top:0.2rem;font-size:0.72rem"></p>
                     <p class="t20-hint" id="fichaPercepcaoPassivaInline" style="margin-top:0.2rem;font-size:0.72rem"></p>
@@ -425,6 +425,10 @@
                 </div>
                 <div class="t20-ficha-dialog__body">
                     <p class="t20-pericia-dc-hint" id="t20PericiaDcHint">Informe a Classe de Dificuldade (CD) do teste.</p>
+                    <fieldset id="t20PericiaDcUsos" class="t20-pericia-dc-usos" hidden aria-hidden="true">
+                        <legend id="t20PericiaDcUsosLegend">Uso do teste</legend>
+                        <div id="t20PericiaDcUsosList" class="t20-pericia-dc-usos__list" role="radiogroup" aria-labelledby="t20PericiaDcUsosLegend"></div>
+                    </fieldset>
                     <label class="ficha-modal-field t20-pericia-dc-field" for="t20PericiaDcInput">
                         <span id="t20PericiaDcLabel">CD (padrão 15)</span>
                         <input id="t20PericiaDcInput" type="number" min="1" max="99" step="1" value="15" inputmode="numeric" />
@@ -432,7 +436,7 @@
                 </div>
                 <div class="t20-ficha-dialog__foot">
                     <button type="button" class="ficha-btn-cancelar" id="t20PericiaDcCancelar">Cancelar</button>
-                    <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20PericiaDcRolar">🎲 Rolar teste</button>
+                    <button type="button" class="tormenta-btn tormenta-btn--primary" id="t20PericiaDcRolar">Rolar teste</button>
                 </div>
             </div>
         </dialog>
@@ -1720,8 +1724,9 @@
 <script src="/games/tormenta/js/t20-proficiencia-arma.js?v=20260629s49"></script>
 <script src="/games/tormenta/js/t20-limites-equipamento-v13.js?v=20260629s48"></script>
 <script src="/games/tormenta/js/t20-penalidade-armadura.js?v=20260629s47"></script>
-<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260710lote"></script>
-<script src="/games/tormenta/js/t20-rolagem-contextual.js?v=20260710c"></script>
+<script src="/games/tormenta/js/t20-pericias-usos.js?v=20260725usoP23"></script>
+<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260725usoPer"></script>
+<script src="/games/tormenta/js/t20-rolagem-contextual.js?v=20260725usoPer"></script>
 <script src="/games/tormenta/js/t20-percepcao-passiva.js?v=20260710c"></script>
 <script src="/games/tormenta/js/t20-breakdown-ficha.js?v=20260710lote"></script>
 <script src="/games/tormenta/js/t20-compendium-dnd.js?v=20260710f"></script>
@@ -6998,14 +7003,12 @@
     function renderExtrasPenArmPericia(row) {
         const penArmRegra = row.penalidade_armadura === true;
         const penArmChecked = penArmRegra ? ' checked' : '';
-        const isAtletismo = row.slug === 'atletismo';
         const armInput = `<input type="checkbox" class="p-pen-arm t20-sr-only" title="Perícia sujeita a penalidade de armadura (Tabela 2-1)"${penArmChecked} tabindex="-1" aria-hidden="true" />`;
         const armBadge = penArmRegra
             ? '<span class="t20-pen-arm-badge t20-pen-arm-badge--nome" title="Penalidade de armadura (Tabela 2-1)">A</span>'
             : '';
-        const natCtrl = isAtletismo
-            ? '<label class="t20-pen-nat t20-pen-nat--nome" title="Natação — aplica penalidade de armadura"><input type="checkbox" class="p-pen-natacao" /><span class="t20-pen-nat-ico" aria-hidden="true">🏊</span><span class="t20-sr-only">Natação</span></label>'
-            : '';
+        /* RF-T04i: uso (ex. Nadar) escolhido no diálogo da rolagem — sem checkbox 🏊 na linha. */
+        const natCtrl = '';
         return { armInput, armBadge, natCtrl };
     }
 
@@ -7043,9 +7046,6 @@
                 <td><input type="checkbox" class="p-so-treina" title="Somente treinado (regra base; pode desmarcar se a mesa permitir)"${soTreinaChecked} /></td>
             </tr>`;
         }).join('');
-        tb.querySelectorAll('.p-pen-natacao').forEach((cb) => {
-            cb.addEventListener('change', () => t20AtualizarPenalidadesPericias());
-        });
         if (window.T20PercepcaoPassiva) window.T20PercepcaoPassiva.agendarAtualizacao();
         if (window.T20BreakdownFicha) window.T20BreakdownFicha.agendarPericias();
         if (window.T20PericiasRolador && typeof window.T20PericiasRolador.initRolador === 'function') {
@@ -7075,7 +7075,8 @@
         }
         document.querySelectorAll('#tblPericias tbody tr').forEach((tr, i) => {
             const meta = metaPericiaDaLinha(tr, i);
-            const usoNat = Boolean(tr.querySelector('.p-pen-natacao')?.checked);
+            /* Preview de linha: Atletismo sem uso → sem pen. de natação (uso Nadar só na rolagem). */
+            const usoNat = false;
             const pen = penApi.penalidadeArmaduraPericia(meta, itens, usoNat, slugClasse);
             const badge = tr.querySelector('.t20-pen-arm-badge--nome');
             if (badge) {
@@ -7321,11 +7322,11 @@
             const badge = tr.querySelector('.t20-pen-arm-badge--nome');
             if (badge) badge.hidden = !isV13 || meta.penalidade_armadura !== true;
             const penNat = tr.querySelector('.t20-pen-nat--nome');
-            if (penNat) penNat.style.display = isV13 && meta.slug === 'atletismo' ? '' : 'none';
+            if (penNat) penNat.style.display = 'none';
         });
         if (hint) {
             hint.innerHTML = isV13
-                ? 'Clique no <strong>nome</strong> ou <strong>Σ</strong> para rolar. <strong>Σ</strong> = atributo + ½ nv + treino + outros ± penalidade de armadura. Atletismo 🏊 = natação.'
+                ? 'Clique no <strong>nome</strong> ou <strong>Σ</strong> para rolar. <strong>Σ</strong> = atributo + ½ nv + treino + outros ± penalidade de armadura. Em Atletismo e outras com usos, escolha o uso no diálogo (Nadar aplica pen. de armadura).'
                 : 'Clique no <strong>nome</strong> da perícia para rolar. ½ nível em <strong>Editar ficha</strong>. <strong>Total</strong> = graduações MB. Linhas <span class="t20-pericia-de-classe">destacadas</span> = perícias de classe.';
         }
         t20AtualizarPenalidadesPericias();

@@ -1505,9 +1505,13 @@
     }
 }
 
-/* Modal CD — teste de perícia (rolador 🎲) */
+/* Modal CD — teste de perícia (rolador) + seletor de uso RF-T04i */
 .t20-dialog-pericia-dc {
     max-width: min(96vw, 22rem);
+}
+
+.t20-dialog-pericia-dc.t20-dialog-pericia-dc--com-usos {
+    max-width: min(96vw, 26rem);
 }
 
 .t20-dialog-pericia-dc .t20-ficha-dialog__titulo {
@@ -1521,6 +1525,92 @@
     font-size: 0.82rem;
     color: var(--t20-muted);
     line-height: 1.4;
+}
+
+.t20-pericia-dc-usos {
+    margin: 0 0 0.85rem;
+    padding: 0.55rem 0.6rem 0.65rem;
+    border: 1px solid rgba(90, 58, 30, 0.28);
+    border-radius: 6px;
+    background: linear-gradient(180deg, rgba(253, 246, 230, 0.92), rgba(245, 232, 208, 0.75));
+    min-width: 0;
+}
+
+.t20-pericia-dc-usos legend {
+    padding: 0 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--t20-red-deep, #6e0a18);
+}
+
+.t20-pericia-dc-usos__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.25rem;
+}
+
+.t20-pericia-dc-uso {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0.55rem 0.65rem;
+    border: 1.5px solid rgba(90, 58, 30, 0.22);
+    border-radius: 5px;
+    background: rgba(255, 252, 245, 0.88);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    min-height: 2.6rem;
+    box-sizing: border-box;
+}
+
+.t20-pericia-dc-uso:hover {
+    border-color: rgba(160, 120, 40, 0.55);
+    background: rgba(255, 249, 235, 0.98);
+}
+
+.t20-pericia-dc-uso.is-selected {
+    border-color: #b0892e;
+    background: linear-gradient(180deg, rgba(255, 248, 225, 0.98), rgba(250, 236, 200, 0.92));
+    box-shadow: inset 0 0 0 1px rgba(176, 137, 46, 0.35);
+}
+
+.t20-pericia-dc-uso:focus-within {
+    outline: none;
+    border-color: #b0892e;
+    box-shadow: 0 0 0 3px rgba(176, 137, 46, 0.22);
+}
+
+.t20-pericia-dc-uso input[type="radio"] {
+    margin: 0.2rem 0 0;
+    flex-shrink: 0;
+    accent-color: var(--t20-red-deep, #6e0a18);
+    width: 1.05rem;
+    height: 1.05rem;
+}
+
+.t20-pericia-dc-uso__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    min-width: 0;
+}
+
+.t20-pericia-dc-uso__rotulo {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--t20-ink);
+    line-height: 1.25;
+}
+
+.t20-pericia-dc-uso__hint {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--t20-muted);
+    line-height: 1.35;
 }
 
 .t20-dialog-pericia-dc .ficha-modal-field {
@@ -1556,6 +1646,23 @@
     outline: none;
     border-color: var(--t20-red-bright);
     box-shadow: 0 0 0 3px rgba(163, 22, 22, 0.18);
+}
+
+/* RF-T04i: checkbox 🏊 legado oculto se ainda existir no DOM */
+.t20-pen-nat--nome,
+.t20-pericias-table .t20-pen-nat {
+    display: none !important;
+}
+
+@media (max-width: 480px) {
+    .t20-dialog-pericia-dc.t20-dialog-pericia-dc--com-usos {
+        max-width: 96vw;
+    }
+
+    .t20-pericia-dc-uso {
+        padding: 0.65rem 0.7rem;
+        min-height: 2.85rem;
+    }
 }
 
 .t20-attrs-foto-split {
