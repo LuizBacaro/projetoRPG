@@ -48,6 +48,26 @@ def test_calcular_bonus_pericia_treinado():
     assert b == 3 + 2 + 2 + 2  # mod + meio nv + grad + treinado
 
 
+def test_calcular_bonus_pericia_bonus_uso_separado_de_outros():
+    base = calcular_bonus_pericia(
+        nivel=7,
+        mod_atributo=3,
+        treinado=True,
+        outros=1,
+        regra_versao="v13",
+    )
+    com_uso = calcular_bonus_pericia(
+        nivel=7,
+        mod_atributo=3,
+        treinado=True,
+        outros=1,
+        bonus_uso=2,
+        regra_versao="v13",
+    )
+    assert base == 3 + 3 + 4 + 1  # atr + ½nv + treino + outros
+    assert com_uso == base + 2
+
+
 def test_percepcao_passiva():
     assert percepcao_passiva_t20(7) == 17
 

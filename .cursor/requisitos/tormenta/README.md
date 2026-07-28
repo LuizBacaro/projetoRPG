@@ -46,6 +46,7 @@ Principais mudanças v1.3 (sem copiar texto do livro):
 | [11-herois-de-arton-plano-implementacao.md](11-herois-de-arton-plano-implementacao.md) | Plano Heróis de Arton | Suplemento HA |
 | [12-inspiracao-roll20-ux-mesa.md](12-inspiracao-roll20-ux-mesa.md) | Benchmark Roll20 — UX ficha/mesa (sem VTT mapa) | Referência externa |
 | [13-construcao-npc-monstro.md](13-construcao-npc-monstro.md) | Ameaça (NPC/monstro) — bloco estilo livro + CRUD | Bestiário / Reforma Monstrográfica |
+| [14-bonus-penalidades-pericias-fontes.md](14-bonus-penalidades-pericias-fontes.md) | Catálogo bônus/penalidade perícias (itens, poderes, raça…) | Cap. 1–3, 8 |
 
 ## Direitos autorais
 

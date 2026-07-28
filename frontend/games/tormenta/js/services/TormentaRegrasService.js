@@ -461,6 +461,8 @@ class TormentaRegrasService {
         if (body.regraVersao && payload.regra_versao == null) {
             payload.regra_versao = body.regraVersao;
         }
+        delete payload.regraVersao;
+        if (payload.bonus_uso == null) payload.bonus_uso = 0;
         return payload;
     }
 

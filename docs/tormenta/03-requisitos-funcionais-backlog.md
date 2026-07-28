@@ -81,6 +81,7 @@ Rastreio transversal da Edição Jogo do Ano. Detalhe por domínio: `.cursor/req
 | RF-T02-v13 | Escolhas raciais P2 (17 raças — escolhas + traços) | **Feito** | `escolhas_raciais_v13.json`, API, ficha + wizard |
 | RF-T02g | Tamanho/deslocamento automático (17 raças, exceções) | **Feito** | Preview + ficha + wizard; `tamanho_racial_*` no JSON |
 | RF-T04-v13b | Ofício: especialidades múltiplas | **Feito** | `oficio_especialidades[]` + UI tags na ficha v1.3 |
+| RF-T14 | Catálogo bônus/penalidade perícias (itens/poderes/raça) | **Feito (dados+MVP)** | Catálogo JSON; auto-apply melhorias TS em ataques → `calcular-bonus` |
 
 ### Raças — fora de escopo (habilidades avançadas P2)
 

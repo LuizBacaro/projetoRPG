@@ -1511,7 +1511,7 @@
 }
 
 .t20-dialog-pericia-dc.t20-dialog-pericia-dc--com-usos {
-    max-width: min(96vw, 26rem);
+    max-width: min(96vw, 28rem);
 }
 
 .t20-dialog-pericia-dc .t20-ficha-dialog__titulo {
@@ -1550,6 +1550,86 @@
     flex-direction: column;
     gap: 0.35rem;
     margin-top: 0.25rem;
+}
+
+.t20-pericia-dc-uso-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.t20-pericia-dc-uso-row .t20-pericia-dc-uso {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.t20-pericia-dc-uso-bonus {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0.35rem 0.4rem;
+    border: 1.5px solid rgba(90, 58, 30, 0.22);
+    border-radius: 5px;
+    background: rgba(255, 252, 245, 0.88);
+    box-sizing: border-box;
+    min-width: 3.6rem;
+}
+
+.t20-pericia-dc-uso-row.is-selected .t20-pericia-dc-uso-bonus {
+    border-color: #b0892e;
+    background: linear-gradient(180deg, rgba(255, 248, 225, 0.98), rgba(250, 236, 200, 0.92));
+}
+
+.t20-pericia-dc-uso-bonus__lbl {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--t20-muted);
+    line-height: 1;
+}
+
+.t20-pericia-dc-uso-bonus__inp {
+    width: 2.75rem;
+    padding: 0.2rem 0.15rem;
+    border: 1.5px solid var(--t20-input-border, rgba(90, 58, 30, 0.35));
+    border-radius: 4px;
+    background: var(--t20-input, #fffef8);
+    color: var(--t20-ink);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.t20-pericia-dc-uso-bonus__inp:focus {
+    outline: none;
+    border-color: var(--t20-red-bright, #a31616);
+    box-shadow: 0 0 0 2px rgba(163, 22, 22, 0.16);
+}
+
+.t20-pericia-usos-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.35rem;
+    padding: 0.05rem 0.35rem;
+    border: 1px solid rgba(176, 137, 46, 0.45);
+    border-radius: 999px;
+    background: rgba(255, 248, 225, 0.95);
+    color: var(--t20-red-deep, #6e0a18);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    vertical-align: middle;
+    cursor: default;
+    user-select: none;
 }
 
 .t20-pericia-dc-uso {
@@ -1662,6 +1742,15 @@
     .t20-pericia-dc-uso {
         padding: 0.65rem 0.7rem;
         min-height: 2.85rem;
+    }
+
+    .t20-pericia-dc-uso-bonus {
+        min-width: 3.25rem;
+        padding: 0.3rem 0.3rem;
+    }
+
+    .t20-pericia-dc-uso-bonus__inp {
+        width: 2.5rem;
     }
 }
 

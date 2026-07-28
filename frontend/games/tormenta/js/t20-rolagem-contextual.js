@@ -57,6 +57,7 @@
         if (dlg) {
             dlg.classList.remove('t20-dialog-pericia-dc--com-usos');
             delete dlg.dataset.t20TemUsos;
+            delete dlg.dataset.t20PericiaSlug;
         }
     }
 
@@ -65,7 +66,30 @@
         return checked ? String(checked.value) : null;
     }
 
-    function montarUsosUi(usos, usoDefaultId) {
+    function periciaSlugDialogo() {
+        const dlg = q('t20ModalPericiaDc');
+        return (dlg && dlg.dataset.t20PericiaSlug) || '';
+    }
+
+    /** Lê os campos de bônus do diálogo e grava em T20PericiasUsos. */
+    function sincronizarBonusUsosDoDialogo() {
+        const slug = periciaSlugDialogo();
+        const list = usosListEl();
+        const api = global.T20PericiasUsos;
+        if (!slug || !list || !api || typeof api.setBonusUso !== 'function') return;
+        list.querySelectorAll('input.t20-pericia-dc-uso-bonus__inp').forEach((inp) => {
+            const usoId = inp.getAttribute('data-uso-id');
+            if (!usoId) return;
+            const raw = String(inp.value).trim();
+            const n = raw === '' || raw === '-' ? 0 : Number(raw);
+            api.setBonusUso(slug, usoId, Number.isFinite(n) ? n : 0);
+        });
+        if (typeof global.T20PericiasUsosBadge === 'function') {
+            global.T20PericiasUsosBadge(slug);
+        }
+    }
+
+    function montarUsosUi(usos, usoDefaultId, periciaSlug) {
         const fs = usosFieldset();
         const list = usosListEl();
         const dlg = q('t20ModalPericiaDc');
@@ -73,6 +97,9 @@
             limparUsosUi();
             return;
         }
+        const slug = String(periciaSlug || '').trim();
+        dlg.dataset.t20PericiaSlug = slug;
+        const api = global.T20PericiasUsos;
         const def =
             usoDefaultId && usos.some((u) => u.id === usoDefaultId)
                 ? usoDefaultId
@@ -80,17 +107,29 @@
         list.innerHTML = usos
             .map((u) => {
                 const id = `t20PericiaDcUso_${u.id}`;
+                const bonusId = `t20PericiaDcUsoBonus_${u.id}`;
                 const checked = u.id === def ? ' checked' : '';
                 const hint = u.hint
                     ? `<span class="t20-pericia-dc-uso__hint">${escapeHtml(u.hint)}</span>`
                     : '';
-                return `<label class="t20-pericia-dc-uso" for="${id}">
-                    <input type="radio" name="t20PericiaDcUso" id="${id}" value="${escapeAttr(u.id)}"${checked} />
-                    <span class="t20-pericia-dc-uso__body">
-                        <span class="t20-pericia-dc-uso__rotulo">${escapeHtml(u.rotulo)}</span>
-                        ${hint}
-                    </span>
-                </label>`;
+                const bonusVal =
+                    api && typeof api.bonusDoUso === 'function' && slug
+                        ? api.bonusDoUso(slug, u.id)
+                        : 0;
+                return `<div class="t20-pericia-dc-uso-row">
+                    <label class="t20-pericia-dc-uso" for="${id}">
+                        <input type="radio" name="t20PericiaDcUso" id="${id}" value="${escapeAttr(u.id)}"${checked} />
+                        <span class="t20-pericia-dc-uso__body">
+                            <span class="t20-pericia-dc-uso__rotulo">${escapeHtml(u.rotulo)}</span>
+                            ${hint}
+                        </span>
+                    </label>
+                    <label class="t20-pericia-dc-uso-bonus" for="${bonusId}" title="Bônus específico deste uso (soma no teste)">
+                        <span class="t20-pericia-dc-uso-bonus__lbl">Bônus</span>
+                        <input type="number" class="t20-pericia-dc-uso-bonus__inp t20-input" id="${bonusId}"
+                            data-uso-id="${escapeAttr(u.id)}" value="${bonusVal}" min="-99" max="99" step="1" inputmode="numeric" />
+                    </label>
+                </div>`;
             })
             .join('');
         fs.hidden = false;
@@ -101,14 +140,35 @@
         list.querySelectorAll('input[name="t20PericiaDcUso"]').forEach((inp) => {
             inp.addEventListener('change', syncUsoHighlight);
         });
+        list.querySelectorAll('input.t20-pericia-dc-uso-bonus__inp').forEach((inp) => {
+            inp.addEventListener('click', (ev) => ev.stopPropagation());
+            inp.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Enter') ev.stopPropagation();
+            });
+            const persist = () => {
+                const usoId = inp.getAttribute('data-uso-id');
+                if (!usoId || !api || typeof api.setBonusUso !== 'function') return;
+                const raw = String(inp.value).trim();
+                const n = raw === '' || raw === '-' ? 0 : Number(raw);
+                api.setBonusUso(slug, usoId, Number.isFinite(n) ? n : 0);
+                if (typeof global.T20PericiasUsosBadge === 'function') {
+                    global.T20PericiasUsosBadge(slug);
+                }
+            };
+            inp.addEventListener('change', persist);
+            inp.addEventListener('blur', persist);
+        });
     }
 
     function syncUsoHighlight() {
         const list = usosListEl();
         if (!list) return;
-        list.querySelectorAll('.t20-pericia-dc-uso').forEach((lab) => {
+        list.querySelectorAll('.t20-pericia-dc-uso-row').forEach((row) => {
+            const lab = row.querySelector('.t20-pericia-dc-uso');
+            if (!lab) return;
             const on = Boolean(lab.querySelector('input:checked'));
             lab.classList.toggle('is-selected', on);
+            row.classList.toggle('is-selected', on);
             lab.setAttribute('aria-checked', on ? 'true' : 'false');
         });
     }
@@ -140,6 +200,10 @@
         dialogBound = true;
 
         const fechar = (valor) => {
+            if (dlg.dataset.t20TemUsos === '1' && valor == null) {
+                // Cancelar: ainda persiste bônus editados (são dados da ficha).
+                sincronizarBonusUsosDoDialogo();
+            }
             if (typeof dlg.close === 'function') dlg.close();
             if (dialogResolve) {
                 dialogResolve(valor);
@@ -159,6 +223,7 @@
             const modo = dlg.dataset.t20RollModo || 'dc';
             const raw = inp ? String(inp.value).trim() : '';
             if (modo === 'ca' && raw === '') {
+                if (dlg.dataset.t20TemUsos === '1') sincronizarBonusUsosDoDialogo();
                 fechar(resolverRetornoConfirmacao(null));
                 return;
             }
@@ -178,6 +243,7 @@
                 usosListEl()?.querySelector('input')?.focus();
                 return;
             }
+            if (dlg.dataset.t20TemUsos === '1') sincronizarBonusUsosDoDialogo();
             const num = val == null ? null : Math.round(val);
             fechar(resolverRetornoConfirmacao(num));
         };
@@ -209,6 +275,7 @@
      * @param {{ id: string, rotulo: string, hint?: string }[]} [opts.usos]
      * @param {string} [opts.usoDefault]
      * @param {string} [opts.usoLegend]
+     * @param {string} [opts.periciaSlug] — slug da perícia (bônus por uso)
      * @returns {Promise<number|null|{ valor: number|null, usoId: string|null }|undefined>}
      *   Sem usos: número (CD/CA) ou null (cancelar / CA vazia).
      *   Com usos: { valor, usoId } ou null (cancelar).
@@ -255,7 +322,7 @@
         }
         if (btn) btn.textContent = o.modo === 'ca' ? 'Rolar ataque' : 'Rolar teste';
 
-        if (temUsos) montarUsosUi(o.usos, o.usoDefault);
+        if (temUsos) montarUsosUi(o.usos, o.usoDefault, o.periciaSlug);
         else limparUsosUi();
 
         return new Promise((resolve) => {
@@ -277,6 +344,12 @@
     function exibirResultadoPericia(nome, roll, calc) {
         let msg = `${nome}: 1d20=${roll.d20} + ${roll.bonus} = ${roll.total} vs CD ${roll.dc} → `;
         msg += roll.sucesso ? 'SUCESSO' : 'FALHA';
+        if (calc && calc.bonus_itens != null && calc.bonus_itens !== 0) {
+            msg += ` (itens ${calc.bonus_itens > 0 ? '+' : ''}${calc.bonus_itens})`;
+        }
+        if (calc && calc.bonus_uso != null && calc.bonus_uso !== 0) {
+            msg += ` (uso ${calc.bonus_uso > 0 ? '+' : ''}${calc.bonus_uso})`;
+        }
         if (calc && calc.penalidade_armadura_aplicada > 0) {
             msg += ` (pen. −${calc.penalidade_armadura_aplicada})`;
         }

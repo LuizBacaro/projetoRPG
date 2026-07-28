@@ -645,6 +645,65 @@ def test_post_pericias_calcular_bonus_v13(client_regras_tormenta):
     assert body["bonus_total"] == 10
     assert body["bonus_treinamento"] == 4
     assert body["penalidade_armadura_aplicada"] == 0
+    assert body.get("bonus_uso", 0) == 0
+
+
+def test_post_pericias_calcular_bonus_com_bonus_uso(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pericias/calcular-bonus",
+        json={
+            "nivel": 7,
+            "mod_atributo": 3,
+            "treinado": True,
+            "outros": 1,
+            "bonus_uso": 2,
+            "regra_versao": "v13",
+            "nome_pericia": "Enganação",
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["bonus_uso"] == 2
+    assert body["bonus_total"] == 10 + 1 + 2  # base 10 + outros + uso
+
+
+def test_post_pericias_calcular_bonus_itens_melhorias_ts(client_regras_tormenta):
+    r = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pericias/calcular-bonus",
+        json={
+            "nivel": 7,
+            "mod_atributo": 3,
+            "treinado": True,
+            "outros": 0,
+            "regra_versao": "v13",
+            "nome_pericia": "Diplomacia",
+            "itens_com_melhorias": [{"melhorias": ["banhado_a_ouro"]}],
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["bonus_itens"] == 2
+    assert body["bonus_total"] == 10 + 2
+    assert any(
+        f.get("melhoria") == "banhado_a_ouro" for f in body.get("itens_fontes") or []
+    )
+
+    r2 = client_regras_tormenta.post(
+        "/api/v1/tormenta/regras/pericias/calcular-bonus",
+        json={
+            "nivel": 7,
+            "mod_atributo": 3,
+            "treinado": True,
+            "regra_versao": "v13",
+            "nome_pericia": "Ladinagem",
+            "uso_id": "ocultar",
+            "itens_com_melhorias": [{"melhorias": ["discreto"]}],
+        },
+    )
+    assert r2.status_code == 200
+    b2 = r2.json()
+    assert b2["bonus_uso"] == 5
+    assert b2["bonus_itens"] == 0
 
 
 def test_post_pericias_calcular_bonus_lote(client_regras_tormenta):

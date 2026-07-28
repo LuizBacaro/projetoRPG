@@ -66,6 +66,7 @@
         const o = opts || {};
         const usos = Array.isArray(o.usos) ? o.usos : [];
         const usoDefault = o.usoDefault || null;
+        const periciaSlug = o.periciaSlug || null;
         const normalizar = (v) => {
             if (v == null) return null;
             if (typeof v === 'object' && v.valor != null) {
@@ -79,7 +80,7 @@
             const hintBase =
                 'Informe a Classe de Dificuldade (CD) do teste. O resultado será 1d20 + bônus da perícia.';
             const hintUsos = usos.length
-                ? 'Escolha o uso e a CD. O nome do uso aparece no resultado da rolagem.'
+                ? 'Escolha o uso e a CD. O bônus do uso soma no teste (não na CD) e fica salvo na ficha.'
                 : hintBase;
             return window.T20RolagemContextual.pedirValorRolagem({
                 modo: 'dc',
@@ -90,6 +91,7 @@
                 usos: usos.length ? usos : undefined,
                 usoDefault: usoDefault || undefined,
                 usoLegend: 'Uso do teste',
+                periciaSlug: periciaSlug || undefined,
             }).then(normalizar);
         }
         bindDcDialog();
@@ -211,7 +213,7 @@
         if (o.usoId != null && o.usoId !== '') {
             usoNat = usosApi
                 ? usosApi.usoAtletismoNatacao(slug || nome, o.usoId)
-                : String(o.usoId) === 'nadar';
+                : String(o.usoId) === 'nadar' || String(o.usoId) === 'natacao';
         } else if (!temSeletorUso) {
             // Legado: checkbox 🏊 só se não houver seletor RF-T04i.
             usoNat = Boolean(tr.querySelector('.p-pen-natacao')?.checked);
@@ -223,12 +225,53 @@
             treinado,
             graduacao: isV13 ? 0 : grad,
             outros: isV13 ? outros + grad : outros,
+            bonus_uso: 0,
             racial_bonus: bonusRacialPericia(nome),
             slug_raca: slugRaca(),
             nome_pericia: nome,
             pericia_de_classe: deClasse,
             regraVersao: rv,
         };
+
+        if (o.usoId != null && o.usoId !== '') {
+            body.uso_id = String(o.usoId);
+            if (usosApi && typeof usosApi.bonusDoUso === 'function') {
+                body.bonus_uso = usosApi.bonusDoUso(slug || nome, o.usoId);
+            }
+        }
+
+        // RF-T14: melhorias TS dos ataques (e armaduras se tiverem melhorias[])
+        const itensMel = [];
+        const ataques =
+            typeof window.t20AtaquesLista !== 'undefined' && Array.isArray(window.t20AtaquesLista)
+                ? window.t20AtaquesLista
+                : [];
+        ataques.forEach((a) => {
+            if (!a || a.bonus_ativo === false) return;
+            const mels = Array.isArray(a.melhorias) ? a.melhorias.filter(Boolean) : [];
+            if (!mels.length) return;
+            itensMel.push({
+                tipo_slot: 'arma',
+                melhorias: mels.map((s) => String(s)),
+                bonus_ativo: true,
+            });
+        });
+        const armas =
+            typeof window.t20ArmadurasEquipadas !== 'undefined' && Array.isArray(window.t20ArmadurasEquipadas)
+                ? window.t20ArmadurasEquipadas
+                : [];
+        armas.forEach((ar) => {
+            if (!ar) return;
+            const mels = Array.isArray(ar.melhorias) ? ar.melhorias.filter(Boolean) : [];
+            if (!mels.length) return;
+            itensMel.push({
+                tipo_slot: 'armadura',
+                melhorias: mels.map((s) => String(s)),
+                bonus_ativo: true,
+            });
+        });
+        if (itensMel.length) body.itens_com_melhorias = itensMel;
+
         if (isV13) {
             body.itens_protecao = itensProtecaoEquipados();
             body.uso_atletismo_natacao = usoNat;
@@ -246,8 +289,8 @@
     }
 
     async function calcularBonusLinha(tr, opts) {
-        const res = await regras().calcularBonusPericia(buildBonusBody(tr, opts));
-        return res;
+        const body = buildBonusBody(tr, opts);
+        return regras().calcularBonusPericia(body);
     }
 
     async function calcularBonusLote(trs) {
@@ -274,7 +317,11 @@
         const usos = usosApi ? usosApi.usosDaPericia(slug || nomeCanon) : [];
         const usoDefault = usosApi && usos.length ? usosApi.usoDefault(slug || nomeCanon) : null;
 
-        const pedida = await pedirDcPericia(nomeExibido, { usos, usoDefault });
+        const pedida = await pedirDcPericia(nomeExibido, {
+            usos,
+            usoDefault,
+            periciaSlug: slug || (usosApi && usosApi.normalizarSlug(nomeCanon)) || '',
+        });
         if (pedida == null || pedida.valor == null) return;
         const dc = pedida.valor;
         const usoId = pedida.usoId || null;
@@ -303,6 +350,9 @@
             } else {
                 let msg = `${nomeResultado}: 1d20=${roll.d20} + ${roll.bonus} = ${roll.total} vs DC ${dc} → `;
                 msg += roll.sucesso ? 'SUCESSO' : 'FALHA';
+                if (calc.bonus_uso) {
+                    msg += ` (uso ${calc.bonus_uso > 0 ? '+' : ''}${calc.bonus_uso})`;
+                }
                 if (calc.penalidade_armadura_aplicada > 0) {
                     msg += ` (pen. armadura −${calc.penalidade_armadura_aplicada})`;
                 }
@@ -342,7 +392,7 @@
         if (!tbl || tbl.dataset.rollBound === '1') return;
         tbl.dataset.rollBound = '1';
         tbl.addEventListener('click', (ev) => {
-            if (ev.target.closest('input, button, label, .t20-oficio-esp-wrap')) return;
+            if (ev.target.closest('input, button, label, .t20-oficio-esp-linha-nome .p-oficio-esp, .t20-pericia-usos-badge')) return;
             const nomeEl = ev.target.closest('.t20-p-nome--rolavel');
             const bonusCell = ev.target.closest('.t20-p-bonus-cell');
             if (!nomeEl && !bonusCell) return;
