@@ -1,25 +1,37 @@
 /**
  * Ofício v1.3 — especialidades múltiplas (RF-T04g / RF-T04-v13b).
  *
- * Cada especialidade é uma LINHA própria na tabela de perícias, com seus
- * próprios Tr / Atrib. / Out / Σ e rolagem — em T20 cada Ofício é treinado
- * separadamente. A linha-pai «Ofício» segue existindo como cabeçalho do grupo
- * e traz a setinha que mostra/esconde as especialidades.
+ * UX simples: cada linha é um Ofício completo (Tr / Atrib. / Out / Σ).
+ * «+» duplica a linha; campo inline define a especialidade (alquimia, armeiro…).
+ * Sem acordeão, chevron ou painel extra.
  *
- * Contratos preservados:
- * - `data-per-idx` da linha-pai é repetido nas filhas → meta (INT, somente
- *   treinada, penalidade de armadura) resolve igual.
+ * Contratos:
+ * - `data-per-idx` da linha-pai nas filhas → meta INT / somente treinada.
  * - `data-per-nome-canon="Ofício"` → bônus racial e lookup do backend.
  * - Sem `data-per-slug` nas filhas → origem/classe não marcam todas de uma vez.
+ * - Nome salvo: «Ofício» ou «Ofício (especialidade)» via `.p-oficio-esp`.
  */
 (function (global) {
     'use strict';
 
     const CANON = 'Ofício';
+    const SUGESTOES = [
+        'alquimia',
+        'armeiro',
+        'artesão',
+        'cozinheiro',
+        'alfaiate',
+        'carpinteiro',
+        'pedreiro',
+        'ourives',
+        'fazendeiro',
+        'pescador',
+        'estalajadeiro',
+        'escriba',
+        'escultor',
+        'pintor',
+    ];
 
-    let lista = [];
-    let expandido = false;
-    /** Valores por especialidade, para não perder em reconstruções. */
     const valoresCache = new Map();
 
     function q(id) {
@@ -41,15 +53,18 @@
         return Array.from(document.querySelectorAll('#tblPericias tbody tr[data-oficio-esp]'));
     }
 
-    function rowEsp(nome) {
-        const alvo = String(nome || '').toLowerCase();
-        return rowsEsp().find(
-            (tr) => (tr.getAttribute('data-oficio-esp') || '').toLowerCase() === alvo
-        );
+    function todasLinhasOficio() {
+        const pai = rowOficio();
+        const out = [];
+        if (pai) out.push(pai);
+        rowsEsp().forEach((tr) => out.push(tr));
+        return out;
     }
 
-    function nomeExibido(esp) {
-        return `${CANON} (${esp})`;
+    function ultimaLinhaOficio() {
+        const esp = rowsEsp();
+        if (esp.length) return esp[esp.length - 1];
+        return rowOficio();
     }
 
     function escAttr(s) {
@@ -60,7 +75,18 @@
             .replace(/"/g, '&quot;');
     }
 
-    /** Snapshot dos valores digitados, para não perder ao reconstruir linhas. */
+    function lerEspDaLinha(tr) {
+        if (!tr) return '';
+        const inp = tr.querySelector('.p-oficio-esp');
+        if (inp) return String(inp.value || '').trim();
+        return String(tr.getAttribute('data-oficio-esp') || '').trim();
+    }
+
+    function nomeSalvoDaLinha(tr) {
+        const esp = lerEspDaLinha(tr);
+        return esp ? `${CANON} (${esp})` : CANON;
+    }
+
     function lerValoresLinha(tr) {
         if (!tr) return null;
         return {
@@ -69,6 +95,7 @@
             mod: tr.querySelector('.p-mod')?.value || '0',
             outros: tr.querySelector('.p-out')?.value || '0',
             so_treina: Boolean(tr.querySelector('.p-so-treina')?.checked),
+            esp: lerEspDaLinha(tr),
         };
     }
 
@@ -84,6 +111,87 @@
         if (out) out.value = String(vals.outros ?? '0');
         const st = tr.querySelector('.p-so-treina');
         if (st && vals.so_treina != null) st.checked = Boolean(vals.so_treina);
+        if (vals.esp != null) setEspNaLinha(tr, vals.esp);
+    }
+
+    function setEspNaLinha(tr, esp) {
+        const nome = String(esp || '').trim();
+        const inp = tr.querySelector('.p-oficio-esp');
+        if (inp && inp.value !== nome) inp.value = nome;
+        if (tr.hasAttribute('data-oficio-esp') || tr.classList.contains('t20-pericia-oficio-esp')) {
+            tr.setAttribute('data-oficio-esp', nome || '_');
+        }
+        const span = tr.querySelector('.t20-p-nome');
+        if (span) {
+            span.textContent = CANON;
+            span.title = nome
+                ? `Clique para rolar Ofício (${nome})`
+                : 'Clique para rolar Ofício';
+        }
+    }
+
+    function ensureDatalist() {
+        if (q('t20OficioEspSugestoes')) return;
+        const dl = document.createElement('datalist');
+        dl.id = 't20OficioEspSugestoes';
+        dl.innerHTML = SUGESTOES.map((s) => '<option value="' + escAttr(s) + '"></option>').join('');
+        document.body.appendChild(dl);
+    }
+
+    function montarNomeCell(opts) {
+        const { comAdd, comRemover } = opts;
+        const addHtml = comAdd
+            ? '<button type="button" class="t20-oficio-esp-add-btn" title="Duplicar linha de Ofício">' +
+              '<span aria-hidden="true">+</span>' +
+              '<span class="t20-sr-only">Duplicar Ofício</span>' +
+              '</button>'
+            : '';
+        const remHtml = comRemover
+            ? '<button type="button" class="t20-oficio-esp-remover" title="Remover este Ofício">×</button>'
+            : '';
+        return (
+            '<span class="t20-p-nome-wrap t20-oficio-esp-linha-nome">' +
+            addHtml +
+            '<span class="t20-p-nome t20-p-nome--rolavel" title="Clique para rolar 1d20 + bônus">' +
+            CANON +
+            '</span>' +
+            '<span class="t20-oficio-esp-paren" aria-hidden="true">(</span>' +
+            '<input type="text" class="t20-input p-oficio-esp" maxlength="60" list="t20OficioEspSugestoes" ' +
+            'placeholder="ex.: alquimia" autocomplete="off" />' +
+            '<span class="t20-oficio-esp-paren" aria-hidden="true">)</span>' +
+            remHtml +
+            '</span>'
+        );
+    }
+
+    function bindLinhaOficio(tr, { comAdd, comRemover }) {
+        const addBtn = tr.querySelector('.t20-oficio-esp-add-btn');
+        if (addBtn && comAdd) {
+            addBtn.onclick = (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+                duplicarLinha();
+            };
+        }
+        const remBtn = tr.querySelector('.t20-oficio-esp-remover');
+        if (remBtn && comRemover) {
+            remBtn.onclick = (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+                removerLinha(tr);
+            };
+        }
+        const inp = tr.querySelector('.p-oficio-esp');
+        if (inp) {
+            const sync = () => {
+                setEspNaLinha(tr, inp.value);
+                atualizarAcessorios();
+            };
+            inp.addEventListener('input', sync);
+            inp.addEventListener('change', sync);
+            inp.addEventListener('click', (ev) => ev.stopPropagation());
+            inp.addEventListener('keydown', (ev) => ev.stopPropagation());
+        }
     }
 
     function criarLinhaEsp(esp, pai) {
@@ -93,19 +201,21 @@
         if (idx !== '') tr.setAttribute('data-per-idx', idx);
         tr.setAttribute('data-per-attr', pai.getAttribute('data-per-attr') || 'int');
         tr.setAttribute('data-per-nome-canon', CANON);
-        tr.setAttribute('data-oficio-esp', esp);
+        tr.setAttribute('data-oficio-esp', String(esp || '').trim() || '_');
+
+        const armInput = pai.querySelector('.p-pen-arm');
+        const armHtml = armInput
+            ? '<input type="checkbox" class="p-pen-arm t20-sr-only" tabindex="-1" aria-hidden="true"' +
+              (armInput.checked ? ' checked' : '') +
+              ' />'
+            : '';
+
         tr.innerHTML =
             '<td><input type="checkbox" class="p-treinado" /></td>' +
             '<td class="t20-p-nome-cell">' +
-            '<span class="t20-p-nome-wrap t20-oficio-esp-linha-nome">' +
-            '<span class="t20-oficio-esp-ramo" aria-hidden="true">↳</span>' +
-            '<span class="t20-p-nome t20-p-nome--rolavel" title="Clique para rolar 1d20 + bônus">' +
-            escAttr(nomeExibido(esp)) +
-            '</span>' +
-            '<button type="button" class="t20-oficio-esp-remover" data-oficio-esp-del="' +
-            escAttr(esp) +
-            '" title="Remover especialidade">×</button>' +
-            '</span></td>' +
+            armHtml +
+            montarNomeCell({ comAdd: false, comRemover: true }) +
+            '</td>' +
             '<td><input type="number" class="p-total t20-input" value="0" /></td>' +
             '<td><span class="t20-p-half">0</span></td>' +
             '<td><input type="number" class="p-mod t20-input" value="0" /></td>' +
@@ -114,66 +224,16 @@
             '<span class="t20-p-bonus-val">—</span>' +
             '<span class="t20-p-breakdown t20-sr-only" aria-hidden="true"></span></td>' +
             '<td><input type="checkbox" class="p-so-treina" title="Somente treinado (Ofício exige treino)" checked /></td>';
-        // Em v1.3 a coluna «Total» (graduações MB) está oculta no cabeçalho;
-        // a linha nasce depois de t20AtualizarUiPericiasVersao, então alinha aqui.
+
         if (isV13()) {
             const tdTotal = tr.querySelector('.p-total')?.closest('td');
             if (tdTotal) tdTotal.style.display = 'none';
         }
-        const btn = tr.querySelector('[data-oficio-esp-del]');
-        if (btn) {
-            btn.addEventListener('click', (ev) => {
-                ev.preventDefault();
-                ev.stopPropagation();
-                remover(btn.getAttribute('data-oficio-esp-del'));
-            });
-        }
+        setEspNaLinha(tr, esp);
+        bindLinhaOficio(tr, { comAdd: false, comRemover: true });
         return tr;
     }
 
-    /**
-     * Reconstrói as linhas filhas preservando valores por especialidade.
-     * As linhas existem sempre que houver especialidade (mesmo recolhidas), para
-     * que `coletarPericias` grave os valores ao salvar a ficha; recolher só oculta.
-     */
-    function sincronizarLinhas() {
-        const pai = rowOficio();
-        if (!pai) return;
-        const snapshot = new Map();
-        rowsEsp().forEach((tr) => {
-            const k = (tr.getAttribute('data-oficio-esp') || '').toLowerCase();
-            const vals = lerValoresLinha(tr);
-            if (vals) {
-                snapshot.set(k, vals);
-                valoresCache.set(k, vals);
-            }
-            tr.remove();
-        });
-        if (!isV13() || !lista.length) {
-            atualizarAcessorios();
-            return;
-        }
-        let anchor = pai;
-        lista.forEach((esp) => {
-            const tr = criarLinhaEsp(esp, pai);
-            tr.hidden = !expandido;
-            anchor.insertAdjacentElement('afterend', tr);
-            anchor = tr;
-            const k = esp.toLowerCase();
-            const vals = snapshot.get(k) || valoresCache.get(k);
-            if (vals) aplicarValoresLinha(tr, vals);
-        });
-        atualizarAcessorios();
-    }
-
-    function atualizarVisibilidadeLinhas() {
-        const mostrar = isV13() && expandido;
-        rowsEsp().forEach((tr) => {
-            tr.hidden = !mostrar;
-        });
-    }
-
-    /** Meio nível, mod. de atributo, Σ e penalidades para as linhas novas. */
     function atualizarAcessorios() {
         if (typeof global.atualizarMeioNivelColuna === 'function') {
             global.atualizarMeioNivelColuna();
@@ -192,243 +252,123 @@
         }
     }
 
-    function renderTags() {
-        const host = q('t20OficioEspTags');
-        if (!host) return;
-        host.innerHTML = '';
-        if (!lista.length) {
-            const vazio = document.createElement('p');
-            vazio.className = 't20-hint';
-            vazio.style.margin = '0 0 0.25rem';
-            vazio.textContent = 'Nenhuma especialidade. Cada Ofício vira uma linha própria.';
-            host.appendChild(vazio);
-            return;
-        }
-        lista.forEach((nome) => {
-            const tag = document.createElement('span');
-            tag.className = 't20-oficio-esp-tag';
-            tag.textContent = nome;
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 't20-oficio-esp-del';
-            btn.textContent = '×';
-            btn.title = 'Remover';
-            btn.addEventListener('click', (ev) => {
-                ev.preventDefault();
-                ev.stopPropagation();
-                remover(nome);
-            });
-            tag.appendChild(btn);
-            host.appendChild(tag);
+    function limparUiLegada(tr) {
+        if (!tr) return;
+        ['t20OficioEspHead', 't20OficioEspWrap', 't20OficioEspToggle', 't20OficioEspBadge'].forEach(
+            (id) => q(id)?.remove()
+        );
+        tr.querySelectorAll('.t20-oficio-esp-head, .t20-oficio-esp-wrap, .t20-oficio-esp-toggle, .t20-oficio-esp-badge').forEach(
+            (el) => el.remove()
+        );
+        tr.classList.remove('t20-pericia-oficio-pai');
+        ['.p-treinado', '.p-total', '.p-mod', '.p-out'].forEach((sel) => {
+            const el = tr.querySelector(sel);
+            if (el) el.disabled = false;
         });
     }
 
-    /** A linha-pai mantém o nome canônico «Ofício» (lookup racial/backend). */
-    function atualizarRotuloOficio() {
+    function ensureUiPai() {
         const tr = rowOficio();
         if (!tr) return;
-        const span = tr.querySelector('.t20-p-nome');
-        if (span) span.textContent = CANON;
-        ajustarLinhaPai();
-        atualizarAccordionUi();
-    }
+        limparUiLegada(tr);
+        ensureDatalist();
 
-    /**
-     * Com especialidades, «Ofício» vira só cabeçalho do grupo: sem treino nem
-     * valores próprios, para não haver dúvida de onde o bônus está e para não
-     * consumir uma vaga de perícia treinada a mais.
-     */
-    function ajustarLinhaPai() {
-        const tr = rowOficio();
-        if (!tr) return;
-        const virouCabecalho = isV13() && lista.length > 0;
-        const tre = tr.querySelector('.p-treinado');
-        if (tre) {
-            if (virouCabecalho && tre.checked) tre.checked = false;
-            tre.disabled = virouCabecalho;
-        }
-        ['.p-total', '.p-mod', '.p-out'].forEach((sel) => {
-            const inp = tr.querySelector(sel);
-            if (!inp) return;
-            if (virouCabecalho) inp.value = '0';
-            inp.disabled = virouCabecalho;
-        });
-        const nomeSpan = tr.querySelector('.t20-p-nome');
-        if (nomeSpan) {
-            nomeSpan.classList.toggle('t20-p-nome--rolavel', !virouCabecalho);
-            nomeSpan.title = virouCabecalho
-                ? 'Grupo de especialidades — role a especialidade desejada'
-                : 'Clique para rolar 1d20 + bônus';
-        }
-    }
-
-    /** Ao criar a 1ª especialidade, herda o que já estava na linha «Ofício». */
-    function migrarValoresDoPai() {
-        const tr = rowOficio();
-        if (!tr) return null;
-        const vals = lerValoresLinha(tr);
-        if (!vals) return null;
-        const vazio =
-            !vals.treinado &&
-            Number(vals.total || 0) === 0 &&
-            Number(vals.outros || 0) === 0;
-        return vazio ? null : vals;
-    }
-
-    function atualizarAccordionUi() {
-        const btn = q('t20OficioEspToggle');
-        const badge = q('t20OficioEspBadge');
-        const wrap = q('t20OficioEspWrap');
-        const v13 = isV13();
-        if (btn) {
-            btn.hidden = !v13;
-            btn.setAttribute('aria-expanded', expandido ? 'true' : 'false');
-            btn.title = expandido ? 'Ocultar especialidades de Ofício' : 'Mostrar especialidades de Ofício';
-            btn.classList.toggle('is-open', expandido);
-        }
-        if (badge) {
-            if (v13 && lista.length) {
-                badge.hidden = false;
-                badge.textContent = String(lista.length);
-                badge.title = lista.join(', ');
-            } else {
-                badge.hidden = true;
-                badge.textContent = '';
-                badge.title = '';
-            }
-        }
-        if (wrap) {
-            wrap.hidden = !v13 || !expandido;
-            wrap.style.display = !v13 || !expandido ? 'none' : '';
-        }
-        const pai = rowOficio();
-        if (pai) pai.classList.toggle('t20-pericia-oficio-pai', v13 && lista.length > 0);
-    }
-
-    function toggleAccordion(ev) {
-        if (ev) {
-            ev.preventDefault();
-            ev.stopPropagation();
-        }
-        if (!isV13()) return;
-        expandido = !expandido;
-        atualizarVisibilidadeLinhas();
-        atualizarAccordionUi();
-        if (expandido) {
-            const inp = q('t20OficioEspInput');
-            if (inp) {
-                try {
-                    inp.focus({ preventScroll: true });
-                } catch (_e) {
-                    inp.focus();
-                }
-            }
-        }
-    }
-
-    function ensureUi() {
-        const tr = rowOficio();
-        if (!tr) return;
-        const td = tr.querySelector('td:nth-child(2)');
+        const td = tr.querySelector('.t20-p-nome-cell') || tr.querySelector('td:nth-child(2)');
         if (!td) return;
 
-        if (!q('t20OficioEspHead')) {
-            const nomeWrap = td.querySelector('.t20-p-nome-wrap') || td;
-            const head = document.createElement('span');
-            head.id = 't20OficioEspHead';
-            head.className = 't20-oficio-esp-head';
-            head.innerHTML =
-                '<button type="button" class="t20-oficio-esp-toggle" id="t20OficioEspToggle" aria-expanded="false" aria-controls="t20OficioEspWrap" title="Mostrar especialidades de Ofício">' +
-                '<span class="t20-oficio-esp-chevron" aria-hidden="true">▾</span>' +
-                '</button>' +
-                '<span class="t20-oficio-esp-badge" id="t20OficioEspBadge" hidden></span>';
-            const nomeSpan = nomeWrap.querySelector('.t20-p-nome');
-            if (nomeSpan) nomeSpan.insertAdjacentElement('afterend', head);
-            else nomeWrap.appendChild(head);
-            q('t20OficioEspToggle')?.addEventListener('click', toggleAccordion);
+        if (!tr.querySelector('.p-oficio-esp')) {
+            const armInput = td.querySelector('.p-pen-arm');
+            const armBadge = td.querySelector('.t20-pen-arm-badge');
+            const armHtml = armInput ? armInput.outerHTML : '';
+            const badgeHtml = armBadge ? armBadge.outerHTML : '';
+            td.innerHTML = armHtml + badgeHtml + montarNomeCell({ comAdd: true, comRemover: false });
+            bindLinhaOficio(tr, { comAdd: true, comRemover: false });
+        } else {
+            bindLinhaOficio(tr, { comAdd: true, comRemover: false });
         }
 
-        if (!q('t20OficioEspWrap')) {
-            const div = document.createElement('div');
-            div.id = 't20OficioEspWrap';
-            div.className = 't20-oficio-esp-wrap';
-            div.hidden = true;
-            div.style.display = 'none';
-            div.innerHTML =
-                '<div id="t20OficioEspTags" class="t20-oficio-esp-tags"></div>' +
-                '<div class="t20-oficio-esp-add">' +
-                '<input id="t20OficioEspInput" class="t20-input" maxlength="60" placeholder="Especialidade (ex.: alquimia)" />' +
-                '<button type="button" class="tormenta-btn" id="t20OficioEspBtn">+</button>' +
-                '</div>' +
-                '<p class="t20-hint t20-oficio-esp-nota">Cada especialidade é treinada à parte e consome uma vaga de perícia treinada.</p>';
-            td.appendChild(div);
-            q('t20OficioEspBtn')?.addEventListener('click', (ev) => {
-                ev.preventDefault();
-                ev.stopPropagation();
-                adicionar();
-            });
-            q('t20OficioEspInput')?.addEventListener('keydown', (ev) => {
-                if (ev.key === 'Enter') {
-                    ev.preventDefault();
-                    ev.stopPropagation();
-                    adicionar();
-                }
-            });
-            div.addEventListener('click', (ev) => ev.stopPropagation());
+        const addBtn = tr.querySelector('.t20-oficio-esp-add-btn');
+        if (addBtn) addBtn.hidden = !isV13();
+        const paren = tr.querySelectorAll('.t20-oficio-esp-paren, .p-oficio-esp');
+        paren.forEach((el) => {
+            el.hidden = !isV13();
+        });
+        if (!isV13()) {
+            const inp = tr.querySelector('.p-oficio-esp');
+            if (inp) inp.value = '';
+            const span = tr.querySelector('.t20-p-nome');
+            if (span) {
+                span.textContent = CANON;
+                span.classList.add('t20-p-nome--rolavel');
+                span.title = 'Clique para rolar 1d20 + bônus';
+            }
         }
     }
 
-    function adicionar() {
-        const inp = q('t20OficioEspInput');
-        if (!inp) return;
-        const v = inp.value.trim();
-        if (!v) return;
-        const key = v.toLowerCase();
-        if (lista.some((x) => x.toLowerCase() === key)) {
-            inp.value = '';
+    function duplicarLinha() {
+        if (!isV13()) return;
+        const pai = rowOficio();
+        if (!pai) return;
+        const tr = criarLinhaEsp('', pai);
+        const ancora = ultimaLinhaOficio();
+        ancora.insertAdjacentElement('afterend', tr);
+        atualizarAcessorios();
+        const inp = tr.querySelector('.p-oficio-esp');
+        if (inp) {
+            inp.focus();
+            inp.select();
+        }
+    }
+
+    function removerLinha(tr) {
+        if (!tr || !tr.classList.contains('t20-pericia-oficio-esp')) return;
+        const key = lerEspDaLinha(tr).toLowerCase();
+        if (key) valoresCache.delete(key);
+        tr.remove();
+        atualizarAcessorios();
+    }
+
+    function sincronizarLinhasExtras(listaEsp) {
+        const pai = rowOficio();
+        if (!pai) return;
+
+        const snapshot = new Map();
+        rowsEsp().forEach((tr) => {
+            const vals = lerValoresLinha(tr);
+            const k = (vals && vals.esp ? vals.esp : tr.getAttribute('data-oficio-esp') || '').toLowerCase();
+            if (vals) {
+                snapshot.set(k, vals);
+                if (vals.esp) valoresCache.set(vals.esp.toLowerCase(), vals);
+            }
+            tr.remove();
+        });
+
+        if (!isV13()) {
+            atualizarAcessorios();
             return;
         }
-        const herdado = lista.length === 0 ? migrarValoresDoPai() : null;
-        lista.push(v);
-        if (herdado) valoresCache.set(key, herdado);
-        inp.value = '';
-        expandido = true;
-        renderTags();
-        sincronizarLinhas();
-        atualizarRotuloOficio();
-    }
 
-    function remover(esp) {
-        const key = String(esp || '').toLowerCase();
-        const antes = lista.length;
-        lista = lista.filter((x) => x.toLowerCase() !== key);
-        if (lista.length === antes) return;
-        valoresCache.delete(key);
-        const tr = rowEsp(esp);
-        if (tr) tr.remove();
-        renderTags();
-        sincronizarLinhas();
-        atualizarRotuloOficio();
-    }
-
-    function syncVisibilidade() {
-        ensureUi();
-        if (!isV13()) {
-            lista = [];
-            expandido = false;
-            valoresCache.clear();
-            rowsEsp().forEach((tr) => tr.remove());
-        }
-        renderTags();
-        sincronizarLinhas();
-        atualizarRotuloOficio();
+        const extras = Array.isArray(listaEsp) ? listaEsp.slice(1) : [];
+        let anchor = pai;
+        extras.forEach((esp) => {
+            const nome = String(esp || '').trim();
+            const tr = criarLinhaEsp(nome, pai);
+            anchor.insertAdjacentElement('afterend', tr);
+            anchor = tr;
+            const k = nome.toLowerCase();
+            const vals = snapshot.get(k) || valoresCache.get(k);
+            if (vals) aplicarValoresLinha(tr, { ...vals, esp: nome });
+            else setEspNaLinha(tr, nome);
+        });
+        atualizarAcessorios();
     }
 
     function lerLista() {
-        return lista.slice();
+        return todasLinhasOficio()
+            .map((tr) => lerEspDaLinha(tr))
+            .filter(Boolean);
     }
 
-    /** Extrai especialidades de uma lista `pericias[]` salva (fallback de restore). */
     function derivarDePericias(pericias) {
         const out = [];
         const seen = new Set();
@@ -446,18 +386,56 @@
     }
 
     function aplicarLista(arr) {
-        lista = Array.isArray(arr) ? arr.map((x) => String(x || '').trim()).filter(Boolean) : [];
-        // Com especialidades salvas, abre o grupo para os valores ficarem visíveis
-        expandido = lista.length > 0;
+        ensureUiPai();
+        const lista = Array.isArray(arr)
+            ? arr.map((x) => String(x || '').trim()).filter(Boolean)
+            : [];
         valoresCache.clear();
-        ensureUi();
-        renderTags();
-        sincronizarLinhas();
-        atualizarRotuloOficio();
+        const pai = rowOficio();
+        if (pai && isV13()) {
+            setEspNaLinha(pai, lista[0] || '');
+        }
+        sincronizarLinhasExtras(lista);
+    }
+
+    function syncVisibilidade() {
+        ensureUiPai();
+        if (!isV13()) {
+            valoresCache.clear();
+            rowsEsp().forEach((tr) => tr.remove());
+            atualizarAcessorios();
+            return;
+        }
+        // Mantém especialidades já na DOM; só garante UI do pai.
+        rowsEsp().forEach((tr) => {
+            if (!tr.querySelector('.p-oficio-esp')) {
+                const esp = tr.getAttribute('data-oficio-esp') || '';
+                const nomeCell = tr.querySelector('.t20-p-nome-cell') || tr.querySelector('td:nth-child(2)');
+                if (nomeCell) {
+                    const armInput = nomeCell.querySelector('.p-pen-arm');
+                    const armHtml = armInput ? armInput.outerHTML : '';
+                    nomeCell.innerHTML = armHtml + montarNomeCell({ comAdd: false, comRemover: true });
+                    setEspNaLinha(tr, esp === '_' ? '' : esp);
+                    bindLinhaOficio(tr, { comAdd: false, comRemover: true });
+                }
+            } else {
+                bindLinhaOficio(tr, { comAdd: false, comRemover: true });
+            }
+        });
+        atualizarAcessorios();
     }
 
     function initAposTabelaPericias() {
         syncVisibilidade();
+    }
+
+    /** Usado por coletarPericias / mapa de nomes na ficha. */
+    function nomeExibidoLinha(tr) {
+        if (!tr) return '';
+        if (tr.getAttribute('data-per-slug') === 'oficio' || tr.hasAttribute('data-oficio-esp')) {
+            return nomeSalvoDaLinha(tr);
+        }
+        return '';
     }
 
     global.T20OficioEspecialidadesV13 = {
@@ -466,5 +444,8 @@
         lerLista,
         aplicarLista,
         derivarDePericias,
+        nomeExibidoLinha,
+        duplicarLinha,
     };
+    global.T20OficioEspecialidades = global.T20OficioEspecialidadesV13;
 })(typeof window !== 'undefined' ? window : globalThis);

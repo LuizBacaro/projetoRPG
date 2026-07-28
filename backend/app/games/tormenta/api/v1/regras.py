@@ -18,6 +18,11 @@ from app.games.tormenta.rules.atributos_t20 import (
     valores_4d6_para_mapa,
 )
 from app.games.tormenta.rules.beneficios_nivel_t20 import lista_beneficios_por_nivel
+from app.games.tormenta.rules.bonus_pericias_itens_t20 import (
+    agregar_bonus_pericia_itens,
+    aplicar_agregado_em_totais,
+    slug_pericia_nome,
+)
 from app.games.tormenta.rules.carga_t20 import PENALIDADE_SOBRECARGA, preview_carga_v13
 from app.games.tormenta.rules.catalogo_armaduras_t20 import (
     filtrar_armaduras_protecao_mb,
@@ -1248,12 +1253,26 @@ def _calcular_bonus_pericia_response(
         nao_proficiente_armadura=nao_prof,
     ):
         pen_arm += PENALIDADE_SOBRECARGA
+
+    pericia_slug = slug_pericia_nome(body.nome_pericia or "")
+    agg = agregar_bonus_pericia_itens(
+        pericia_slug=pericia_slug,
+        uso_id=body.uso_id,
+        itens=body.itens_com_melhorias,
+    )
+    totais = aplicar_agregado_em_totais(
+        outros_ficha=int(body.outros or 0),
+        bonus_uso_ficha=int(body.bonus_uso or 0),
+        agregado=agg,
+    )
+    bonus_uso = totais["bonus_uso"]
     bonus = calcular_bonus_pericia(
         nivel=body.nivel,
         mod_atributo=body.mod_atributo,
         treinado=body.treinado,
         graduacao=body.graduacao,
-        outros=body.outros,
+        outros=totais["outros"],
+        bonus_uso=bonus_uso,
         racial_bonus=racial,
         penalidade_armadura=pen_arm,
         pericia_de_classe=body.pericia_de_classe,
@@ -1269,10 +1288,13 @@ def _calcular_bonus_pericia_response(
         bonus_total=bonus,
         meio_nivel=meio,
         bonus_treinamento=tre,
+        bonus_uso=bonus_uso,
+        bonus_itens=totais["bonus_itens"],
         penalidade_armadura_aplicada=pen_arm,
         percepcao_passiva=pp,
         pode_usar=pode,
         motivo_bloqueio=motivo,
+        itens_fontes=list(agg.get("fontes") or []),
     )
 
 

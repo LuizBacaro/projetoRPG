@@ -298,6 +298,10 @@
         const outrosEff = isV13 ? outrosInp + grad : outrosInp;
         if (outrosEff) parts.push(`outros ${fmtSigned(outrosEff)}`);
 
+        if (calc.bonus_itens) parts.push(`itens ${fmtSigned(calc.bonus_itens)}`);
+
+        if (calc.bonus_uso) parts.push(`uso ${fmtSigned(calc.bonus_uso)}`);
+
         if (racial) parts.push(`racial ${fmtSigned(racial)}`);
 
         const pen = calc.penalidade_armadura_aplicada || 0;

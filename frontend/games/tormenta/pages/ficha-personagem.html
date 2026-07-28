@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260726ameaca" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260725oficioLinhas" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260728usosCanon" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260728oficio1ln" />
 </head>
 <body class="tormenta-ficha-body">
 <div class="tormenta-ficha-wrap ficha-layout-dnd">
@@ -1815,16 +1815,17 @@
 <script src="/games/tormenta/js/t20-ficha-mb-extras.js?v=20260515"></script>
 <script src="/games/tormenta/js/t20-tracos-raciais.js?v=20260726defesa"></script>
 <script src="/games/tormenta/js/t20-escolhas-raciais.js?v=20260711pericias"></script>
-<script src="/games/tormenta/js/t20-oficio-especialidades.js?v=20260725oficioLinhas"></script>
+<script src="/games/tormenta/js/t20-oficio-especialidades.js?v=20260728oficioDup"></script>
 <script src="/games/tormenta/js/t20-carga-v13.js?v=20260629s46"></script>
 <script src="/games/tormenta/js/t20-proficiencia-arma.js?v=20260629s49"></script>
 <script src="/games/tormenta/js/t20-limites-equipamento-v13.js?v=20260629s48"></script>
 <script src="/games/tormenta/js/t20-penalidade-armadura.js?v=20260629s47"></script>
-<script src="/games/tormenta/js/t20-pericias-usos.js?v=20260725usoP23"></script>
-<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260725usoPer"></script>
-<script src="/games/tormenta/js/t20-rolagem-contextual.js?v=20260726defesa"></script>
+<script src="/games/tormenta/js/t20-pericias-usos.js?v=20260728usosCanon"></script>
+<script src="/games/tormenta/js/t20-pericias-usos-badge.js?v=20260728usosCanon"></script>
+<script src="/games/tormenta/js/t20-pericias-rolador.js?v=20260728oficioDup"></script>
+<script src="/games/tormenta/js/t20-rolagem-contextual.js?v=20260728itensPer"></script>
 <script src="/games/tormenta/js/t20-percepcao-passiva.js?v=20260710c"></script>
-<script src="/games/tormenta/js/t20-breakdown-ficha.js?v=20260710lote"></script>
+<script src="/games/tormenta/js/t20-breakdown-ficha.js?v=20260728itensPer"></script>
 <script src="/games/tormenta/js/t20-compendium-dnd.js?v=20260710f"></script>
 <script src="/games/tormenta/js/t20-progressao-pv.js?v=20260725prod503"></script>
 <script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
@@ -7342,7 +7343,12 @@
             const livre = tr.querySelector('.nome-livre');
             const metaNome = metaPericiaDaLinha(tr, i).nome || '';
             const spanNome = tr.querySelector('.t20-p-nome');
-            let nome = livre ? (livre.value || '').trim() : '';
+            const oficioApi = window.T20OficioEspecialidadesV13;
+            let nome =
+                oficioApi && typeof oficioApi.nomeExibidoLinha === 'function'
+                    ? oficioApi.nomeExibidoLinha(tr)
+                    : '';
+            if (!nome) nome = livre ? (livre.value || '').trim() : '';
             if (!nome && spanNome) nome = spanNome.textContent.trim();
             if (!nome) nome = metaNome;
             if (!nome && metaNome === '—') return;
@@ -7381,10 +7387,15 @@
 
     function mapaPericiasPorNomeNaTabela() {
         const map = new Map();
+        const oficioApi = window.T20OficioEspecialidadesV13;
         document.querySelectorAll('#tblPericias tbody tr').forEach((tr) => {
             const livre = tr.querySelector('.nome-livre');
             const spanNome = tr.querySelector('.t20-p-nome');
-            let nome = livre ? (livre.value || '').trim() : '';
+            let nome =
+                oficioApi && typeof oficioApi.nomeExibidoLinha === 'function'
+                    ? oficioApi.nomeExibidoLinha(tr)
+                    : '';
+            if (!nome) nome = livre ? (livre.value || '').trim() : '';
             if (!nome && spanNome) nome = spanNome.textContent.trim();
             if (nome && nome !== '—') map.set(nome, tr);
         });
@@ -7471,13 +7482,20 @@
             if (!tr && nomeCanon) {
                 rows.forEach((row, j) => {
                     if (tr) return;
-                    const span = row.querySelector('.t20-p-nome');
-                    const liv = row.querySelector('.nome-livre');
-                    const rn = liv
-                        ? (liv.value || '').trim()
-                        : span
-                          ? span.textContent.trim()
-                          : '';
+                    const oficioApi = window.T20OficioEspecialidadesV13;
+                    let rn =
+                        oficioApi && typeof oficioApi.nomeExibidoLinha === 'function'
+                            ? oficioApi.nomeExibidoLinha(row)
+                            : '';
+                    if (!rn) {
+                        const span = row.querySelector('.t20-p-nome');
+                        const liv = row.querySelector('.nome-livre');
+                        rn = liv
+                            ? (liv.value || '').trim()
+                            : span
+                              ? span.textContent.trim()
+                              : '';
+                    }
                     if (rn === nomeCanon) {
                         tr = row;
                         idx = j;
@@ -7801,6 +7819,10 @@
                 window.T20OficioEspecialidadesV13 && window.T20OficioEspecialidadesV13.lerLista
                     ? window.T20OficioEspecialidadesV13.lerLista()
                     : [],
+            pericias_usos_bonus:
+                window.T20PericiasUsos && typeof window.T20PericiasUsos.lerBonusMap === 'function'
+                    ? window.T20PericiasUsos.lerBonusMap()
+                    : {},
             ataques: coletarAtaques(),
             ataques_bonus_planilha: coletarAtaquesBonusPlanilha(),
             talentos_texto: q('f_talentos').value,
@@ -7924,6 +7946,9 @@
                 esp = espMod.derivarDePericias(j.pericias);
             }
             espMod.aplicarLista(esp);
+        }
+        if (window.T20PericiasUsos && typeof window.T20PericiasUsos.aplicarBonusMap === 'function') {
+            window.T20PericiasUsos.aplicarBonusMap(j.pericias_usos_bonus || {});
         }
         preencherPericias(j.pericias);
         t20AplicarPericiasOrigemBeneficios();
