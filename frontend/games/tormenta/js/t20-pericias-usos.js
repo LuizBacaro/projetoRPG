@@ -1,90 +1,240 @@
 /**
  * RF-T04i — catálogo de usos na rolagem (mesma perícia; não linha separada).
- * P0: Atletismo · P1: Enganação, Acrobacia, Ladinagem, Sobrevivência, Cura ·
- * P2: Diplomacia, Investigação, Adestramento, Percepção · P3: Cavalgar.
- * Atuação: fora até confirmar no livro se é especialidade (Ofício) ou só rótulo.
- * Extensível: basta acrescentar entradas em USOS_POR_SLUG.
+ * Fonte: Tormenta20 Edição Jogo do Ano v1.3 — Cap. 2 Perícias (p.114–123).
+ * Ofício = especialidades em linhas próprias (não este catálogo).
+ *
+ * Bônus por uso (persistido em `ficha_json.pericias_usos_bonus`):
+ * `{ enganacao: { mentir: 2 }, … }` — soma no teste via `bonus_uso`, não na CD.
  */
 (function (global) {
     'use strict';
 
-    /** @type {Record<string, { id: string, rotulo: string, hint?: string }[]>} */
+    /**
+     * @typedef {{ id: string, rotulo: string, hint?: string, apenas_treinado?: boolean }} UsoPericia
+     * @type {Record<string, UsoPericia[]>}
+     */
     const USOS_POR_SLUG = {
-        atletismo: [
-            { id: 'escalar', rotulo: 'Escalar' },
-            { id: 'nadar', rotulo: 'Nadar', hint: 'Aplica penalidade de armadura' },
-            { id: 'saltar', rotulo: 'Saltar' },
-        ],
-        enganacao: [
-            { id: 'blefar', rotulo: 'Blefar' },
-            { id: 'disfarce', rotulo: 'Disfarce' },
-            { id: 'fingir', rotulo: 'Fingir' },
-        ],
         acrobacia: [
+            {
+                id: 'amortecer_queda',
+                rotulo: 'Amortecer Queda',
+                apenas_treinado: true,
+                hint: 'Apenas Treinado',
+            },
             { id: 'equilibrio', rotulo: 'Equilíbrio' },
             { id: 'escapar', rotulo: 'Escapar' },
-            { id: 'queda', rotulo: 'Queda' },
+            {
+                id: 'levantar_se',
+                rotulo: 'Levantar-se Rapidamente',
+                apenas_treinado: true,
+                hint: 'Apenas Treinado',
+            },
+            {
+                id: 'espaco_apertado',
+                rotulo: 'Passar por Espaço Apertado',
+                apenas_treinado: true,
+                hint: 'Apenas Treinado',
+            },
+            { id: 'passar_inimigo', rotulo: 'Passar por Inimigo' },
         ],
-        ladinagem: [
-            { id: 'fechaduras', rotulo: 'Fechaduras' },
-            { id: 'armadilhas', rotulo: 'Armadilhas' },
-            { id: 'pungar', rotulo: 'Pungar' },
+        adestramento: [
+            { id: 'acalmar_animal', rotulo: 'Acalmar Animal' },
+            { id: 'manejar_animal', rotulo: 'Manejar Animal' },
         ],
-        sobrevivencia: [
-            { id: 'orientar', rotulo: 'Orientar' },
-            { id: 'rastrear', rotulo: 'Rastrear' },
-            { id: 'forragear', rotulo: 'Forragear' },
+        atletismo: [
+            { id: 'corrida', rotulo: 'Corrida' },
+            { id: 'escalar', rotulo: 'Escalar' },
+            {
+                id: 'natacao',
+                rotulo: 'Natação',
+                hint: 'Aplica penalidade de armadura',
+            },
+            { id: 'saltar', rotulo: 'Saltar' },
+        ],
+        atuacao: [
+            { id: 'apresentacao', rotulo: 'Apresentação' },
+            { id: 'impressionar', rotulo: 'Impressionar' },
+        ],
+        cavalgar: [
+            { id: 'conduzir', rotulo: 'Conduzir' },
+            { id: 'galopar', rotulo: 'Galopar' },
+            { id: 'montar_rapidamente', rotulo: 'Montar Rapidamente' },
+        ],
+        conhecimento: [
+            { id: 'idiomas', rotulo: 'Idiomas' },
+            { id: 'informacao', rotulo: 'Informação' },
         ],
         cura: [
+            {
+                id: 'cuidados_prolongados',
+                rotulo: 'Cuidados Prolongados',
+                apenas_treinado: true,
+                hint: 'Apenas Treinado',
+            },
+            {
+                id: 'necropsia',
+                rotulo: 'Necropsia',
+                apenas_treinado: true,
+                hint: 'Apenas Treinado',
+            },
             { id: 'primeiros_socorros', rotulo: 'Primeiros Socorros' },
-            { id: 'tratamento', rotulo: 'Tratamento' },
+            {
+                id: 'tratamento',
+                rotulo: 'Tratamento',
+                apenas_treinado: true,
+                hint: 'Apenas Treinado',
+            },
         ],
         diplomacia: [
-            { id: 'persuadir', rotulo: 'Persuadir' },
-            { id: 'barganhar', rotulo: 'Barganhar' },
+            { id: 'barganha', rotulo: 'Barganha' },
+            { id: 'mudar_atitude', rotulo: 'Mudar Atitude' },
+            { id: 'persuasao', rotulo: 'Persuasão' },
+        ],
+        enganacao: [
+            { id: 'disfarce', rotulo: 'Disfarce' },
+            { id: 'falsificacao', rotulo: 'Falsificação' },
+            { id: 'fintar', rotulo: 'Fintar' },
+            { id: 'insinuacao', rotulo: 'Insinuação' },
+            { id: 'intriga', rotulo: 'Intriga' },
+            { id: 'mentir', rotulo: 'Mentir' },
+        ],
+        furtividade: [
+            { id: 'esconder_se', rotulo: 'Esconder-se' },
+            { id: 'seguir', rotulo: 'Seguir' },
+        ],
+        guerra: [
+            { id: 'analisar_terreno', rotulo: 'Analisar Terreno' },
+            { id: 'plano_de_acao', rotulo: 'Plano de Ação' },
+        ],
+        intimidacao: [
+            { id: 'assustar', rotulo: 'Assustar' },
+            { id: 'coagir', rotulo: 'Coagir' },
+        ],
+        intuicao: [
+            { id: 'perceber_mentira', rotulo: 'Perceber Mentira' },
             {
-                id: 'obter_informacao',
-                rotulo: 'Obter Informação',
-                hint: 'Uso legado MB (perícia removida do catálogo v1.3)',
+                id: 'pressentimento',
+                rotulo: 'Pressentimento',
+                apenas_treinado: true,
+                hint: 'Apenas Treinado',
             },
         ],
         investigacao: [
-            { id: 'buscar', rotulo: 'Buscar' },
-            { id: 'analisar', rotulo: 'Analisar' },
+            { id: 'interrogar', rotulo: 'Interrogar' },
+            { id: 'procurar', rotulo: 'Procurar' },
+        ],
+        jogatina: [{ id: 'apostar', rotulo: 'Apostar' }],
+        ladinagem: [
+            { id: 'abrir_fechadura', rotulo: 'Abrir Fechadura' },
+            { id: 'ocultar', rotulo: 'Ocultar' },
+            { id: 'punga', rotulo: 'Punga' },
+            { id: 'sabotar', rotulo: 'Sabotar' },
+        ],
+        misticismo: [
+            { id: 'detectar_magia', rotulo: 'Detectar Magia' },
+            { id: 'identificar_criatura', rotulo: 'Identificar Criatura' },
+            { id: 'identificar_item', rotulo: 'Identificar Item Mágico' },
+            { id: 'identificar_magia', rotulo: 'Identificar Magia' },
+            { id: 'informacao', rotulo: 'Informação' },
             {
-                id: 'obter_informacao',
-                rotulo: 'Obter Informação',
-                hint: 'Uso legado MB (perícia removida do catálogo v1.3)',
+                id: 'lancar_magia_armadura',
+                rotulo: 'Lançar Magia de Armadura',
+                hint: 'Penalidade de armadura no teste',
             },
         ],
-        adestramento: [
-            { id: 'comandar', rotulo: 'Comandar' },
-            { id: 'treinar', rotulo: 'Treinar' },
+        nobreza: [
+            { id: 'etiqueta', rotulo: 'Etiqueta' },
+            { id: 'informacao', rotulo: 'Informação' },
         ],
         percepcao: [
             { id: 'observar', rotulo: 'Observar' },
             { id: 'ouvir', rotulo: 'Ouvir' },
         ],
-        cavalgar: [
-            { id: 'montar', rotulo: 'Montar' },
-            { id: 'combater_montado', rotulo: 'Combater Montado' },
+        religiao: [
+            { id: 'identificar_criatura', rotulo: 'Identificar Criatura' },
+            { id: 'identificar_item', rotulo: 'Identificar Item Mágico' },
+            { id: 'informacao', rotulo: 'Informação' },
+            { id: 'rito', rotulo: 'Rito' },
+        ],
+        sobrevivencia: [
+            { id: 'acampamento', rotulo: 'Acampamento' },
+            { id: 'identificar_criatura', rotulo: 'Identificar Criatura' },
+            { id: 'orientar_se', rotulo: 'Orientar-se' },
+            {
+                id: 'rastrear',
+                rotulo: 'Rastrear',
+                apenas_treinado: true,
+                hint: 'Apenas Treinado',
+            },
         ],
     };
 
     const DEFAULT_USO = {
+        acrobacia: 'equilibrio',
+        adestramento: 'manejar_animal',
         atletismo: 'escalar',
-        diplomacia: 'persuadir',
-        investigacao: 'buscar',
-        adestramento: 'comandar',
+        atuacao: 'apresentacao',
+        cavalgar: 'conduzir',
+        conhecimento: 'informacao',
+        cura: 'primeiros_socorros',
+        diplomacia: 'persuasao',
+        enganacao: 'mentir',
+        furtividade: 'esconder_se',
+        guerra: 'analisar_terreno',
+        intimidacao: 'assustar',
+        intuicao: 'perceber_mentira',
+        investigacao: 'procurar',
+        jogatina: 'apostar',
+        ladinagem: 'abrir_fechadura',
+        misticismo: 'identificar_magia',
+        nobreza: 'etiqueta',
         percepcao: 'observar',
-        cavalgar: 'montar',
+        religiao: 'informacao',
+        sobrevivencia: 'orientar_se',
+    };
+
+    /**
+     * Ids antigos → canônicos (v1.3 Cap. 2), por perícia.
+     * Entradas sem mapeamento válido são descartadas em `aplicarBonusMap`.
+     * @type {Record<string, Record<string, string>>}
+     */
+    const MIGRACAO_USO_IDS = {
+        atletismo: { nadar: 'natacao' },
+        enganacao: { blefar: 'mentir', fingir: 'fintar' },
+        acrobacia: { queda: 'amortecer_queda' },
+        ladinagem: {
+            fechaduras: 'abrir_fechadura',
+            armadilhas: 'sabotar',
+            pungar: 'punga',
+        },
+        sobrevivencia: { orientar: 'orientar_se' },
+        diplomacia: {
+            persuadir: 'persuasao',
+            barganhar: 'barganha',
+            obter_informacao: 'persuasao',
+        },
+        investigacao: {
+            buscar: 'procurar',
+            analisar: 'interrogar',
+            obter_informacao: 'interrogar',
+        },
+        adestramento: { comandar: 'manejar_animal', treinar: 'acalmar_animal' },
+        cavalgar: { montar: 'montar_rapidamente', combater_montado: 'galopar' },
     };
 
     /** Último uso escolhido na sessão (memória em runtime). */
     const ultimoUsoPorSlug = Object.create(null);
 
+    /**
+     * Bônus persistidos por perícia → uso.
+     * @type {Record<string, Record<string, number>>}
+     */
+    let bonusPorSlugUso = Object.create(null);
+
     const ALIAS_NOME = {
         atletismo: 'atletismo',
+        atuacao: 'atuacao',
+        atuação: 'atuacao',
         enganacao: 'enganacao',
         enganação: 'enganacao',
         acrobacia: 'acrobacia',
@@ -99,6 +249,18 @@
         percepcao: 'percepcao',
         percepção: 'percepcao',
         cavalgar: 'cavalgar',
+        conhecimento: 'conhecimento',
+        furtividade: 'furtividade',
+        guerra: 'guerra',
+        intimidacao: 'intimidacao',
+        intimidação: 'intimidacao',
+        intuicao: 'intuicao',
+        intuição: 'intuicao',
+        jogatina: 'jogatina',
+        misticismo: 'misticismo',
+        nobreza: 'nobreza',
+        religiao: 'religiao',
+        religião: 'religiao',
     };
 
     function normalizarSlug(slugOuNome) {
@@ -118,6 +280,14 @@
         return s;
     }
 
+    function migrarUsoId(slug, usoId) {
+        const id = String(usoId || '').trim();
+        if (!id) return '';
+        const map = MIGRACAO_USO_IDS[slug];
+        if (map && map[id]) return map[id];
+        return id;
+    }
+
     function usosDaPericia(slugOuNome) {
         const slug = normalizarSlug(slugOuNome);
         const lista = USOS_POR_SLUG[slug];
@@ -126,6 +296,7 @@
             id: u.id,
             rotulo: u.rotulo,
             hint: u.hint || undefined,
+            apenas_treinado: Boolean(u.apenas_treinado),
         }));
     }
 
@@ -134,9 +305,10 @@
     }
 
     function usoPorId(slugOuNome, usoId) {
-        const id = String(usoId || '').trim();
+        const slug = normalizarSlug(slugOuNome);
+        const id = migrarUsoId(slug, usoId);
         if (!id) return null;
-        return usosDaPericia(slugOuNome).find((u) => u.id === id) || null;
+        return usosDaPericia(slug).find((u) => u.id === id) || null;
     }
 
     function usoDefault(slugOuNome) {
@@ -165,13 +337,116 @@
         return `${base} (${u.rotulo})`;
     }
 
-    /** Atletismo + nadar → flag de API; demais usos / perícias → false. */
+    /** Atletismo + natação → flag de API; aceita id legado `nadar`. */
     function usoAtletismoNatacao(slugOuNome, usoId) {
-        return normalizarSlug(slugOuNome) === 'atletismo' && String(usoId || '') === 'nadar';
+        if (normalizarSlug(slugOuNome) !== 'atletismo') return false;
+        const id = migrarUsoId('atletismo', usoId);
+        return id === 'natacao';
+    }
+
+    function _clampBonus(n) {
+        if (!Number.isFinite(n)) return 0;
+        return Math.max(-99, Math.min(99, Math.trunc(n)));
+    }
+
+    function bonusDoUso(slugOuNome, usoId) {
+        const slug = normalizarSlug(slugOuNome);
+        const id = migrarUsoId(slug, usoId);
+        if (!slug || !id) return 0;
+        const n = Number(bonusPorSlugUso[slug] && bonusPorSlugUso[slug][id]);
+        return _clampBonus(Number.isFinite(n) ? n : 0);
+    }
+
+    function setBonusUso(slugOuNome, usoId, valor) {
+        const slug = normalizarSlug(slugOuNome);
+        const id = migrarUsoId(slug, usoId);
+        if (!slug || !id) return;
+        if (!usoPorId(slug, id)) return;
+        const n = _clampBonus(Number(valor));
+        if (!bonusPorSlugUso[slug]) bonusPorSlugUso[slug] = Object.create(null);
+        if (n === 0) {
+            delete bonusPorSlugUso[slug][id];
+            if (!Object.keys(bonusPorSlugUso[slug]).length) delete bonusPorSlugUso[slug];
+        } else {
+            bonusPorSlugUso[slug][id] = n;
+        }
+    }
+
+    /** Snapshot limpo para `ficha_json.pericias_usos_bonus`. */
+    function lerBonusMap() {
+        const out = {};
+        Object.keys(bonusPorSlugUso).forEach((slug) => {
+            const usos = bonusPorSlugUso[slug];
+            if (!usos || typeof usos !== 'object') return;
+            const inner = {};
+            Object.keys(usos).forEach((id) => {
+                const n = _clampBonus(Number(usos[id]));
+                if (n !== 0) inner[id] = n;
+            });
+            if (Object.keys(inner).length) out[slug] = inner;
+        });
+        return out;
+    }
+
+    function aplicarBonusMap(map) {
+        bonusPorSlugUso = Object.create(null);
+        if (!map || typeof map !== 'object' || Array.isArray(map)) {
+            if (typeof global.T20PericiasUsosBadgeAll === 'function') {
+                try {
+                    global.T20PericiasUsosBadgeAll();
+                } catch (_e) {
+                    /* ignore */
+                }
+            }
+            return;
+        }
+        Object.keys(map).forEach((rawSlug) => {
+            const slug = normalizarSlug(rawSlug);
+            if (!slug || !temUsos(slug)) return;
+            const usos = map[rawSlug];
+            if (!usos || typeof usos !== 'object' || Array.isArray(usos)) return;
+            Object.keys(usos).forEach((rawId) => {
+                const id = migrarUsoId(slug, rawId);
+                if (!usoPorId(slug, id)) return;
+                const n = _clampBonus(Number(usos[rawId]));
+                if (n !== 0) setBonusUso(slug, id, n);
+            });
+        });
+        if (typeof global.T20PericiasUsosBadgeAll === 'function') {
+            try {
+                global.T20PericiasUsosBadgeAll();
+            } catch (_e) {
+                /* ignore */
+            }
+        }
+    }
+
+    function contarUsosComBonus(slugOuNome) {
+        const slug = normalizarSlug(slugOuNome);
+        const usos = bonusPorSlugUso[slug];
+        if (!usos || typeof usos !== 'object') return 0;
+        return Object.keys(usos).filter((id) => _clampBonus(Number(usos[id])) !== 0).length;
+    }
+
+    /** Lista legível dos usos com bônus (para title do badge). */
+    function listarUsosComBonus(slugOuNome) {
+        const slug = normalizarSlug(slugOuNome);
+        const usos = bonusPorSlugUso[slug];
+        if (!usos || typeof usos !== 'object') return [];
+        const out = [];
+        Object.keys(usos).forEach((id) => {
+            const n = _clampBonus(Number(usos[id]));
+            if (n === 0) return;
+            const u = usoPorId(slug, id);
+            const rotulo = u ? u.rotulo : id;
+            out.push(`${rotulo} ${n > 0 ? '+' : ''}${n}`);
+        });
+        return out;
     }
 
     global.T20PericiasUsos = {
         USOS_POR_SLUG,
+        MIGRACAO_USO_IDS,
         normalizarSlug,
         usosDaPericia,
         temUsos,
@@ -180,5 +455,12 @@
         lembrarUso,
         formatarNomeComUso,
         usoAtletismoNatacao,
+        bonusDoUso,
+        setBonusUso,
+        lerBonusMap,
+        aplicarBonusMap,
+        contarUsosComBonus,
+        listarUsosComBonus,
+        migrarUsoId,
     };
 })(typeof window !== 'undefined' ? window : globalThis);

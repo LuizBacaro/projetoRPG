@@ -881,6 +881,12 @@ class TormentaPericiaBonusRequest(BaseModel):
     treinado: bool = False
     graduacao: int = Field(0, ge=0, le=99)
     outros: int = Field(0, ge=-99, le=99)
+    bonus_uso: int = Field(
+        0,
+        ge=-99,
+        le=99,
+        description="Bônus do uso selecionado na rolagem (RF-T04i); separado de outros.",
+    )
     racial_bonus: int = Field(0, ge=-99, le=99)
     penalidade_armadura: int = Field(
         0,
@@ -913,12 +919,37 @@ class TormentaPericiaBonusRequest(BaseModel):
         max_length=40,
         description="Slug da classe v1.3 — proficiência de armadura (RF-T07e-1).",
     )
+    itens_com_melhorias: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description=(
+            "Itens com melhorias TS (ex. ataques): "
+            "[{ melhorias: ['banhado_a_ouro'], bonus_ativo?, pericia_slug? }]. "
+            "RF-T14 — agrega em outros/bonus_uso sem alterar a ficha."
+        ),
+    )
+    uso_id: Optional[str] = Field(
+        default=None,
+        max_length=40,
+        description="Uso da perícia na rolagem (RF-T04i) — necessário p/ mods como ocultar.",
+    )
 
 
 class TormentaPericiaBonusResponse(BaseModel):
     bonus_total: int
     meio_nivel: int
     bonus_treinamento: int = Field(default=0, ge=0, le=10)
+    bonus_uso: int = Field(
+        default=0,
+        ge=-99,
+        le=99,
+        description="Bônus de uso aplicado (manual + itens TS, RF-T04i/T14).",
+    )
+    bonus_itens: int = Field(
+        default=0,
+        ge=-99,
+        le=99,
+        description="Parcela de outros vinda de melhorias TS (RF-T14).",
+    )
     penalidade_armadura_aplicada: int = Field(
         default=0,
         ge=0,
@@ -928,6 +959,10 @@ class TormentaPericiaBonusResponse(BaseModel):
     percepcao_passiva: Optional[int] = None
     pode_usar: bool = Field(default=True)
     motivo_bloqueio: str = Field(default="", max_length=300)
+    itens_fontes: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Melhorias TS que entraram no cálculo (auditoria).",
+    )
 
 
 class TormentaPericiaBonusLoteRequest(BaseModel):

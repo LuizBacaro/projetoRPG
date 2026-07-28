@@ -1320,89 +1320,68 @@ body::before {
     width: 8px;
 }
 
-.t20-oficio-esp-head {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.2rem;
-    margin-left: 0.2rem;
-    max-width: 100%;
-    vertical-align: middle;
-}
-
-.t20-oficio-esp-toggle {
+.t20-oficio-esp-add-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.15rem;
-    height: 1.15rem;
+    width: 1.25rem;
+    height: 1.25rem;
     padding: 0;
-    border: 1px solid rgba(92, 58, 30, 0.35);
+    border: 1.5px solid rgba(139, 26, 26, 0.55);
     border-radius: 4px;
-    background: rgba(250, 243, 224, 0.9);
-    color: var(--cor-madeira, #5c3a1e);
+    background: linear-gradient(180deg, #fff8e8, #f3e2b8);
+    color: var(--cor-vermelho, #8b1a1a);
     cursor: pointer;
     line-height: 1;
     flex-shrink: 0;
-}
-
-.t20-oficio-esp-toggle:hover {
-    border-color: var(--cor-vermelho, #8b1a1a);
-    color: var(--cor-vermelho, #8b1a1a);
-}
-
-.t20-oficio-esp-chevron {
-    display: inline-block;
-    font-size: 0.7rem;
-    transform: rotate(-90deg);
-    transition: transform 0.15s ease;
-}
-
-.t20-oficio-esp-toggle.is-open .t20-oficio-esp-chevron {
-    transform: rotate(0deg);
-}
-
-.t20-oficio-esp-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 1rem;
-    height: 1rem;
-    padding: 0 0.25rem;
-    border-radius: 999px;
-    background: rgba(139, 26, 26, 0.12);
-    color: var(--cor-vermelho, #8b1a1a);
-    font-size: 0.65rem;
+    font-size: 1rem;
     font-weight: 700;
-    line-height: 1;
 }
 
-/* «Ofício» com especialidades vira cabeçalho do grupo: sem valores próprios */
-.t20-pericias-table tr.t20-pericia-oficio-pai > td:not(.t20-p-nome-cell) {
-    visibility: hidden;
+.t20-oficio-esp-add-btn:hover {
+    border-color: var(--cor-vermelho, #8b1a1a);
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(139, 26, 26, 0.15);
 }
 
-.t20-pericias-table tr.t20-pericia-oficio-pai .t20-p-nome {
-    cursor: default;
-    text-decoration: none;
-    opacity: 0.85;
-}
-
-/* Linhas de especialidade de Ofício (uma por especialidade) */
+/* Linhas extras de Ofício (duplicadas) */
 .t20-pericias-table tr.t20-pericia-oficio-esp > td {
     background: rgba(201, 168, 76, 0.07);
 }
 
+.t20-p-nome-wrap.t20-oficio-esp-linha-nome,
 .t20-oficio-esp-linha-nome {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    min-width: 0;
+    gap: 0.15rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    max-width: 100%;
 }
 
-.t20-oficio-esp-ramo {
-    color: rgba(92, 58, 30, 0.55);
-    font-size: 0.75rem;
+.t20-pericias-table .t20-p-nome-cell:has(.t20-oficio-esp-linha-nome) {
+    white-space: nowrap;
+}
+
+.t20-oficio-esp-paren {
+    color: rgba(92, 58, 30, 0.7);
+    font-weight: 600;
     flex-shrink: 0;
+}
+
+.t20-oficio-esp-linha-nome .t20-p-nome {
+    flex-shrink: 0;
+    word-break: normal;
+    white-space: nowrap;
+}
+
+.t20-oficio-esp-linha-nome .p-oficio-esp {
+    width: 5.5rem;
+    min-width: 3.25rem;
+    max-width: 7rem;
+    padding: 0.1rem 0.25rem;
+    font-size: 0.8rem;
+    flex: 0 1 5.5rem;
 }
 
 .t20-oficio-esp-remover {
@@ -1418,56 +1397,6 @@ body::before {
 
 .t20-oficio-esp-remover:hover {
     color: var(--cor-vermelho, #8b1a1a);
-}
-
-.t20-oficio-esp-nota {
-    margin: 0.35rem 0 0;
-    font-size: 0.68rem;
-    opacity: 0.85;
-}
-
-.t20-oficio-esp-wrap {
-    margin-top: 0.35rem;
-    padding: 0.35rem 0.4rem 0.4rem;
-    border: 1px solid rgba(92, 58, 30, 0.18);
-    border-radius: 6px;
-    background: rgba(250, 243, 224, 0.55);
-}
-
-.t20-oficio-esp-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-    margin-bottom: 0.25rem;
-}
-
-.t20-oficio-esp-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.2rem;
-    padding: 0.1rem 0.35rem;
-    border-radius: 4px;
-    background: rgba(120, 90, 40, 0.15);
-    font-size: 0.85rem;
-}
-
-.t20-oficio-esp-del {
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    padding: 0 0.15rem;
-    line-height: 1;
-}
-
-.t20-oficio-esp-add {
-    display: flex;
-    gap: 0.35rem;
-    align-items: center;
-}
-
-.t20-oficio-esp-add .t20-input {
-    flex: 1;
-    min-width: 6rem;
 }
 
 .ficha-pericia-item {

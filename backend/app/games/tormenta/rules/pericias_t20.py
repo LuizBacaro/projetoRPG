@@ -118,14 +118,19 @@ def calcular_bonus_pericia(
     treinado: bool = False,
     graduacao: int = 0,
     outros: int = 0,
+    bonus_uso: int = 0,
     racial_bonus: int = 0,
     penalidade_armadura: int = 0,
     pericia_de_classe: bool = False,
     regra_versao: Optional[str] = None,
 ) -> int:
     """
-    MB: mod + ½ nv + graduação + treino (+2) + outros + racial − penalidade.
-    v1.3: valor atributo + ½ nv + treino (+2/+4/+6) + outros + racial − penalidade (sem graduação).
+    MB: mod + ½ nv + graduação + treino (+2) + outros + bonus_uso + racial − penalidade.
+    v1.3: valor atributo + ½ nv + treino (+2/+4/+6) + outros + bonus_uso + racial −
+    penalidade (sem graduação).
+
+    ``bonus_uso`` é o modificador do uso escolhido na rolagem (RF-T04i); não misturar
+    com ``outros`` da linha da ficha.
     """
     rv = normalizar_regra_versao(regra_versao)
     meio = bonus_meio_nivel_t20(nivel)
@@ -141,6 +146,10 @@ def calcular_bonus_pericia(
     except (TypeError, ValueError):
         out = 0
     try:
+        uso = int(bonus_uso)
+    except (TypeError, ValueError):
+        uso = 0
+    try:
         rac = int(racial_bonus)
     except (TypeError, ValueError):
         rac = 0
@@ -153,7 +162,7 @@ def calcular_bonus_pericia(
     except (TypeError, ValueError):
         mod = 0
     _ = pericia_de_classe
-    return mod + meio + grad + tre + out + rac - pen
+    return mod + meio + grad + tre + out + uso + rac - pen
 
 
 def percepcao_passiva_t20(bonus_percepcao: int) -> int:

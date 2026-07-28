@@ -17,6 +17,9 @@
 Documentado também em `backend/app/games/tormenta/README.md`. Resumo:
 
 - `origem`, `pericias[]`, `ataques[]`, `equipamentos[]`
+- `pericias_usos_bonus` — mapa `{ [slug_pericia]: { [uso_id]: number } }` (ex.: `{ enganacao: { mentir: 2 } }`); bônus específico do uso na rolagem (RF-T04i); zeros omitidos; ids canônicos Cap. 2 v1.3 (migração de legados no cliente)
+- Catálogo de referência (não aplicado automaticamente): `backend/app/games/tormenta/data/bonus_pericias_fontes_v13.json` (RF-T14) — itens/poderes/raça com +/− em perícias
+- `oficio_especialidades[]` — especialidades de Ofício (v1.3); cada uma vira linha própria na tabela
 - `defesa_detalhe`, `armadura_escudo_tabela`
 - `talentos_texto`, `magias_texto`, `raca_origem_texto`
 - `raca_tormenta_slug`, `raca_tormenta_mais2a`, `raca_tormenta_mais2b`, `raca_tormenta_livre` (raça MB + escolhas Humano/Lefou ou texto livre)
@@ -41,6 +44,7 @@ Novas chaves devem ser **aditivas** (nunca remover silenciosamente) para compati
 
 ## API
 
+- `POST /api/v1/tormenta/regras/pericias/calcular-bonus` (e lote) — `outros` (linha) + `bonus_uso` (uso manual) + opcional `itens_com_melhorias` / `uso_id` (RF-T14: agrega mods TS). Response: `bonus_itens`, `itens_fontes`, `bonus_uso` total.
 - `POST/PATCH` aceitam `foto_url` como string opcional (comprimento máximo definido no schema Pydantic).
 - Validação de URL pode ser fase posterior (formato básico ou allowlist de domínio).
 - `GET /api/v1/tormenta/regras/atributos` — resposta `{ pontos_compra_iniciais, custos[], pericias[] }` (`pericias[].nome`, `atributo`, `somente_treinado`, `penalidade_armadura`). Espelha `data/atributos_compra_pontos.json` + `data/pericias_atributo_chave.json`. Fallback estático na ficha: `/games/tormenta/data/regras-atributos.json`.
