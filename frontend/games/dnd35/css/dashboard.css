@@ -1047,7 +1047,7 @@ body {
 /* ── Seletor de tipo ── */
 .seletor-tipo-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
     padding: 1.5rem;
 }
@@ -1093,6 +1093,23 @@ body {
 .btn-tipo-monstro.selected {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     box-shadow: 0 0 15px rgba(248, 113, 113, 0.4);
+}
+
+.btn-tipo-bestiario {
+    background: #1d4ed822;
+    border: 2px solid #3b82f6;
+    color: #93c5fd;
+    padding: .75rem;
+    border-radius: .4rem;
+    cursor: pointer;
+    font-size: .95rem;
+    font-weight: 600;
+    transition: all .2s;
+}
+.btn-tipo-bestiario:hover {
+    background: #1d4ed844;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
+    transform: translateY(-2px);
 }
 
 .btn-tipo-npc {
@@ -1221,6 +1238,7 @@ body {
 
     .btn-tipo-jogador,
     .btn-tipo-monstro,
+    .btn-tipo-bestiario,
     .btn-tipo-npc {
         padding: 1rem;
         font-size: 1rem;
@@ -1300,6 +1318,7 @@ body {
 
     .btn-tipo-jogador,
     .btn-tipo-monstro,
+    .btn-tipo-bestiario,
     .btn-tipo-npc {
         padding: 0.6rem;
         font-size: 0.9rem;
@@ -1747,4 +1766,153 @@ body {
     border-color: rgba(251, 191, 36, 0.65);
     background: rgba(245, 158, 11, 0.16);
     color: #fde68a;
+}
+/* ── Bestiário MM (import modal) ── */
+.dash-modal-box--bestiario {
+    max-width: 960px;
+}
+.d35-bestiario-hint {
+    color: #94a3b8;
+    font-size: .85rem;
+    margin: .4rem 0;
+}
+.d35-bestiario-aviso {
+    color: #fbbf24;
+    font-size: .82rem;
+    margin: .35rem 0;
+}
+.d35-bestiario-filtros {
+    display: grid;
+    grid-template-columns: 2fr 1fr 0.7fr 0.7fr;
+    gap: .55rem;
+    margin-bottom: .75rem;
+}
+@media (max-width: 720px) {
+    .d35-bestiario-filtros {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.d35-bestiario-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: .75rem;
+    min-height: 220px;
+}
+@media (max-width: 720px) {
+    .d35-bestiario-layout {
+        grid-template-columns: 1fr;
+    }
+}
+.d35-bestiario-lista-wrap {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+.d35-bestiario-lista {
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid #2d2d44;
+    border-radius: .45rem;
+    background: #12121f;
+    padding: .35rem;
+}
+.d35-bestiario-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    text-align: left;
+    gap: .15rem;
+    padding: .45rem .55rem;
+    margin-bottom: .25rem;
+    border: 1px solid transparent;
+    border-radius: .35rem;
+    background: transparent;
+    color: #e2e8f0;
+    cursor: pointer;
+}
+.d35-bestiario-item:hover,
+.d35-bestiario-item.is-active {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.45);
+}
+.d35-bestiario-item.is-active {
+    box-shadow: inset 2px 0 0 #3b82f6;
+}
+.d35-bestiario-item-nome {
+    font-weight: 600;
+    font-size: .9rem;
+}
+.d35-bestiario-item-meta {
+    font-size: .75rem;
+    color: #94a3b8;
+}
+.d35-bestiario-pager {
+    margin-top: .35rem;
+    font-size: .78rem;
+    color: #94a3b8;
+}
+.d35-bestiario-preview {
+    border: 1px solid #2d2d44;
+    border-radius: .45rem;
+    background: #12121f;
+    padding: .75rem;
+    max-height: 320px;
+    overflow-y: auto;
+}
+.d35-bestiario-prev-nome {
+    margin: 0 0 .35rem;
+    color: #f8fafc;
+    font-size: 1.05rem;
+}
+.d35-bestiario-prev-meta,
+.d35-bestiario-prev-linha {
+    margin: .2rem 0;
+    font-size: .82rem;
+    color: #cbd5e1;
+}
+.d35-bestiario-atq-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: .5rem;
+    font-size: .78rem;
+}
+.d35-bestiario-atq-table th,
+.d35-bestiario-atq-table td {
+    border-bottom: 1px solid #2d2d44;
+    padding: .3rem .35rem;
+    text-align: left;
+}
+.d35-bestiario-atq-table th {
+    color: #94a3b8;
+    font-weight: 600;
+}
+.d35-bestiario-bloco-wrap {
+    margin-top: .75rem;
+}
+.d35-bestiario-bloco-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-bottom: .35rem;
+}
+.d35-bestiario-bloco-hd label {
+    margin: 0;
+    font-size: .82rem;
+    color: #94a3b8;
+}
+.d35-bestiario-bloco {
+    margin: 0;
+    padding: .65rem .75rem;
+    max-height: 160px;
+    overflow: auto;
+    border: 1px solid #2d2d44;
+    border-radius: .4rem;
+    background: #0b1220;
+    color: #e2e8f0;
+    font-size: .75rem;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }

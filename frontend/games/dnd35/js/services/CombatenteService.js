@@ -325,4 +325,82 @@ export class CombatenteService {
             throw error;
         }
     }
+
+    /**
+     * Importa monstro/NPC a partir do catálogo do Livro dos Monstros.
+     * @param {{ slug: string, tipo?: string, campanha_id?: number, nome_override?: string, foto_url?: string }} payload
+     * @returns {Promise<Combatente>}
+     */
+    async importarBestiario(payload) {
+        try {
+            const response = await fetch(getApiUrl('/combatentes/importar-bestiario'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`,
+                },
+                body: JSON.stringify(payload || {}),
+            });
+
+            if (!response.ok) {
+                let detail = 'Erro ao importar do bestiário';
+                try {
+                    const errorData = await response.json();
+                    detail = errorData.detail || detail;
+                } catch {
+                    /* ignore */
+                }
+                if (this._tratar401(response)) {
+                    throw new Error('HTTP 401: Token inválido ou expirado');
+                }
+                throw new Error(detail);
+            }
+
+            const data = await response.json();
+            return this._toModel(data);
+        } catch (error) {
+            console.error('❌ Erro ao importar bestiário:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Envia retrato do combatente (multipart).
+     * @param {number} id
+     * @param {File} file
+     * @returns {Promise<Combatente>}
+     */
+    async enviarFoto(id, file) {
+        try {
+            const fd = new FormData();
+            fd.append('foto', file);
+            const response = await fetch(`${getApiUrl('/combatentes')}/${id}/foto`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                },
+                body: fd,
+            });
+
+            if (!response.ok) {
+                let detail = 'Erro ao enviar foto';
+                try {
+                    const errorData = await response.json();
+                    detail = errorData.detail || detail;
+                } catch {
+                    /* ignore */
+                }
+                if (this._tratar401(response)) {
+                    throw new Error('HTTP 401: Token inválido ou expirado');
+                }
+                throw new Error(detail);
+            }
+
+            const data = await response.json();
+            return this._toModel(data);
+        } catch (error) {
+            console.error('❌ Erro ao enviar foto:', error);
+            throw error;
+        }
+    }
 }

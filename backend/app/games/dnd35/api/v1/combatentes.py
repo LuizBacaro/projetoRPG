@@ -17,6 +17,7 @@ from fastapi import (
 )
 
 from app.core.dependencies import get_combatente_service
+from app.games.dnd35.schemas.bestiario import DnD35BestiarioImportRequest
 from app.games.dnd35.schemas.combatente import (
     CombatenteResponse,
     CombatenteUpdate,
@@ -33,7 +34,11 @@ from app.shared.core.deps import (
     requer_dono_ou_admin_combatente,
     requer_game_dnd35,
 )
-from app.shared.exceptions.custom_exceptions import ArenaBaseException
+from app.shared.exceptions.custom_exceptions import (
+    ArenaBaseException,
+    DadosInvalidos,
+    InvalidFileError,
+)
 from app.shared.models.usuario import Usuario
 
 router = APIRouter(
@@ -146,6 +151,49 @@ async def criar_combatente(
     }
     try:
         return service.criar(combatente_data, foto, dono_id=usuario_atual.id)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/importar-bestiario",
+    response_model=CombatenteResponse,
+    status_code=201,
+    summary="Importar criatura do Livro dos Monstros (RF-M05)",
+)
+def importar_bestiario(
+    payload: DnD35BestiarioImportRequest,
+    service: CombatenteService = Depends(get_combatente_service),
+    usuario_atual: Usuario = Depends(get_usuario_atual),
+):
+    try:
+        return service.importar_do_bestiario(usuario_atual, payload)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{combatente_id}/foto",
+    response_model=CombatenteResponse,
+    summary="Enviar retrato do combatente",
+)
+def upload_foto(
+    combatente_id: int,
+    foto: UploadFile = File(...),
+    service: CombatenteService = Depends(get_combatente_service),
+    _: Usuario = Depends(requer_dono_ou_admin_combatente),
+):
+    """Upload de imagem do personagem/monstro (após import do bestiário ou edição)."""
+    if not foto.filename:
+        raise HTTPException(status_code=400, detail="Nenhum arquivo enviado")
+    try:
+        return service.atualizar_foto(combatente_id, foto)
+    except InvalidFileError as e:
+        raise HTTPException(status_code=400, detail=e.message)
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
