@@ -149,6 +149,7 @@ class DashboardController {
         this._configurarUpload('');
         this._configurarUpload('Monstro');
         this._configurarUpload('NPC');
+        this._configurarUpload('Bestiario');
         this._configurarUploadEdicao();
         this._configurarDivindadesCustom();
         this._configurarFecharPainelCampanhas();
@@ -167,6 +168,24 @@ class DashboardController {
             );
         }
         this.carregarCombatentes();
+        this._configurarBestiarioImport();
+    }
+
+    _configurarBestiarioImport() {
+        if (!window.__d35ArenaBestiarioImport || typeof window.__d35ArenaBestiarioImport.bindOnce !== 'function') {
+            return;
+        }
+        const self = this;
+        window.__d35ArenaBestiarioImport.bindOnce({
+            Toast,
+            fecharSeletor: () => self._fecharModal('seletorTipo'),
+            podeAbrir: () => self._isMestre(),
+            importarBestiario: (payload) => self.service.importarBestiario(payload),
+            enviarFoto: (id, file) => self.service.enviarFoto(id, file),
+            onImported: async () => {
+                await self.carregarCombatentes();
+            },
+        });
     }
 
     _getAuthHeader() {
@@ -621,6 +640,7 @@ class DashboardController {
         bindClick('btnFecharCadastroMonstro', () => this._fecharModal('modalCadastroMonstro'));
         bindClick('btnCancelarCadastroMonstro', () => this._fecharModal('modalCadastroMonstro'));
         bindClick('btnRemoverImagemMonstro', () => this._removerImagem('Monstro', false));
+        bindClick('btnRemoverImagemBestiario', () => this._removerImagem('Bestiario', false));
 
         bindClick('btnFecharCadastroNPC', () => this._fecharModal('modalCadastroNPC'));
         bindClick('btnCancelarCadastroNPC', () => this._fecharModal('modalCadastroNPC'));
@@ -2016,6 +2036,28 @@ class CombatenteServiceGlobal {
         const res = await fetch(this._url(`/${id}`), { method: 'DELETE', headers: this._headers() });
         await this._handleResponse(res, 'Erro ao deletar');
         return true;
+    }
+
+    async importarBestiario(payload) {
+        const res = await fetch(this._url('/importar-bestiario'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload || {}),
+        });
+        await this._handleResponse(res, 'Erro ao importar do bestiário');
+        return res.json();
+    }
+
+    async enviarFoto(id, file) {
+        const fd = new FormData();
+        fd.append('foto', file);
+        const res = await fetch(this._url(`/${id}/foto`), {
+            method: 'POST',
+            headers: this._headers(),
+            body: fd,
+        });
+        await this._handleResponse(res, 'Erro ao enviar foto');
+        return res.json();
     }
 }
 
