@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/games/dnd35/css/combatentes.css" />
     <link rel="stylesheet" href="/games/dnd35/css/formularios.css" />
     <link rel="stylesheet" href="/games/dnd35/css/modais.css" />
-    <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=23">
+    <link rel="stylesheet" href="/games/dnd35/css/dashboard.css?v=20260729bestiario">
     <link rel="stylesheet" href="/games/dnd35/css/responsivo.css" />
 </head>
 <body>
@@ -232,7 +232,76 @@
         <div class="seletor-tipo-grid">
             <button class="btn-tipo-jogador" id="btnTipoJogador">🧙 Jogador</button>
             <button class="btn-tipo-monstro" id="btnTipoMonstro">👹 Monstro</button>
+            <button class="btn-tipo-bestiario" id="btnTipoBestiario" title="Livro dos Monstros">📖 Bestiário MM</button>
             <button class="btn-tipo-npc" id="btnTipoNPC">🤝 NPC</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL — Importar do Bestiário (Livro dos Monstros) -->
+<div id="modalBestiarioMm35" class="dash-modal-overlay">
+    <div class="dash-modal-box dash-modal-box--bestiario">
+        <div class="dash-modal-header">
+            <h2>📖 Importar do bestiário</h2>
+            <button type="button" class="dash-modal-close" id="d35BestiarioFechar" aria-label="Fechar">×</button>
+        </div>
+        <div class="dash-modal-body d35-bestiario-modal-bd">
+            <p class="d35-bestiario-hint" style="margin-top:0">Catálogo do Livro dos Monstros (lote inicial) — cria um combatente <strong>monstro</strong> com CA/toque/surpresa, PV e ataques.</p>
+            <div class="d35-bestiario-filtros">
+                <div class="dash-form-group d35-bestiario-filtros__busca">
+                    <label for="d35BestiarioBusca">Buscar</label>
+                    <input id="d35BestiarioBusca" type="search" placeholder="Nome (ex.: goblin, dragão)…" autocomplete="off" />
+                </div>
+                <div class="dash-form-group">
+                    <label for="d35BestiarioFiltroTipo">Tipo</label>
+                    <select id="d35BestiarioFiltroTipo"></select>
+                </div>
+                <div class="dash-form-group">
+                    <label for="d35BestiarioNdMin">ND mín.</label>
+                    <input id="d35BestiarioNdMin" type="number" min="0" max="50" step="0.25" placeholder="0" />
+                </div>
+                <div class="dash-form-group">
+                    <label for="d35BestiarioNdMax">ND máx.</label>
+                    <input id="d35BestiarioNdMax" type="number" min="0" max="50" step="0.25" placeholder="20" />
+                </div>
+            </div>
+            <div class="d35-bestiario-layout">
+                <div class="d35-bestiario-lista-wrap">
+                    <div id="d35BestiarioLista" class="d35-bestiario-lista" role="listbox" aria-label="Criaturas do bestiário"></div>
+                    <div class="d35-bestiario-pager" aria-live="polite">
+                        <span id="d35BestiarioPagerInfo">0 criaturas</span>
+                    </div>
+                </div>
+                <div id="d35BestiarioPreview" class="d35-bestiario-preview">
+                    <p class="d35-bestiario-hint">Selecione uma criatura para ver os detalhes.</p>
+                </div>
+            </div>
+            <div class="d35-bestiario-bloco-wrap">
+                <div class="d35-bestiario-bloco-hd">
+                    <label for="d35BestiarioBloco">Bloco de estatísticas (3.5)</label>
+                    <button type="button" class="btn-dash-cancel" id="d35BestiarioBtnCopiarBloco" style="font-size:.78rem;padding:.25rem .6rem">Copiar</button>
+                </div>
+                <pre id="d35BestiarioBloco" class="d35-bestiario-bloco" aria-live="polite"></pre>
+            </div>
+            <div class="dash-form-group" style="margin-top:.65rem">
+                <label for="d35BestiarioNomeOverride">Nome na mesa (opcional)</label>
+                <input id="d35BestiarioNomeOverride" type="text" maxlength="100" placeholder="Ex.: Goblin #2" />
+            </div>
+            <div class="dash-form-group">
+                <label>Foto (opcional)</label>
+                <div class="dash-upload-area" id="uploadPlaceholderBestiario">
+                    📷 Clique para adicionar foto
+                </div>
+                <input type="file" id="inputFotoBestiario" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" />
+                <div id="uploadPreviewBestiario" class="dash-upload-preview" style="display:none">
+                    <img id="previewImageBestiario" src="" alt="Preview" />
+                    <button type="button" class="dash-upload-remove" id="btnRemoverImagemBestiario">✕</button>
+                </div>
+            </div>
+        </div>
+        <div class="dash-modal-actions" style="padding:0 1.25rem 1.25rem">
+            <button type="button" class="btn-dash-cancel" id="d35BestiarioCancelar">Cancelar</button>
+            <button type="button" class="btn-dash-save" id="d35BestiarioBtnImportar" disabled>Adicionar monstro</button>
         </div>
     </div>
 </div>
@@ -778,8 +847,11 @@
 <script src="/games/dnd35/js/services/DivindadeCustomService.js?v=2"></script>
 <script src="/games/dnd35/js/services/CampanhaService.js?v=20260708pedidos"></script>
 <script src="/games/dnd35/js/d35-dashboard-solicitacoes-campanha.js?v=20260708pedidos"></script>
+<script src="/games/dnd35/js/services/DnD35RegrasService.js?v=20260729bestiario"></script>
+<script src="/games/dnd35/js/dnd35-bloco-monstro.js?v=20260729bestiario"></script>
+<script src="/games/dnd35/js/dnd35-arena-bestiario-import.js?v=20260729bestiariofoto"></script>
 <script src="/js/shared/personagem-rotulo.js?v=1"></script>
-<script src="/games/dnd35/js/controllers/DashboardController.js?v=33"></script>
+<script src="/games/dnd35/js/controllers/DashboardController.js?v=20260729bestiariofoto"></script>
 
 </body>
 </html>

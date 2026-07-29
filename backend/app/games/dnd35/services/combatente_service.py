@@ -32,9 +32,16 @@ from app.games.dnd35.ports import (
     CondicaoRepositoryProtocol,
 )
 from app.games.dnd35.ports.divindade_custom import DivindadeCustomRepositoryProtocol
+from app.games.dnd35.repositories.ataque_repository import AtaqueRepository
 from app.games.dnd35.repositories.divindade_custom_repository import (
     DivindadeCustomRepository,
 )
+from app.games.dnd35.rules.bestiario_import_dnd35 import (
+    mapear_bestiario_para_combatente,
+)
+from app.games.dnd35.schemas.ataque import AtaqueCreate
+from app.games.dnd35.schemas.bestiario import DnD35BestiarioImportRequest
+from app.games.dnd35.services.ataque_service import AtaqueService
 from app.repositories.base import commit_with_rollback
 from app.services.file_service import FileService
 from app.shared.core.deps import usuario_e_mestre_dnd35
@@ -44,7 +51,7 @@ from app.shared.exceptions.custom_exceptions import (
     CombatenteNaoEncontrado,
     DadosInvalidos,
 )
-from app.shared.models.usuario import PerfilUsuario
+from app.shared.models.usuario import PerfilUsuario, Usuario
 
 # Nomes canônicos das condições automáticas de HP (D&D 3.5)
 _CONDICAO_INCONSCIENTE = "Inconsciente"
@@ -332,15 +339,50 @@ class CombatenteService:
         )
         self._normalizar_idiomas_customizados(combatente_data, combatente_atual=None)
         self._aplicar_predefinicoes_raciais(combatente_data, combatente_atual=None)
-        self._recalcular_defesas(combatente_data, combatente_atual=None)
-        self._aplicar_regra_iniciativa_por_tipo(combatente_data)
-        self._preencher_bonus_base_ataque(combatente_data)
+        tipo = str(combatente_data.get("tipo") or "").strip().lower()
+        if tipo != "monstro":
+            self._recalcular_defesas(combatente_data, combatente_atual=None)
+            self._aplicar_regra_iniciativa_por_tipo(combatente_data)
+            self._preencher_bonus_base_ataque(combatente_data)
         combatente_data["hp_atual"] = combatente_data["hp_maximo"]
         combatente = Combatente(**combatente_data)
         criado = self.repository.create(combatente)
 
         # Recarrega via get_by_id para garantir relacionamentos no response
         return self.obter_por_id(criado.id)
+
+    def importar_do_bestiario(
+        self, usuario: Usuario, payload: DnD35BestiarioImportRequest
+    ) -> Combatente:
+        """Cria monstro/NPC a partir do catálogo do Livro dos Monstros."""
+        if not self._usuario_pode_mestrar_dnd35(usuario):
+            raise DadosInvalidos("Somente mestre pode importar criaturas do bestiário")
+
+        data, ataques, overrides = mapear_bestiario_para_combatente(
+            payload.slug,
+            tipo=payload.tipo,
+            campanha_id=payload.campanha_id,
+            nome_override=payload.nome_override,
+            foto_url=payload.foto_url,
+        )
+        criado = self.criar(data, dono_id=usuario.id)
+
+        ent = self.repository.get_by_id(criado.id)
+        if not ent:
+            raise CombatenteNaoEncontrado(criado.id)
+        for key, value in overrides.items():
+            if hasattr(ent, key) and value is not None:
+                setattr(ent, key, value)
+        self.repository.update(ent)
+
+        if ataques:
+            ataque_svc = AtaqueService(
+                ataque_repo=AtaqueRepository(self.repository.db),
+                combatente_repo=self.repository,
+            )
+            ataque_svc.salvar_ataques(ent.id, [AtaqueCreate(**a) for a in ataques])
+
+        return self.obter_por_id(ent.id)
 
     def atualizar(
         self,
@@ -534,6 +576,10 @@ class CombatenteService:
         """
         precisa_commit = False
         for combatente in combatentes:
+            # Monstros (bestiário / manuais) trazem CA, BBA e saves explícitos —
+            # não sobrescrever com progressão de classe de personagem.
+            if str(getattr(combatente, "tipo", "") or "").lower() == "monstro":
+                continue
             payload = {
                 "tipo": combatente.tipo,
                 "classe": combatente.classe,
@@ -953,6 +999,16 @@ class CombatenteService:
         """Atualiza iniciativa, mínimo 0."""
         combatente = self.obter_por_id(combatente_id)
         combatente.iniciativa = max(0, nova_iniciativa)
+        return self.repository.update(combatente)
+
+    def atualizar_foto(self, combatente_id: int, foto_file) -> Combatente:
+        """Substitui o retrato do combatente."""
+        if not foto_file or not getattr(foto_file, "filename", None):
+            raise DadosInvalidos("Nenhum arquivo enviado")
+        combatente = self.obter_por_id(combatente_id)
+        if combatente.foto_url:
+            self.file_service.deletar_arquivo(combatente.foto_url)
+        combatente.foto_url = self.file_service.salvar_arquivo(foto_file)
         return self.repository.update(combatente)
 
     # ── Dano / Cura ───────────────────────────────────────

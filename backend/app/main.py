@@ -51,6 +51,7 @@ from .games.dnd35.api.v1 import magias as dnd35_magias
 from .games.dnd35.api.v1 import magias_preparadas as dnd35_magias_preparadas
 from .games.dnd35.api.v1 import pericias as dnd35_pericias
 from .games.dnd35.api.v1 import racas as dnd35_racas
+from .games.dnd35.api.v1 import regras as dnd35_regras
 from .games.dnd35.api.v1 import tabelas_classes as dnd35_tabelas_classes
 from .games.dnd35.api.v1 import talentos as dnd35_talentos
 from .games.dnd35.legacy_membership import (
@@ -529,6 +530,7 @@ app.include_router(dnd35_armaduras_protecao.router, prefix=settings.API_V1_PREFI
 app.include_router(dnd35_talentos.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_tabelas_classes.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_racas.router, prefix=settings.API_V1_PREFIX)
+app.include_router(dnd35_regras.router, prefix=settings.API_V1_PREFIX)
 app.include_router(dnd35_habilidades_especiais.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gurps_personagens.router, prefix=settings.API_V1_PREFIX)
 app.include_router(gurps_campanhas.router, prefix=settings.API_V1_PREFIX)
