@@ -27,6 +27,10 @@ from app.games.tormenta.schemas.equipamento_personagem import (
     TormentaEquipamentoVinculoPatch,
     TormentaMigrarEquipJsonResponse,
 )
+from app.games.tormenta.schemas.habilidade_origem import (
+    TormentaHabilidadeOrigemAtivarRequest,
+    TormentaHabilidadeOrigemAtivarResponse,
+)
 from app.games.tormenta.schemas.inventario_legado import (
     TormentaInventarioLegadoImportResponse,
 )
@@ -250,6 +254,25 @@ def ativar_poder_personagem(
             payload.vinculo_id,
             custo_pm_override=payload.custo_pm,
         )
+    except DadosInvalidos as e:
+        raise HTTPException(status_code=422, detail=e.message)
+    except ArenaBaseException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.message)
+
+
+@router.post(
+    "/{personagem_id}/habilidades-origem/ativar",
+    response_model=TormentaHabilidadeOrigemAtivarResponse,
+    summary="Ativa habilidade da origem e debita o custo oficial de PM",
+)
+def ativar_habilidade_origem_personagem(
+    personagem_id: int,
+    payload: TormentaHabilidadeOrigemAtivarRequest,
+    service: TormentaPersonagemService = Depends(get_tormenta_personagem_service),
+    _: Usuario = Depends(requer_dono_ou_admin_tormenta_personagem),
+):
+    try:
+        return service.ativar_habilidade_origem(personagem_id, payload.habilidade_id)
     except DadosInvalidos as e:
         raise HTTPException(status_code=422, detail=e.message)
     except ArenaBaseException as e:

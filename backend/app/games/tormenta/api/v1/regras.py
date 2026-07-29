@@ -1,5 +1,6 @@
 """HTTP — regras de ficha Tormenta 20 (dados estáticos para o frontend)."""
 
+import json
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -66,6 +67,7 @@ from app.games.tormenta.rules.duende_t20 import (
     opcoes_duende_catalogo,
     rolar_duende_aleatorio,
 )
+from app.games.tormenta.rules.efeitos_ficha_t20 import agregar_efeitos_ficha
 from app.games.tormenta.rules.escolhas_raciais_t20 import escolhas_por_raca
 from app.games.tormenta.rules.itens_superiores_v13_t20 import (
     resumo_itens_superiores_v13,
@@ -151,6 +153,8 @@ from app.games.tormenta.schemas.regras_ficha import (
     TormentaDuendeCalcularRequest,
     TormentaDuendeCalcularResponse,
     TormentaDuendeOpcoesResponse,
+    TormentaEfeitosAgregarRequest,
+    TormentaEfeitosAgregarResponse,
     TormentaEscolhaRacialAscendenciaItem,
     TormentaEscolhaRacialFonteItem,
     TormentaEscolhaRacialMagiaInataItem,
@@ -405,6 +409,68 @@ def obter_regras_origens(
     return TormentaRegrasOrigensResponse(regra_versao=rv, origens=rows)
 
 
+@router.post(
+    "/efeitos/agregar",
+    response_model=TormentaEfeitosAgregarResponse,
+    summary="Agrega bônus/penalidades de origem, poderes e itens na ficha",
+)
+def agregar_efeitos_ficha_api(
+    body: TormentaEfeitosAgregarRequest,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaEfeitosAgregarResponse:
+    agg = agregar_efeitos_ficha(
+        body.ficha_json,
+        poderes_slugs=body.poderes_slugs or None,
+        contexto=body.contexto,
+    )
+    return TormentaEfeitosAgregarResponse(
+        fontes=list(agg.get("fontes") or []),
+        totais=dict(agg.get("totais") or {}),
+        condicionais=list(agg.get("condicionais") or []),
+        ativos=list(agg.get("ativos") or []),
+    )
+
+
+@router.get(
+    "/reliquias",
+    response_model=TormentaCatalogoPaginaResponse,
+    summary="Catálogo de itens mágicos / relíquias (Heróis de Arton)",
+)
+def listar_catalogo_reliquias(
+    q: Optional[str] = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=200),
+    response: Response = None,
+    _: Usuario = Depends(get_usuario_atual),
+) -> TormentaCatalogoPaginaResponse:
+    from pathlib import Path
+
+    path = (
+        Path(__file__).resolve().parents[2] / "data" / "itens_magicos_herois_arton.json"
+    )
+    rows: list[dict] = []
+    if path.is_file():
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for i, row in enumerate(data.get("itens") or [], start=1):
+            if isinstance(row, dict) and row.get("nome"):
+                item = dict(row)
+                item["id"] = i
+                rows.append(item)
+    qn = (q or "").strip().lower()
+    if qn:
+        rows = [r for r in rows if qn in str(r.get("nome", "")).lower()]
+    total = len(rows)
+    s = max(0, int(skip))
+    lim = max(1, min(200, int(limit)))
+    slice_rows = rows[s : s + lim]
+    if response is not None:
+        response.headers["X-Total-Count"] = str(total)
+        response.headers["X-Skip"] = str(s)
+        response.headers["X-Limit"] = str(lim)
+    itens = [TormentaCatalogoItem.model_validate(r) for r in slice_rows]
+    return TormentaCatalogoPaginaResponse(itens=itens, total=total)
+
+
 @router.get(
     "/truques-melhor-amigo",
     response_model=TormentaTruquesMelhorAmigoResponse,
@@ -528,10 +594,14 @@ def listar_catalogo_equipamentos(
     q: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=200),
+    suplemento: Optional[str] = Query(
+        None,
+        description=f"Incluir arsenal HA com '{SUPLEMENTO_HEROIS_ARTON}'.",
+    ),
     response: Response = None,
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaCatalogoPaginaResponse:
-    slice_rows, total = filtrar_equipamentos_mb(q, skip, limit)
+    slice_rows, total = filtrar_equipamentos_mb(q, skip, limit, suplemento)
     if response is not None:
         response.headers["X-Total-Count"] = str(total)
         response.headers["X-Skip"] = str(skip)
@@ -726,10 +796,14 @@ def listar_catalogo_armaduras_protecao(
     q: Optional[str] = None,
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=200),
+    suplemento: Optional[str] = Query(
+        None,
+        description=f"Incluir armaduras HA com '{SUPLEMENTO_HEROIS_ARTON}'.",
+    ),
     response: Response = None,
     _: Usuario = Depends(get_usuario_atual),
 ) -> TormentaArmaduraCatalogoPaginaResponse:
-    slice_rows, total = filtrar_armaduras_protecao_mb(q, skip, limit)
+    slice_rows, total = filtrar_armaduras_protecao_mb(q, skip, limit, suplemento)
     if response is not None:
         response.headers["X-Total-Count"] = str(total)
         response.headers["X-Skip"] = str(skip)

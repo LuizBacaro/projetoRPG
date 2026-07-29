@@ -64,6 +64,10 @@ def lista_poderes_herois_arton() -> List[Dict[str, Any]]:
             item["classe_exigida"] = normalizar_slug_poder_ha(item["classe_exigida"])
         if item.get("raca_exigida"):
             item["raca_exigida"] = normalizar_slug_poder_ha(item["raca_exigida"])
+        if row.get("efeitos"):
+            item["efeitos"] = list(row.get("efeitos") or [])
+        if row.get("requer_aliado_mesmo_poder"):
+            item["requer_aliado_mesmo_poder"] = True
         out.append(item)
     return sorted(out, key=lambda x: x["nome"].lower())
 

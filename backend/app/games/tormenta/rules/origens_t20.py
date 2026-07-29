@@ -125,7 +125,7 @@ def origem_por_slug(slug: str) -> Optional[Dict[str, Any]]:
 
 
 # ---------------------------------------------------------------------------
-# Heróis de Arton — 14 origens especiais
+# Heróis de Arton — origens especiais
 # ---------------------------------------------------------------------------
 
 
@@ -137,7 +137,7 @@ def _documento_herois_arton() -> Dict[str, Any]:
 
 
 def lista_origens_herois_arton() -> List[Dict[str, Any]]:
-    """14 origens especiais do suplemento Heróis de Arton v1.1."""
+    """Origens especiais do suplemento Heróis de Arton v1.1 (benefício fixo)."""
     rows = _documento_herois_arton().get("origens") or []
     out: List[Dict[str, Any]] = []
     for row in rows:
@@ -156,14 +156,39 @@ def lista_origens_herois_arton() -> List[Dict[str, Any]]:
                 ).strip(),
                 "beneficios_pericias": list(row.get("beneficios_pericias") or []),
                 "beneficios_poderes": list(row.get("beneficios_poderes") or []),
+                "poderes_escolher": row.get("poderes_escolher"),
                 "poder_unico": row.get("poder_unico"),
-                "itens": [],
-                "itens_escolha": None,
+                "itens": list(row.get("itens") or []),
+                "itens_escolha": row.get("itens_escolha"),
                 "troca_pericia_treinada": bool(row.get("troca_pericia_treinada")),
+                "beneficio_fixo": bool(row.get("beneficio_fixo")),
                 "notas": str(row.get("notas") or "").strip(),
+                "efeitos": list(row.get("efeitos") or []),
+                "habilidades_ativas": list(row.get("habilidades_ativas") or []),
             }
         )
     return sorted(out, key=lambda x: x["nome"].lower())
+
+
+def habilidade_ativa_origem(
+    slug_origem: str, habilidade_id: str
+) -> Optional[Dict[str, Any]]:
+    """Resolve uma habilidade acionável diretamente no catálogo da origem."""
+    origem = origem_por_slug(slug_origem)
+    alvo = str(habilidade_id or "").strip().lower()
+    if not origem or not alvo:
+        return None
+    for raw in origem.get("habilidades_ativas") or []:
+        if not isinstance(raw, dict):
+            continue
+        if str(raw.get("id") or "").strip().lower() != alvo:
+            continue
+        habilidade = dict(raw)
+        habilidade["origem_slug"] = str(origem.get("slug") or slug_origem)
+        habilidade["origem_nome"] = str(origem.get("nome") or slug_origem)
+        habilidade["pagina"] = int(origem.get("pagina") or 0)
+        return habilidade
+    return None
 
 
 def lista_origens_com_suplemento(
@@ -175,16 +200,98 @@ def lista_origens_com_suplemento(
     origens = lista_origens_v13()
     if suplemento and str(suplemento).strip().lower() == SUPLEMENTO_HEROIS_ARTON:
         origens = origens + lista_origens_herois_arton()
-    return origens
+    return sorted(origens, key=lambda x: str(x.get("nome") or "").lower())
+
+
+def origem_tem_beneficio_fixo(slug_origem: str) -> bool:
+    """Origens de Heróis de Arton concedem um benefício único, sem escolha de 2."""
+    orig = origem_por_slug(slug_origem)
+    return bool(orig and orig.get("beneficio_fixo"))
+
+
+def _qtd_poderes_escolher(orig: Dict[str, Any]) -> int:
+    poderes = list(orig.get("beneficios_poderes") or [])
+    bruto = orig.get("poderes_escolher")
+    if bruto is None:
+        return len(poderes)
+    try:
+        return max(0, min(len(poderes), int(bruto)))
+    except (TypeError, ValueError):
+        return len(poderes)
+
+
+def beneficios_fixos_origem(slug_origem: str) -> List[str]:
+    """Benefícios concedidos automaticamente por uma origem de benefício fixo."""
+    orig = origem_por_slug(slug_origem)
+    if not orig or not orig.get("beneficio_fixo"):
+        return []
+    out = [f"pericia:{p}" for p in orig.get("beneficios_pericias") or []]
+    poderes = list(orig.get("beneficios_poderes") or [])
+    if poderes and _qtd_poderes_escolher(orig) == len(poderes):
+        out.extend(f"poder:{p}" for p in poderes)
+    return out
+
+
+def normalizar_beneficios_origem(slug_origem: str, beneficios: Any) -> List[str]:
+    """Completa `origem_beneficios` com os benefícios automáticos da origem fixa."""
+    atuais = [
+        str(b or "").strip().lower()
+        for b in (beneficios if isinstance(beneficios, list) else [])
+        if str(b or "").strip()
+    ]
+    if not origem_tem_beneficio_fixo(slug_origem):
+        return atuais
+    out = list(beneficios_fixos_origem(slug_origem))
+    vistos = set(out)
+    orig = origem_por_slug(slug_origem) or {}
+    opcionais = {f"poder:{p}" for p in orig.get("beneficios_poderes") or []}
+    limite = _qtd_poderes_escolher(orig)
+    escolhidos = 0
+    for b in atuais:
+        if b in vistos or b not in opcionais or escolhidos >= limite:
+            continue
+        out.append(b)
+        vistos.add(b)
+        escolhidos += 1
+    return out
+
+
+def _validar_beneficios_origem_fixa(
+    orig: Dict[str, Any], beneficios: List[str]
+) -> tuple[bool, str]:
+    nome = str(orig.get("nome") or "").strip() or "Origem"
+    informados = {str(b or "").strip().lower() for b in beneficios}
+    obrigatorios = set(beneficios_fixos_origem(str(orig.get("slug") or "")))
+    faltando = obrigatorios - informados
+    if faltando:
+        return False, f"{nome}: benefícios automáticos ausentes: {sorted(faltando)}."
+    poderes = list(orig.get("beneficios_poderes") or [])
+    limite = _qtd_poderes_escolher(orig)
+    pool_opcional = {f"poder:{p}" for p in poderes} - obrigatorios
+    escolhidos = informados & pool_opcional
+    if pool_opcional and len(escolhidos) != limite:
+        return (
+            False,
+            f"{nome}: escolha exatamente {limite} poder(es) entre {sorted(pool_opcional)}.",
+        )
+    desconhecidos = informados - obrigatorios - pool_opcional
+    if desconhecidos:
+        return (
+            False,
+            f"{nome}: benefício inválido para a origem: {sorted(desconhecidos)[0]}",
+        )
+    return True, ""
 
 
 def validar_beneficios_origem(
     slug_origem: str, beneficios: List[str]
 ) -> tuple[bool, str]:
-    """Valida exatamente 2 benefícios no formato pericia:slug ou poder:slug."""
+    """Valida os benefícios da origem (2 escolhas no core; conjunto fixo em HA)."""
     orig = origem_por_slug(slug_origem)
     if not orig:
         return False, "Origem desconhecida."
+    if orig.get("beneficio_fixo"):
+        return _validar_beneficios_origem_fixa(orig, beneficios)
     if len(beneficios) != 2:
         return False, "Escolha exatamente 2 benefícios da origem."
     per_pool = {f"pericia:{p}" for p in orig.get("beneficios_pericias") or []}
@@ -467,6 +574,11 @@ def sincronizar_pericias_origem_ficha_json(
     fj = dict(ficha_json or {})
     if regra_versao_de_ficha(fj) != REGRA_VERSAO_V13:
         return fj
+    slug_origem_atual = str(fj.get("origem_slug") or "").strip().lower()
+    if origem_tem_beneficio_fixo(slug_origem_atual):
+        fj["origem_beneficios"] = normalizar_beneficios_origem(
+            slug_origem_atual, fj.get("origem_beneficios")
+        )
     beneficios = fj.get("origem_beneficios")
     if not slugs_pericias_de_beneficios_origem(beneficios):
         return fj

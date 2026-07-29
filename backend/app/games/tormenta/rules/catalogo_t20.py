@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _EQUIP_JSON = _DATA_DIR / "equipamentos_mb_catalogo.json"
+_EQUIP_HA_JSON = _DATA_DIR / "equipamentos_herois_arton.json"
 _TALENT_JSON = _DATA_DIR / "talentos_mb_catalogo.json"
 _MAGIAS_JSON = _DATA_DIR / "magias_mb_catalogo.json"
 _MAGIAS_ALIASES_MB_V13 = _DATA_DIR / "magias_mb_v13_slug_aliases.json"
@@ -136,6 +137,42 @@ def _enriquecer_equipamento_v13(item: Dict[str, Any]) -> Dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
+def _carregar_equipamentos_ha() -> List[Dict[str, Any]]:
+    if not _EQUIP_HA_JSON.is_file():
+        return []
+    data = json.loads(_EQUIP_HA_JSON.read_text(encoding="utf-8"))
+    rows = data.get("itens") or []
+    out: List[Dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        nome = str(row.get("nome", "")).strip()
+        if not nome:
+            continue
+        item = dict(row)
+        item["nome"] = nome
+        item.setdefault("fonte_catalogo", "herois_arton")
+        out.append(_enriquecer_equipamento_v13(item))
+    return out
+
+
+def lista_equipamentos_com_suplemento(
+    suplemento: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTO_HEROIS_ARTON
+
+    rows = lista_equipamentos_mb_catalogo()
+    if suplemento and str(suplemento).strip().lower() == SUPLEMENTO_HEROIS_ARTON:
+        seen = {_norm_nome_catalogo(r.get("nome", "")) for r in rows}
+        for ha in _carregar_equipamentos_ha():
+            ch = _norm_nome_catalogo(ha.get("nome", ""))
+            if ch and ch not in seen:
+                rows.append(ha)
+                seen.add(ch)
+    return rows
+
+
+@lru_cache(maxsize=1)
 def _carregar_equipamentos() -> List[Dict[str, Any]]:
     if not _EQUIP_JSON.is_file():
         return []
@@ -230,9 +267,9 @@ def lista_equipamentos_mb_catalogo() -> List[Dict[str, Any]]:
 
 
 def filtrar_equipamentos_mb(
-    q: str | None, skip: int, limit: int
+    q: str | None, skip: int, limit: int, suplemento: str | None = None
 ) -> Tuple[List[Dict[str, Any]], int]:
-    rows = [dict(r) for r in lista_equipamentos_mb_catalogo()]
+    rows = [dict(r) for r in lista_equipamentos_com_suplemento(suplemento)]
     qn = (q or "").strip().lower()
     if qn:
         filtrados = [r for r in rows if qn in str(r.get("nome", "")).lower()]

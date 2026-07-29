@@ -336,6 +336,12 @@ class TormentaOrigemV13Item(BaseModel):
     )
     beneficios_pericias: List[str] = Field(default_factory=list)
     beneficios_poderes: List[str] = Field(default_factory=list)
+    poderes_escolher: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=10,
+        description="Quantos poderes escolher da lista; None = todos automáticos.",
+    )
     poder_unico: Optional[str] = Field(default=None, max_length=60)
     itens: List[str] = Field(default_factory=list)
     itens_escolha: Optional[Dict[str, Any]] = Field(default=None)
@@ -343,7 +349,35 @@ class TormentaOrigemV13Item(BaseModel):
         default=False,
         description="Se perícia já treinada pode ser trocada por outra de classe (Heróis de Arton).",
     )
+    beneficio_fixo: bool = Field(
+        default=False,
+        description="Origem de benefício único (Heróis de Arton): sem 'escolha 2'.",
+    )
     notas: str = Field(default="", max_length=500)
+    efeitos: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Modificadores estruturados aplicados ao selecionar a origem.",
+    )
+    habilidades_ativas: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Habilidades ativas (gasto PM / 1× cena) — metadado para UI.",
+    )
+
+
+class TormentaEfeitosAgregarRequest(BaseModel):
+    ficha_json: Dict[str, Any] = Field(default_factory=dict)
+    poderes_slugs: List[str] = Field(default_factory=list, max_length=80)
+    contexto: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Flags de contexto (em_cidade, conduzindo_veiculo, etc.).",
+    )
+
+
+class TormentaEfeitosAgregarResponse(BaseModel):
+    fontes: List[Dict[str, Any]] = Field(default_factory=list)
+    totais: Dict[str, Any] = Field(default_factory=dict)
+    condicionais: List[Dict[str, Any]] = Field(default_factory=list)
+    ativos: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class TormentaKitInicialV13Opcoes(BaseModel):

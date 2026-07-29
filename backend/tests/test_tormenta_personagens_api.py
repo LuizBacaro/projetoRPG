@@ -147,6 +147,64 @@ def test_criar_mago_mb_preenche_pontos_de_magia(tormenta_personagens_db):
     assert body["pa_atual"] == 5
 
 
+def test_ativar_habilidade_origem_debita_pm_do_catalogo(
+    tormenta_personagens_db,
+):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    criado = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_json(
+            nome="Cirurgião",
+            nivel=1,
+            pv_max=10,
+            pa_max=5,
+            pa_atual=5,
+            ficha_json={"origem_slug": "cirurgiao_barbeiro"},
+        ),
+    )
+    assert criado.status_code == 201, criado.text
+    rid = criado.json()["id"]
+
+    resposta = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/habilidades-origem/ativar",
+        json={"habilidade_id": "remover_condicao"},
+    )
+    assert resposta.status_code == 200, resposta.text
+    body = resposta.json()
+    assert body["nome"] == "Remover condição"
+    assert body["custo_pm"] == 2
+    assert body["pa_atual_antes"] == 5
+    assert body["pa_atual_depois"] == 3
+
+
+def test_ativar_habilidade_rejeita_habilidade_de_outra_origem(
+    tormenta_personagens_db,
+):
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    criado = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_json(
+            nome="Brigão",
+            nivel=1,
+            pv_max=10,
+            pa_max=5,
+            pa_atual=5,
+            ficha_json={"origem_slug": "cao_de_briga"},
+        ),
+    )
+    assert criado.status_code == 201, criado.text
+    rid = criado.json()["id"]
+
+    resposta = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/habilidades-origem/ativar",
+        json={"habilidade_id": "remover_condicao"},
+    )
+    assert resposta.status_code == 422
+    assert "não pertence" in resposta.json()["detail"]
+
+
 def test_patch_mago_mb_sobe_nivel_atualiza_pm(tormenta_personagens_db):
     """PATCH nível + atributos mantém PM MB alinhado ao livro."""
     SessionLocal, u1, *_ = tormenta_personagens_db

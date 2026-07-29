@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha Tormenta 20 — Arena TTRPG</title>
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-tema.css?v=20260511outlineRed" />
-    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260728usosCanon" />
+    <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha.css?v=20260729habilidadesOrigem" />
     <link rel="stylesheet" href="/games/tormenta/css/tormenta-ficha-dnd-parity.css?v=20260728oficio1ln" />
 </head>
 <body class="tormenta-ficha-body">
@@ -154,6 +154,22 @@
                         </button>
                     </div>
                 </div>
+                <details id="t20FontesBonusDetails" class="t20-fontes-details ficha-secao--so-completa" style="margin-top:0.45rem">
+                    <summary class="t20-fontes-summary">Fontes de bônus e penalidades</summary>
+                    <div id="t20FontesBonusHost" class="t20-fontes-host" aria-live="polite"></div>
+                </details>
+                <section id="t20HabilidadesOrigemWrap" class="t20-habilidades-origem t20-ficha-secao--so-completa" hidden aria-labelledby="t20HabilidadesOrigemTitulo">
+                    <div class="t20-habilidades-origem__cabecalho">
+                        <div>
+                            <span class="t20-habilidades-origem__sobretitulo">Origem</span>
+                            <h3 id="t20HabilidadesOrigemTitulo">Habilidades acionáveis</h3>
+                        </div>
+                        <button type="button" id="t20HabilidadesOrigemNovaCena" class="tormenta-btn t20-habilidades-origem__nova-cena" title="Libera habilidades limitadas a uma vez por cena">
+                            Nova cena
+                        </button>
+                    </div>
+                    <div id="t20HabilidadesOrigemHost" class="t20-habilidades-origem__lista" aria-live="polite"></div>
+                </section>
                 <div id="t20FichaCondMesaWrap" class="ficha-secao t20-ficha-cond-mesa-wrap" hidden>
                     <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">⚔️ Condições (mesa)</h3>
                     <div id="t20FichaCondMesaBody" class="t20-ficha-cond-mesa-body" aria-live="polite"></div>
@@ -177,6 +193,14 @@
                     </div>
                     <p class="t20-hint" style="margin:0 0 0.35rem;font-size:0.68rem">Inventário geral. Armadura/escudo nesta lista <strong>não somam Defesa</strong> — use também <strong>Armadura/Item de Proteção</strong>.</p>
                     <div id="fichaEquipamentos" class="ficha-equipamentos-lista t20-dnd-drop-zone" data-dnd-accept="equip"><span class="ficha-vazio">Nenhum equipamento cadastrado</span></div>
+                </div>
+                <div class="ficha-secao t20-ficha-secao t20-ficha-secao--so-completa" style="margin-top:0.65rem">
+                    <div class="ficha-secao-header">
+                        <h3 class="ficha-secao-titulo t20-ficha-secao-titulo">Relíquias</h3>
+                        <button type="button" class="ficha-btn-adicionar tormenta-btn tormenta-btn--primary" id="btnAdicionarReliquia" title="Adicionar relíquia (itens mágicos HA)">➕ Adicionar</button>
+                    </div>
+                    <p class="t20-hint" style="margin:0 0 0.35rem;font-size:0.68rem">Itens mágicos e artefatos do Arsenal dos Heróis — separados do inventário mundano.</p>
+                    <div id="fichaReliquias" class="ficha-equipamentos-lista t20-reliquias-lista"><span class="ficha-vazio">Nenhuma relíquia cadastrada</span></div>
                 </div>
                 <div class="ficha-secao t20-ficha-secao t20-ficha-secao--so-completa" style="margin-top:0.65rem">
                     <div class="ficha-secao-header">
@@ -944,6 +968,7 @@
                             </div>
                             <div class="t20-ficha-field t20-ficha-field--wide" id="wrapOrigemBeneficios" style="display: none">
                                 <div id="t20OrigemBeneficiosHost"></div>
+                                <div id="t20OrigemEfeitosPreview" hidden></div>
                                 <div id="fOrigemTrocasHost" class="t20-ficha-field t20-ficha-field--wide" style="display: none; margin-top: 0.35rem"></div>
                                 <div id="t20OrigemItensEscolhaHost" style="display: none; margin-top: 0.35rem"></div>
                                 <p id="t20OrigemItensLista" class="t20-hint" style="margin: 0.35rem 0 0"></p>
@@ -1804,7 +1829,7 @@
 </script>
 <script src="/games/tormenta/js/services/TormentaCampanhaService.js?v=20260707solic"></script>
 <script src="/games/tormenta/js/t20-ficha-campanha-solicitacao.js?v=20260710solic"></script>
-<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260726ameaca"></script>
+<script src="/games/tormenta/js/services/TormentaPersonagemService.js?v=20260729habilidadesOrigem"></script>
 <script src="/games/tormenta/js/t20-ameaca-bloco.js?v=20260726ameaca2"></script>
 <script src="/games/tormenta/js/t20-regra-versao.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-atributos-geracao.js?v=20260707v13attr"></script>
@@ -1826,6 +1851,9 @@
 <script src="/games/tormenta/js/t20-rolagem-contextual.js?v=20260728itensPer"></script>
 <script src="/games/tormenta/js/t20-percepcao-passiva.js?v=20260710c"></script>
 <script src="/games/tormenta/js/t20-breakdown-ficha.js?v=20260728itensPer"></script>
+<script src="/games/tormenta/js/t20-habilidades-origem.js?v=20260729habilidadesOrigem"></script>
+<script src="/games/tormenta/js/t20-efeitos-ficha.js?v=20260729habilidadesOrigem"></script>
+<script src="/games/tormenta/js/t20-reliquias-ficha.js?v=20260729ha"></script>
 <script src="/games/tormenta/js/t20-compendium-dnd.js?v=20260710f"></script>
 <script src="/games/tormenta/js/t20-progressao-pv.js?v=20260725prod503"></script>
 <script src="/games/tormenta/js/t20-classes-variantes-v13.js?v=20260704ha3"></script>
@@ -1836,7 +1864,7 @@
 <script src="/games/tormenta/js/t20-pericias-orcamento.js?v=20260707v13attr"></script>
 <script src="/games/tormenta/js/t20-pericias-classe.js?v=20260629"></script>
 <script src="/games/tormenta/js/t20-poderes-v13.js?v=20260704ha"></script>
-<script src="/games/tormenta/js/t20-origens-v13.js?v=20260725origemLabel"></script>
+<script src="/games/tormenta/js/t20-origens-v13.js?v=20260729haLabel"></script>
 <script src="/games/tormenta/js/t20-origem-trocas-ficha-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-melhor-amigo-v13.js?v=20260704"></script>
 <script src="/games/tormenta/js/t20-duende-v13.js?v=20260704trocas"></script>
@@ -2578,6 +2606,9 @@
                 history.replaceState(null, '', `ficha-personagem.html?id=${criado.id}`);
                 if (!fecharDialog) Toast.success('Ficha criada.');
             }
+            window.__t20OrigemPersistidaSlug = String(
+                (body.ficha_json && body.ficha_json.origem_slug) || ''
+            ).trim().toLowerCase();
             if (cadastroDashboardOrigem) {
                 travaRacaClasseMb = true;
                 aplicarTravaRacaClasseMb();
@@ -5312,6 +5343,10 @@
         try {
             if (st) st.textContent = 'Carregando…';
             const params = { q: query || '', skip: _catalogoSkip, limit: _catalogoLimit };
+            if (_catalogoMode !== 'talento' && typeof t20GetSuplementoFichaAtivo === 'function') {
+                const sup = t20GetSuplementoFichaAtivo();
+                if (sup) params.suplemento = sup;
+            }
             const listParams =
                 _catalogoMode === 'talento' && window.T20PoderesV13 && window.T20PoderesV13.paramsCatalogoPoderes
                     ? window.T20PoderesV13.paramsCatalogoPoderes(params)
@@ -7832,6 +7867,10 @@
             dinheiro: { ...t20DinheiroParaJson() },
             carga: t20CargaParaJson(),
             armaduras_protecao: t20ArmadurasEquipadas,
+            reliquias:
+                window.T20ReliquiasFicha && typeof window.T20ReliquiasFicha.lerLista === 'function'
+                    ? window.T20ReliquiasFicha.lerLista()
+                    : [],
             idiomas: q('f_idiomas').value,
             campanha: __t20CampanhaNomeFicha || '',
             mestre: q('f_mestre').value,
@@ -7925,6 +7964,9 @@
         const d = j.dinheiro || {};
         t20AplicarDinheiroDoJson(d, j.carga || {});
         t20ArmadurasEquipadas = Array.isArray(j.armaduras_protecao) ? j.armaduras_protecao.slice() : [];
+        if (window.T20ReliquiasFicha && typeof window.T20ReliquiasFicha.aplicarLista === 'function') {
+            window.T20ReliquiasFicha.aplicarLista(j.reliquias);
+        }
         renderT20ArmadurasLista();
         q('f_idiomas').value = j.idiomas || '';
         renderIdiomasListaDoCampo();
@@ -7976,6 +8018,10 @@
         t20AtualizarResumoBotaoXpMb();
         if (window.T20AmeacaBloco && typeof window.T20AmeacaBloco.aplicarPayload === 'function') {
             window.T20AmeacaBloco.aplicarPayload(j);
+        }
+        document.dispatchEvent(new CustomEvent('t20:ficha-aplicada'));
+        if (window.T20EfeitosFicha && window.T20EfeitosFicha.atualizarDebounced) {
+            window.T20EfeitosFicha.atualizarDebounced();
         }
     }
 
@@ -8282,6 +8328,8 @@
             foto_url: (q('f_foto_url').value || '').trim() || null,
         };
     }
+    // Contrato mínimo para módulos externos de regras; evita expor o payload HTTP completo.
+    window.t20MontarFichaJsonEfeitos = () => extrairFichaJson();
 
     function preencherForm(p) {
         _t20RdLegado = p.rd != null && p.rd !== undefined ? String(p.rd) : '';
@@ -8335,6 +8383,7 @@
         t20SetResTotalSpan('fichaVont', p.von_total != null ? p.von_total : 0);
         aplicarFotoUrl(p.foto_url || '');
         const fj = p.ficha_json || {};
+        window.__t20OrigemPersistidaSlug = String(fj.origem_slug || '').trim().toLowerCase();
         cadastroDashboardOrigem = fj.cadastro_dashboard === true;
         forcarTravarNoProximoExtrair = false;
         travaRacaClasseMb = fj.travar_raca_classe_mb === true;
