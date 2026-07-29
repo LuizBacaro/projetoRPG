@@ -1,5 +1,5 @@
 {
-    "_meta": {
+  "_meta": {
     "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.16–21, p.56–77, p.78–95",
     "nota": "Catálogo HA-4: 20 poderes Treinador + raça/classe. Não reproduz texto longo."
   },
@@ -253,6 +253,410 @@
       "custo_pm": 2,
       "descricao_resumo": "Guerreiro: arremessa escudo como ataque à distância (2 PM).",
       "pagina_referencia": "HA p.68"
+    },
+    {
+      "slug": "precisao_letal",
+      "nome": "Precisão Letal",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79",
+      "prerequisitos": "11º nível",
+      "descricao_resumo": "Margem de ameaça +1.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "prec_ameaca",
+          "alvo": "margem_ameaca",
+          "op": "soma",
+          "valor": 1,
+          "quando": "sempre",
+          "rotulo": "Precisão Letal — margem ameaça +1",
+          "pagina": 79
+        }
+      ]
+    },
+    {
+      "slug": "defesa_armada",
+      "nome": "Defesa Armada",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79",
+      "prerequisitos": "Estilo de Duas Mãos",
+      "descricao_resumo": "Arma 2 mãos: +2 Defesa e Fortitude.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "da_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "arma_duas_maos",
+          "rotulo": "Defesa Armada — +2 Defesa (arma 2 mãos)",
+          "pagina": 79
+        },
+        {
+          "id": "da_fort",
+          "alvo": "resistencia",
+          "resistencia": "fortitude",
+          "op": "soma",
+          "valor": 2,
+          "quando": "arma_duas_maos",
+          "rotulo": "Defesa Armada — +2 Fortitude",
+          "pagina": 79
+        }
+      ]
+    },
+    {
+      "slug": "bravura_indomita",
+      "nome": "Bravura Indômita",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.78",
+      "prerequisitos": "Vontade",
+      "descricao_resumo": "Adjacente a ≥2 inimigos: +2 ataque e margem.",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "coragem_aguerida",
+      "nome": "Coragem Aguerrida",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79",
+      "prerequisitos": "Vontade",
+      "descricao_resumo": "≤½ PV: +2 perícias e Defesa.",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "mobilidade",
+      "nome": "Mobilidade",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79",
+      "prerequisitos": "Esquiva",
+      "descricao_resumo": "Movimentar ≥6 m: +2 ataque e Defesa.",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "escudo_heroico_geral",
+      "nome": "Escudo Heroico",
+      "categoria_v13": "combate",
+      "custo_pm": 1,
+      "pagina_referencia": "HA p.79",
+      "prerequisitos": "Ataque com Escudo",
+      "descricao_resumo": "Empunhar/soltar escudo ação livre; arremesso.",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "grandao",
+      "nome": "Grandão",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80",
+      "prerequisitos": "Con 2",
+      "descricao_resumo": "Conta 1 tamanho maior; carga +5.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "grand_carga",
+          "alvo": "carga_espacos",
+          "op": "soma",
+          "valor": 5,
+          "quando": "sempre",
+          "rotulo": "Grandão — carga +5 espaços",
+          "pagina": 80
+        }
+      ]
+    },
+    {
+      "slug": "heroi_sete_instrumentos",
+      "nome": "Herói dos Sete Instrumentos",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.81",
+      "descricao_resumo": "+1 em perícias não treinadas (escala com instrumentos).",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "foco_habilidade",
+      "nome": "Foco em Habilidade",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80",
+      "descricao_resumo": "CD de 1 habilidade +2 (não magias).",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "pose_assustadora",
+      "nome": "Pose Assustadora",
+      "categoria_v13": "destino",
+      "custo_pm": 1,
+      "pagina_referencia": "HA p.81",
+      "prerequisitos": "Car 1, Intimidação",
+      "descricao_resumo": "+2 Intimidação; 1 PM assustar.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "pose_int",
+          "alvo": "pericia",
+          "pericia_slug": "intimidacao",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Pose Assustadora — +2 Intimidação",
+          "pagina": 81
+        }
+      ]
+    },
+    {
+      "slug": "andarilho_urbano",
+      "nome": "Andarilho Urbano",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80",
+      "descricao_resumo": "Em cidade: +2 Defesa, Enganação, Investigação.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "au_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "em_cidade",
+          "rotulo": "Andarilho Urbano — +2 Defesa (em cidade)",
+          "pagina": 80
+        }
+      ]
+    },
+    {
+      "slug": "bolsoes_insanos",
+      "nome": "Bolsões Insanos",
+      "categoria_v13": "tormenta",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83",
+      "descricao_resumo": "Carga +2; +5 Ladinagem ocultar nesses espaços.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "bols_carga",
+          "alvo": "carga_espacos",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Bolsões Insanos — carga +2",
+          "pagina": 83
+        }
+      ]
+    },
+    {
+      "slug": "carapaca_corrompida",
+      "nome": "Carapaça Corrompida",
+      "categoria_v13": "tormenta",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83",
+      "prerequisitos": "Carapaça",
+      "descricao_resumo": "RD 1 (+1 por outros poderes Tormenta).",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "carap_rd",
+          "alvo": "rd",
+          "rd_tipo": "todos",
+          "op": "soma",
+          "valor": 1,
+          "quando": "sempre",
+          "rotulo": "Carapaça Corrompida — RD 1",
+          "pagina": 83
+        }
+      ]
+    },
+    {
+      "slug": "simetria_radial",
+      "nome": "Simetria Radial",
+      "categoria_v13": "tormenta",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83",
+      "prerequisitos": "4 poderes Tormenta",
+      "descricao_resumo": "Não flanqueado/caído; +5 vs agarrar.",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "arquearia_elfica",
+      "nome": "Arquearia Élfica",
+      "categoria_v13": "raca",
+      "raca_exigida": "elfo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "descricao_resumo": "Arcos = simples; +2 dano com arcos.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "arc_elf_dano",
+          "alvo": "dano",
+          "op": "soma",
+          "valor": 2,
+          "quando": "condicional",
+          "condicao": "arco",
+          "rotulo": "Arquearia Élfica — +2 dano arcos",
+          "pagina": 84
+        }
+      ]
+    },
+    {
+      "slug": "asas_de_aco",
+      "nome": "Asas de Aço",
+      "categoria_v13": "raca",
+      "raca_exigida": "suraggel",
+      "custo_pm": 1,
+      "pagina_referencia": "HA p.85",
+      "descricao_resumo": "+2 Defesa; asas como arma; ataque extra 1 PM.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "asas_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Asas de Aço — +2 Defesa",
+          "pagina": 85
+        }
+      ]
+    },
+    {
+      "slug": "coracao_de_pedra",
+      "nome": "Coração de Pedra",
+      "categoria_v13": "raca",
+      "raca_exigida": "anao",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "descricao_resumo": "+1 PV/nível; imune petrificação.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "cor_ped_pv",
+          "alvo": "pv_max",
+          "op": "soma",
+          "valor": 1,
+          "quando": "sempre",
+          "rotulo": "Coração de Pedra — +1 PV/nível (fixo +1 aqui)",
+          "pagina": 86
+        }
+      ]
+    },
+    {
+      "slug": "citadino",
+      "nome": "Citadino",
+      "categoria_v13": "raca",
+      "raca_exigida": "humano",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "descricao_resumo": "+2 perícias Carisma (exceto Adestramento).",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "atracao_polvora",
+      "nome": "Atração pela Pólvora",
+      "categoria_v13": "raca",
+      "raca_exigida": "humano",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.85",
+      "descricao_resumo": "+1 ataque / +2 dano armas de fogo.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "polv_atq",
+          "alvo": "ataque",
+          "op": "soma",
+          "valor": 1,
+          "quando": "condicional",
+          "condicao": "arma fogo",
+          "rotulo": "Atração Pólvora — +1 ataque (fogo)",
+          "pagina": 85
+        },
+        {
+          "id": "polv_dano",
+          "alvo": "dano",
+          "op": "soma",
+          "valor": 2,
+          "quando": "condicional",
+          "condicao": "arma fogo",
+          "rotulo": "Atração Pólvora — +2 dano (fogo)",
+          "pagina": 85
+        }
+      ]
+    },
+    {
+      "slug": "parede_de_escudos",
+      "nome": "Parede de Escudos",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.94",
+      "descricao_resumo": "Escudos adjacentes: +5 Defesa, RD 5.",
+      "fonte_catalogo": "herois_arton",
+      "requer_aliado_mesmo_poder": true
+    },
+    {
+      "slug": "saude_coletiva",
+      "nome": "Saúde Coletiva",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.95",
+      "descricao_resumo": "Cura em aliado com poder: +2 PV/dado.",
+      "fonte_catalogo": "herois_arton",
+      "requer_aliado_mesmo_poder": true
+    },
+    {
+      "slug": "defesa_do_martir",
+      "nome": "Defesa do Mártir",
+      "categoria_v13": "grupo",
+      "custo_pm": 2,
+      "pagina_referencia": "HA p.94",
+      "descricao_resumo": "1×/rod sofrer dano no lugar de aliado.",
+      "fonte_catalogo": "herois_arton",
+      "requer_aliado_mesmo_poder": true
+    },
+    {
+      "slug": "pancada_estonteante",
+      "nome": "Pancada Estonteante",
+      "categoria_v13": "classe",
+      "classe_exigida": "guerreiro",
+      "custo_pm": 2,
+      "pagina_referencia": "HA p.68",
+      "prerequisitos": "Luta",
+      "descricao_resumo": "2 PM + impacto → desprevenido 1 rodada.",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "arma_juramentada",
+      "nome": "Arma Juramentada",
+      "categoria_v13": "classe",
+      "classe_exigida": "paladino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "prerequisitos": "Devoto",
+      "descricao_resumo": "Arma preferida recebe melhoria mágica.",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "senescal",
+      "nome": "Senescal",
+      "categoria_v13": "classe",
+      "classe_exigida": "nobre",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "prerequisitos": "5º nível nobre",
+      "descricao_resumo": "+1/patamar em testes de domínio/negócio.",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "ordens_agressivas",
+      "nome": "Ordens Agressivas",
+      "categoria_v13": "classe",
+      "classe_exigida": "cavaleiro",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "descricao_resumo": "Gritar Ordens soma bônus no 1º dano dos aliados.",
+      "fonte_catalogo": "herois_arton"
     }
   ]
 }

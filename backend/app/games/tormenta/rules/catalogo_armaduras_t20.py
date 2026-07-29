@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Tuple
 
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _ARM_JSON = _DATA_DIR / "armaduras_protecao_catalogo.json"
+_EQUIP_HA_JSON = _DATA_DIR / "equipamentos_herois_arton.json"
 
 
 @lru_cache(maxsize=1)
@@ -46,14 +47,44 @@ def _carregar_armaduras() -> List[Dict[str, Any]]:
     return out
 
 
-def lista_armaduras_protecao_catalogo() -> List[Dict[str, Any]]:
-    return list(_carregar_armaduras())
+def lista_armaduras_protecao_catalogo(
+    suplemento: str | None = None,
+) -> List[Dict[str, Any]]:
+    rows = list(_carregar_armaduras())
+    from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTO_HEROIS_ARTON
+
+    if suplemento and str(suplemento).strip().lower() == SUPLEMENTO_HEROIS_ARTON:
+        if _EQUIP_HA_JSON.is_file():
+            data = json.loads(_EQUIP_HA_JSON.read_text(encoding="utf-8"))
+            seen = {str(r.get("nome", "")).strip().lower() for r in rows}
+            for row in data.get("itens") or []:
+                if not isinstance(row, dict):
+                    continue
+                if str(row.get("categoria") or "").lower() not in (
+                    "armadura",
+                    "escudo",
+                ):
+                    continue
+                nome = str(row.get("nome", "")).strip()
+                if not nome or nome.lower() in seen:
+                    continue
+                rows.append(
+                    {
+                        "nome": nome,
+                        "tipo": str(row.get("tipo", "") or "").strip() or "",
+                        "bonus_ca": int(row.get("bonus_ca", 0) or 0),
+                        "penalidade": int(row.get("penalidade", 0) or 0),
+                        "fonte_catalogo": "herois_arton",
+                    }
+                )
+                seen.add(nome.lower())
+    return rows
 
 
 def filtrar_armaduras_protecao_mb(
-    q: str | None, skip: int, limit: int
+    q: str | None, skip: int, limit: int, suplemento: str | None = None
 ) -> Tuple[List[Dict[str, Any]], int]:
-    rows = [dict(r) for r in lista_armaduras_protecao_catalogo()]
+    rows = [dict(r) for r in lista_armaduras_protecao_catalogo(suplemento)]
     qn = (q or "").strip().lower()
     if qn:
         rows = [

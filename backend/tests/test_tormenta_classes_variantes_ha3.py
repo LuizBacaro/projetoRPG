@@ -15,9 +15,12 @@ from app.games.tormenta.rules.classes_t20 import (
     validar_compatibilidade_classes_v13,
 )
 from app.games.tormenta.rules.origens_t20 import (
+    beneficios_fixos_origem,
     lista_origens_com_suplemento,
     lista_origens_herois_arton,
+    normalizar_beneficios_origem,
     origem_por_slug,
+    sincronizar_pericias_origem_ficha_json,
     validar_beneficios_origem,
 )
 from app.games.tormenta.rules.regra_versao_t20 import SUPLEMENTO_HEROIS_ARTON
@@ -90,16 +93,18 @@ def test_validar_compatibilidade_ficha_multiclasse() -> None:
     assert err is not None
 
 
-def test_origens_herois_arton_quatorze() -> None:
+def test_origens_herois_arton_catalogo() -> None:
     rows = lista_origens_herois_arton()
-    assert len(rows) == 14
+    assert len(rows) == 30
     assert all(r["fonte_catalogo"] == SUPLEMENTO_HEROIS_ARTON for r in rows)
+    # Origens especiais concedem um benefício único, sem "escolha 2".
+    assert all(r["beneficio_fixo"] is True for r in rows)
 
 
 def test_origens_com_suplemento_mescla() -> None:
     core = lista_origens_com_suplemento()
     ha = lista_origens_com_suplemento(SUPLEMENTO_HEROIS_ARTON)
-    assert len(ha) == len(core) + 14
+    assert len(ha) == len(core) + 30
 
 
 def test_origem_por_slug_bacharel() -> None:
@@ -110,9 +115,57 @@ def test_origem_por_slug_bacharel() -> None:
 
 
 def test_validar_beneficios_origem_herois() -> None:
+    # Bacharel treina Conhecimento, Diplomacia e Nobreza automaticamente (p. 48).
+    fixos = beneficios_fixos_origem("bacharel")
+    assert fixos == ["pericia:conhecimento", "pericia:diplomacia", "pericia:nobreza"]
+    ok, _ = validar_beneficios_origem("bacharel", fixos)
+    assert ok is True
+
+
+def test_origem_fixa_rejeita_beneficio_parcial() -> None:
+    ok, motivo = validar_beneficios_origem("bacharel", ["pericia:conhecimento"])
+    assert ok is False
+    assert "automáticos ausentes" in motivo
+
+
+def test_cao_de_briga_sem_escolha_de_beneficio() -> None:
+    row = origem_por_slug("cao_de_briga")
+    assert row is not None
+    assert row["beneficio_fixo"] is True
+    assert row["beneficios_pericias"] == []
+    assert row["beneficios_poderes"] == []
+    assert row["habilidades_ativas"], "ataque extra 1x/cena deve ser listado"
+    ok, _ = validar_beneficios_origem("cao_de_briga", [])
+    assert ok is True
+
+
+def test_origem_fixa_treina_pericias_sem_escolha_do_usuario() -> None:
+    fj = sincronizar_pericias_origem_ficha_json(
+        {
+            "regra_versao": "v13",
+            "origem_slug": "bacharel",
+            "origem_beneficios": [],
+            "tormenta_classe_mb_slug": "guerreiro",
+            "nivel": 1,
+            "pericias": [],
+        }
+    )
+    assert fj["origem_beneficios"] == [
+        "pericia:conhecimento",
+        "pericia:diplomacia",
+        "pericia:nobreza",
+    ]
+    treinadas = sorted(p["nome"] for p in fj["pericias"] if p.get("treinado"))
+    assert treinadas == ["Conhecimento", "Diplomacia", "Nobreza"]
+
+
+def test_menestrel_escolhe_um_poder_de_musica() -> None:
+    assert normalizar_beneficios_origem("menestrel", []) == ["pericia:atuacao"]
+    ok, motivo = validar_beneficios_origem("menestrel", ["pericia:atuacao"])
+    assert ok is False and "escolha exatamente 1" in motivo
     ok, _ = validar_beneficios_origem(
-        "bacharel",
-        ["pericia:conhecimento", "poder:retórica"],
+        "menestrel",
+        normalizar_beneficios_origem("menestrel", ["poder:melodia_curativa"]),
     )
     assert ok is True
 

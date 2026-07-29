@@ -31,6 +31,9 @@ from app.games.tormenta.rules.defesa_t20 import defesa_base_ca
 from app.games.tormenta.rules.duende_t20 import validar_duende_ficha
 from app.games.tormenta.rules.melhor_amigo_t20 import validar_melhor_amigo_ficha
 from app.games.tormenta.rules.origens_t20 import (
+    habilidade_ativa_origem,
+    normalizar_beneficios_origem,
+    origem_tem_beneficio_fixo,
     sincronizar_pericias_origem_ficha_json,
     validar_beneficios_origem,
     validar_trocas_pericia_origem,
@@ -45,6 +48,9 @@ from app.games.tormenta.rules.regra_versao_t20 import (
     regra_versao_de_ficha,
 )
 from app.games.tormenta.rules.tendencias_divindades_t20 import validar_devocao_v13
+from app.games.tormenta.schemas.habilidade_origem import (
+    TormentaHabilidadeOrigemAtivarResponse,
+)
 from app.games.tormenta.schemas.personagem import (
     TormentaBestiarioImportRequest,
     TormentaBlocoAmeacaResponse,
@@ -456,6 +462,12 @@ class TormentaPersonagemService:
         ben = fj.get("origem_beneficios")
         if not isinstance(ben, list):
             ben = []
+        if origem_tem_beneficio_fixo(slug):
+            # Origens de Heróis de Arton concedem tudo automaticamente; o cliente
+            # só envia a escolha opcional de poder, quando houver.
+            ben = normalizar_beneficios_origem(slug, ben)
+            if isinstance(ficha_json, dict):
+                ficha_json["origem_beneficios"] = list(ben)
         ok, motivo = validar_beneficios_origem(slug, ben)
         if not ok:
             raise DadosInvalidos(motivo or "Benefícios de origem inválidos.")
@@ -639,6 +651,45 @@ class TormentaPersonagemService:
         if not p:
             raise ArenaBaseException("Personagem nao encontrado", status_code=404)
         return p
+
+    def ativar_habilidade_origem(
+        self, personagem_id: int, habilidade_id: str
+    ) -> TormentaHabilidadeOrigemAtivarResponse:
+        """Valida a origem salva e debita o custo oficial de PM da habilidade."""
+        personagem = self.obter_por_id(personagem_id)
+        ficha_json = (
+            personagem.ficha_json if isinstance(personagem.ficha_json, dict) else {}
+        )
+        origem_slug = str(ficha_json.get("origem_slug") or "").strip().lower()
+        habilidade = habilidade_ativa_origem(origem_slug, habilidade_id)
+        if not habilidade:
+            raise DadosInvalidos(
+                "A habilidade não pertence à origem atualmente salva na ficha."
+            )
+
+        custo = max(0, int(habilidade.get("custo_pm") or 0))
+        pa_max = int(personagem.pa_max or 0)
+        antes = int(personagem.pa_atual if personagem.pa_atual is not None else pa_max)
+        if antes < custo:
+            raise DadosInvalidos(f"PM insuficientes: possui {antes}, custo {custo}.")
+        depois = antes - custo
+        if custo:
+            personagem.pa_atual = depois
+            self.repo.update(personagem)
+
+        return TormentaHabilidadeOrigemAtivarResponse(
+            habilidade_id=str(habilidade.get("id") or habilidade_id),
+            nome=str(habilidade.get("nome") or habilidade_id),
+            origem_slug=origem_slug,
+            origem_nome=str(habilidade.get("origem_nome") or origem_slug),
+            custo_pm=custo,
+            pa_atual_antes=antes,
+            pa_atual_depois=depois,
+            pa_max=pa_max,
+            frequencia=str(habilidade.get("frequencia") or ""),
+            duracao=str(habilidade.get("duracao") or ""),
+            resumo=str(habilidade.get("resumo") or ""),
+        )
 
     def obter_por_id_sincronizando_pm_mb(
         self, personagem_id: int

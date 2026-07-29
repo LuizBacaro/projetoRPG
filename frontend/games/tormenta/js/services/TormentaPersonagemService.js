@@ -320,6 +320,16 @@ class TormentaPersonagemService {
         return this._handleResponse(res, 'Erro ao lançar magia');
     }
 
+    /** Ativa habilidade concedida pela origem, com custo validado no catálogo. */
+    async ativarHabilidadeOrigem(id, habilidadeId) {
+        const res = await fetch(this._url(`/${id}/habilidades-origem/ativar`), {
+            method: 'POST',
+            headers: this._headers(true),
+            body: JSON.stringify({ habilidade_id: habilidadeId }),
+        });
+        return this._handleResponse(res, 'Erro ao ativar habilidade da origem');
+    }
+
     async previewMagiasConhecidas(id) {
         const res = await fetch(this._url(`/${id}/magias/conhecidas-preview`), {
             headers: this._headers(false),
