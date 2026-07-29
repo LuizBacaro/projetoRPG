@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf Cap.3 p.256–277"
+  },
+  "itens": [
+    {
+      "slug": "florete_vendaval",
+      "nome": "Florete do Vendaval",
+      "categoria": "reliquia",
+      "custo": "—",
+      "pagina": 258,
+      "descricao_resumo": "Florete que acelera o portador.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "fv_init",
+          "alvo": "iniciativa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "empunhado",
+          "rotulo": "Florete do Vendaval — +2 Iniciativa",
+          "pagina": 258
+        }
+      ]
+    },
+    {
+      "slug": "lanca_fenix",
+      "nome": "Lança da Fênix",
+      "categoria": "reliquia",
+      "custo": "—",
+      "pagina": 260,
+      "descricao_resumo": "Lança que restaura PV ao portador.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "lf_pv",
+          "alvo": "pv_max",
+          "op": "soma",
+          "valor": 5,
+          "quando": "empunhado",
+          "rotulo": "Lança da Fênix — +5 PV",
+          "pagina": 260
+        }
+      ]
+    },
+    {
+      "slug": "amuleto_guardiao",
+      "nome": "Amuleto do Guardião",
+      "categoria": "reliquia",
+      "custo": "—",
+      "pagina": 262,
+      "descricao_resumo": "Amuleto que protege o portador.",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "ag_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 1,
+          "quando": "empunhado",
+          "rotulo": "Amuleto do Guardião — +1 Defesa",
+          "pagina": 262
+        }
+      ]
+    }
+  ]
+}

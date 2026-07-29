@@ -1,0 +1,321 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf Cap.3 p.216–243"
+  },
+  "itens": [
+    {
+      "slug": "bastao_ludico",
+      "nome": "Bastão lúdico",
+      "categoria": "arma",
+      "secao": "Armas simples",
+      "custo": "T$ 5",
+      "dano_p": "1d6",
+      "critico": "x2",
+      "tipo_dano": "impacto",
+      "espacos": 1,
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "besta_de_mao",
+      "nome": "Besta de mão",
+      "categoria": "arma",
+      "custo": "T$ 30",
+      "dano_p": "1d6",
+      "critico": "19",
+      "alcance": "Curto",
+      "tipo_dano": "perfuracao",
+      "espacos": 1,
+      "tags": [
+        "surpreendente"
+      ],
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "espadim",
+      "nome": "Espadim",
+      "categoria": "arma",
+      "custo": "T$ 300",
+      "dano_p": "1d8",
+      "critico": "20",
+      "tipo_dano": "corte",
+      "espacos": 1,
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "espadim_atq",
+          "alvo": "ataque",
+          "op": "soma",
+          "valor": 1,
+          "quando": "condicional",
+          "condicao": "nobreza treinada",
+          "rotulo": "Espadim — +1 ataque (Nobreza treinada)",
+          "pagina": 221
+        },
+        {
+          "id": "espadim_dano",
+          "alvo": "dano",
+          "op": "soma",
+          "valor": 1,
+          "quando": "condicional",
+          "condicao": "nobreza treinada",
+          "rotulo": "Espadim — +1 dano (Nobreza treinada)",
+          "pagina": 221
+        }
+      ]
+    },
+    {
+      "slug": "martelo_leve",
+      "nome": "Martelo leve",
+      "categoria": "arma",
+      "custo": "T$ 2",
+      "dano_p": "1d4",
+      "critico": "x4",
+      "alcance": "Curto",
+      "tipo_dano": "impacto",
+      "espacos": 1,
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "bico_de_corvo",
+      "nome": "Bico de corvo",
+      "categoria": "arma",
+      "custo": "T$ 15",
+      "dano_p": "1d8",
+      "critico": "x3",
+      "tipo_dano": "impacto",
+      "espacos": 2,
+      "tags": [
+        "alongada",
+        "versatil"
+      ],
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "bico_manobra",
+          "alvo": "pericia",
+          "pericia_slug": "atletismo",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Bico de corvo — +2 derrubar/quebrar",
+          "pagina": 221
+        }
+      ]
+    },
+    {
+      "slug": "khopesh",
+      "nome": "Khopesh",
+      "categoria": "arma",
+      "custo": "T$ 20",
+      "dano_p": "1d8",
+      "critico": "19/x3",
+      "tipo_dano": "corte",
+      "espacos": 1,
+      "tags": [
+        "versatil"
+      ],
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "garrucha",
+      "nome": "Garrucha",
+      "categoria": "arma",
+      "custo": "T$ 250",
+      "dano_p": "2d4",
+      "critico": "19/x3",
+      "alcance": "Curto",
+      "tipo_dano": "perfuracao",
+      "espacos": 1,
+      "tags": [
+        "ocultavel",
+        "surpreendente"
+      ],
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "armadura_de_chumbo",
+      "nome": "Armadura de chumbo",
+      "categoria": "armadura",
+      "bonus_ca": 7,
+      "penalidade": -5,
+      "espacos": 5,
+      "custo": "T$ 750",
+      "tipo": "pesada",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "chumbo_rd",
+          "alvo": "rd",
+          "rd_tipo": "mundano",
+          "op": "soma",
+          "valor": 2,
+          "quando": "vestido",
+          "rotulo": "Armadura de chumbo — RD 2/mundano",
+          "pagina": 223
+        },
+        {
+          "id": "chumbo_rm",
+          "alvo": "rm",
+          "op": "soma",
+          "valor": 2,
+          "quando": "vestido",
+          "rotulo": "Armadura de chumbo — RM +2",
+          "pagina": 223
+        }
+      ]
+    },
+    {
+      "slug": "armadura_de_pedra",
+      "nome": "Armadura de pedra",
+      "categoria": "armadura",
+      "bonus_ca": 12,
+      "penalidade": -5,
+      "espacos": 5,
+      "custo": "T$ 5500",
+      "tipo": "pesada",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "pedra_rd",
+          "alvo": "rd",
+          "rd_tipo": "todos",
+          "op": "soma",
+          "valor": 2,
+          "quando": "vestido",
+          "rotulo": "Armadura de pedra — RD 2",
+          "pagina": 225
+        }
+      ]
+    },
+    {
+      "slug": "armadura_de_folhas",
+      "nome": "Armadura de folhas",
+      "categoria": "armadura",
+      "bonus_ca": 2,
+      "penalidade": 0,
+      "espacos": 2,
+      "custo": "T$ 75",
+      "tipo": "leve",
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "folhas_pm",
+          "alvo": "pm_max",
+          "op": "soma",
+          "valor": 2,
+          "quando": "condicional",
+          "condicao": "sobrevivencia treinada 1 dia",
+          "rotulo": "Armadura de folhas — +2 PM (Sobrevivência)",
+          "pagina": 223
+        }
+      ]
+    },
+    {
+      "slug": "favor_pessoa_amada",
+      "nome": "Favor da pessoa amada",
+      "categoria": "item",
+      "custo": "variável",
+      "espacos": 0,
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "favor_pm",
+          "alvo": "pm_max",
+          "op": "soma",
+          "valor": 2,
+          "quando": "empunhado",
+          "rotulo": "Favor da pessoa amada — +2 PM",
+          "pagina": 227
+        }
+      ]
+    },
+    {
+      "slug": "casaca_apetrechos",
+      "nome": "Casaca de apetrechos",
+      "categoria": "vestuario",
+      "custo": "T$ 120",
+      "espacos": 0,
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "casaca_carga",
+          "alvo": "carga_espacos",
+          "op": "soma",
+          "valor": 4,
+          "quando": "vestido",
+          "rotulo": "Casaca de apetrechos — +4 espaços carga",
+          "pagina": 227
+        },
+        {
+          "id": "casaca_pen",
+          "alvo": "penalidade_armadura",
+          "op": "soma",
+          "valor": -2,
+          "quando": "vestido",
+          "rotulo": "Casaca de apetrechos — penalidade armadura –2",
+          "pagina": 227
+        }
+      ]
+    },
+    {
+      "slug": "oculos_aeronauta",
+      "nome": "Óculos de aeronauta",
+      "categoria": "item",
+      "custo": "T$ 25",
+      "espacos": 0,
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "oculos_pilot",
+          "alvo": "pericia",
+          "pericia_slug": "pilotagem",
+          "op": "soma",
+          "valor": 1,
+          "quando": "empunhado",
+          "rotulo": "Óculos de aeronauta — +1 Pilotagem",
+          "pagina": 230
+        }
+      ]
+    },
+    {
+      "slug": "roupao_elegante",
+      "nome": "Roupão elegante",
+      "categoria": "vestuario",
+      "custo": "T$ 80",
+      "espacos": 1,
+      "fonte_catalogo": "herois_arton",
+      "efeitos": [
+        {
+          "id": "roup_dip",
+          "alvo": "pericia",
+          "pericia_slug": "diplomacia",
+          "op": "soma",
+          "valor": 5,
+          "quando": "vestido",
+          "rotulo": "Roupão elegante — +5 Diplomacia",
+          "pagina": 230
+        }
+      ]
+    },
+    {
+      "slug": "broquel",
+      "nome": "Broquel",
+      "categoria": "escudo",
+      "bonus_ca": 0,
+      "penalidade": -1,
+      "espacos": 0.5,
+      "custo": "T$ 25",
+      "fonte_catalogo": "herois_arton"
+    },
+    {
+      "slug": "escudo_torre",
+      "nome": "Escudo torre",
+      "categoria": "escudo",
+      "bonus_ca": 2,
+      "penalidade": -4,
+      "espacos": 2,
+      "custo": "T$ 45",
+      "fonte_catalogo": "herois_arton"
+    }
+  ]
+}

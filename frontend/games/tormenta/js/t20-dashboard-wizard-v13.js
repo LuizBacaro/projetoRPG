@@ -271,13 +271,109 @@
         if (!sel) return;
         const prev = sel.value;
         sel.innerHTML = '<option value="">— Escolha a origem —</option>';
-        ORIGENS.forEach((o) => {
+        const lista = ORIGENS.slice().sort((a, b) =>
+            String(a.nome || '').localeCompare(String(b.nome || ''), 'pt', { sensitivity: 'base' })
+        );
+        lista.forEach((o) => {
             const op = document.createElement('option');
             op.value = o.slug;
-            op.textContent = o.nome;
+            const ha = String(o.fonte_catalogo || '') === 'herois_arton' ? ' (HA)' : '';
+            op.textContent = `${o.nome}${ha}`;
             sel.appendChild(op);
         });
         if (prev) sel.value = prev;
+    }
+
+    function escOrigem(txt) {
+        return String(txt == null ? '' : txt).replace(
+            /[&<>"']/g,
+            (c) =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
+        );
+    }
+
+    /**
+     * Origens de Heróis de Arton têm benefício único e fixo (livro, p. 46), sem "escolha 2".
+     */
+    function renderBeneficiosOrigemFixa(host, row) {
+        const pericias = row.beneficios_pericias || [];
+        const poderes = row.beneficios_poderes || [];
+        const qtdEscolher =
+            row.poderes_escolher == null ? poderes.length : Number(row.poderes_escolher) || 0;
+        const poderesAuto = qtdEscolher >= poderes.length ? poderes : [];
+        const poderesOpcao = qtdEscolher >= poderes.length ? [] : poderes;
+        const automaticos = [
+            ...pericias.map((p) => `Treinado em ${slugParaLabel(p)}`),
+            ...poderesAuto.map((p) => `Poder: ${slugParaLabel(p)}`),
+        ];
+
+        let html =
+            '<p class="t20-dash-hint" style="margin:0 0 .35rem">Benefício fixo desta origem' +
+            (row.pagina ? ` (Heróis de Arton, p. ${row.pagina})` : '') +
+            ' — aplicado automaticamente:</p>';
+        if (automaticos.length) {
+            html +=
+                '<ul class="cad-origem-fixa-lista">' +
+                automaticos.map((t) => `<li>${escOrigem(t)}</li>`).join('') +
+                '</ul>';
+        }
+        if (row.notas) {
+            html += `<p class="cad-origem-fixa-nota">${escOrigem(row.notas)}</p>`;
+        }
+        if (!automaticos.length && !row.notas) {
+            html +=
+                '<p class="cad-origem-fixa-nota">Sem perícias treinadas por esta origem.</p>';
+        }
+        if (poderesOpcao.length) {
+            const saved = global.__cadOrigemBeneficios || [];
+            html +=
+                `<p class="t20-dash-hint" style="margin:.5rem 0 .35rem">Escolha <strong>${qtdEscolher}</strong>:</p>` +
+                `<div class="cad-origem-beneficios-list" style="display:grid;gap:0.25rem;max-width:34rem">` +
+                poderesOpcao
+                    .map((p) => {
+                        const id = `poder:${p}`;
+                        const chk = saved.includes(id) ? 'checked' : '';
+                        return (
+                            `<label class="cad-origem-ben-item" style="display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:0.6rem;margin:0;padding:0.25rem 0.1rem;cursor:pointer;line-height:1.3">` +
+                            `<input type="checkbox" class="cad-origem-ben-cb" value="${escOrigem(id)}" ${chk} style="margin-top:0.18rem"/>` +
+                            `<span style="display:block;min-width:0">Poder: ${escOrigem(slugParaLabel(p))}</span></label>`
+                        );
+                    })
+                    .join('') +
+                '</div>';
+        }
+        host.innerHTML = html;
+
+        const fixos = [
+            ...pericias.map((p) => `pericia:${p}`),
+            ...poderesAuto.map((p) => `poder:${p}`),
+        ];
+        const sincronizar = () => {
+            const picks = Array.from(host.querySelectorAll('.cad-origem-ben-cb:checked')).map(
+                (x) => x.value
+            );
+            global.__cadOrigemBeneficios = fixos.concat(picks);
+            global.__cadOrigemTrocasPericia = {};
+            if (global.T20DashPericiasV13 && global.T20DashPericiasV13.invalidarPericias) {
+                global.T20DashPericiasV13.invalidarPericias();
+            }
+        };
+        host.querySelectorAll('.cad-origem-ben-cb').forEach((cb) => {
+            cb.addEventListener('change', () => {
+                const picks = Array.from(host.querySelectorAll('.cad-origem-ben-cb:checked'));
+                if (picks.length > qtdEscolher) {
+                    cb.checked = false;
+                    if (cfg && cfg.Toast) {
+                        cfg.Toast.error(`Escolha no máximo ${qtdEscolher} poder(es) da origem.`);
+                    }
+                    return;
+                }
+                sincronizar();
+                renderResumo();
+            });
+        });
+        sincronizar();
+        renderResumo();
     }
 
     function renderBeneficiosOrigem() {
@@ -291,6 +387,12 @@
             return;
         }
         global.__cadOrigemPermiteTroca = Boolean(row.troca_pericia_treinada);
+        if (row.beneficio_fixo) {
+            renderBeneficiosOrigemFixa(host, row);
+            renderOrigemItensEscolha(row);
+            renderOrigemItensLista(row);
+            return;
+        }
         const saved = global.__cadOrigemBeneficios || [];
         const opts = [];
         (row.beneficios_pericias || []).forEach((p) => {
@@ -880,7 +982,24 @@
         if (n === 4) {
             const slug = q('cadOrigemSlug') && q('cadOrigemSlug').value;
             if (!slug) return { ok: false, msg: 'Escolha a origem do personagem (v1.3).' };
+            const row = origemPorSlug(slug);
             const bens = global.__cadOrigemBeneficios || [];
+            if (row && row.beneficio_fixo) {
+                const poderes = row.beneficios_poderes || [];
+                const qtd =
+                    row.poderes_escolher == null
+                        ? poderes.length
+                        : Number(row.poderes_escolher) || 0;
+                if (qtd < poderes.length) {
+                    const escolhidos = poderes.filter((p) =>
+                        bens.includes(`poder:${p}`)
+                    ).length;
+                    if (escolhidos !== qtd) {
+                        return { ok: false, msg: `Escolha exatamente ${qtd} poder(es) da origem.` };
+                    }
+                }
+                return { ok: true };
+            }
             if (bens.length !== 2) {
                 return { ok: false, msg: 'Escolha exatamente 2 benefícios da origem.' };
             }

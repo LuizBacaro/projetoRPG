@@ -1,7 +1,8 @@
 {
   "_meta": {
-    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.48–55",
-    "nota": "14 origens especiais do suplemento Heróis de Arton v1.1. Não reproduz texto longo."
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1, Novas origens (p. 46–53)",
+    "nota": "Origens especiais: benefício ÚNICO e fixo (não 'escolha 2'). Perícias listadas são todas treinadas automaticamente.",
+    "total": 30
   },
   "origens": [
     {
@@ -9,141 +10,865 @@
       "nome": "Bacharel",
       "pagina": 48,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["conhecimento", "diplomacia", "nobreza"],
-      "beneficios_poderes": ["retórica"],
-      "poder_unico": "mudar_atitude_livre",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "conhecimento",
+        "diplomacia",
+        "nobreza"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Mudar Atitude como ação livre 1×/cena."
+      "itens": [
+        "Tabardo com o símbolo de Khalmyr",
+        "Coleção de livros à sua escolha"
+      ],
+      "habilidades_ativas": [
+        {
+          "id": "mudar_atitude",
+          "nome": "Mudar Atitude",
+          "custo_pm": 0,
+          "frequencia": "1×/cena",
+          "duracao": "instantânea",
+          "resumo": "Usar Diplomacia para mudar atitude como ação livre."
+        }
+      ],
+      "notas": "1×/cena: Diplomacia para mudar atitude como ação livre."
     },
     {
       "slug": "boticario",
       "nome": "Boticário",
       "pagina": 49,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["alquimia", "medicina"],
-      "beneficios_poderes": ["fabricar_pocao", "fabricar_veneno"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "cura",
+        "oficio_alquimista"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Pode fabricar poções e venenos sem nível mínimo de magia."
+      "itens": [
+        "Bálsamo restaurador",
+        "Instrumentos de Ofício (alquimista)",
+        "Maleta de medicamentos"
+      ],
+      "notas": "Fabrica poções de duas fórmulas de 1º círculo, como o poder Alquimista Iniciado."
     },
     {
       "slug": "cacador_de_ratos",
       "nome": "Caçador de Ratos",
       "pagina": 49,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["furtividade", "investigacao", "sobrevivencia"],
-      "beneficios_poderes": ["rastreador_urbano"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "furtividade",
+        "investigacao",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "+2 em ataques e Defesa contra criaturas 2 ou mais tamanhos menores."
+      "itens": [
+        "Clava",
+        "Gato (parceiro perseguidor iniciante)",
+        "T$ 50"
+      ],
+      "efeitos": [
+        {
+          "id": "cacrat_per",
+          "alvo": "pericia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "vs_criaturas_menores",
+          "rotulo": "Caçador de Ratos — +2 em perícias vs criaturas 2 categorias menores",
+          "pagina": 49,
+          "pericia_slug": "furtividade"
+        }
+      ],
+      "notas": "+2 em testes de perícia contra criaturas de duas categorias de tamanho menor (mín. Minúsculas)."
     },
     {
       "slug": "cao_de_briga",
       "nome": "Cão de Briga",
       "pagina": 50,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["oficio"],
-      "beneficios_poderes": ["rd_corte_2", "ignorar_rd"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": false,
-      "notas": "RD corte 2; armas de corte ignoram 5 pontos de RD do alvo."
+      "itens": [
+        "Manoplas ou uma arma marcial"
+      ],
+      "habilidades_ativas": [
+        {
+          "id": "ataque_extra",
+          "nome": "Ataque extra",
+          "custo_pm": 0,
+          "frequencia": "1×/cena",
+          "duracao": "instantânea",
+          "resumo": "Na primeira vez a cada cena em que faz a ação agredir, pode fazer um ataque extra."
+        }
+      ],
+      "notas": "Na primeira vez a cada cena em que faz a ação agredir, pode fazer um ataque extra."
+    },
+    {
+      "slug": "carcereiro",
+      "nome": "Carcereiro",
+      "pagina": 50,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": false,
+      "itens": [
+        "Algemas",
+        "Lampião",
+        "Arma de até T$ 500"
+      ],
+      "efeitos": [
+        {
+          "id": "carc_mental",
+          "alvo": "resistencia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Carcereiro — +2 contra efeitos mentais",
+          "pagina": 50,
+          "resistencia": "vontade"
+        },
+        {
+          "id": "carc_eng",
+          "alvo": "pericia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Carcereiro — +2 Enganação",
+          "pagina": 50,
+          "pericia_slug": "enganacao"
+        },
+        {
+          "id": "carc_furt",
+          "alvo": "pericia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Carcereiro — +2 Furtividade",
+          "pagina": 50,
+          "pericia_slug": "furtividade"
+        },
+        {
+          "id": "carc_int",
+          "alvo": "pericia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Carcereiro — +2 Intimidação",
+          "pagina": 50,
+          "pericia_slug": "intimidacao"
+        }
+      ],
+      "notas": "+2 em testes contra efeitos mentais, Enganação, Furtividade e Intimidação."
+    },
+    {
+      "slug": "carpinteiro_de_guilda",
+      "nome": "Carpinteiro de Guilda",
+      "pagina": 50,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "oficio_artesao"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Instrumentos de Ofício (carpinteiro)",
+        "Arma de corte à sua escolha"
+      ],
+      "efeitos": [
+        {
+          "id": "carp_rd",
+          "alvo": "rd",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Carpinteiro de Guilda — redução de corte 2",
+          "pagina": 50,
+          "rd_tipo": "corte"
+        }
+      ],
+      "notas": "Em suas mãos, armas de corte ignoram 5 pontos de redução de dano."
+    },
+    {
+      "slug": "catador_da_catastrofe",
+      "nome": "Catador da Catástrofe",
+      "pagina": 50,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "fortitude",
+        "percepcao"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Dois equipamentos de aventura de até T$ 150 cada"
+      ],
+      "notas": "Início de cada aventura: Percepção (CD 15 + metade do nível) → tesouro do próprio ND."
     },
     {
       "slug": "chef_hynne",
       "nome": "Chef Hynne",
       "pagina": 50,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["oficio"],
-      "beneficios_poderes": ["culinaria_aprimorada"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "oficio_cozinheiro"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Ofício (cozinheiro) aprimorado; instrumentos especiais de culinária."
+      "itens": [
+        "Cutelo (estatísticas de foice)",
+        "Instrumentos de cozinheiro aprimorados"
+      ],
+      "notas": "Prato especial dura mais 1 dia (benefício de uso diário pode ser usado de novo nesse dia)."
     },
     {
       "slug": "cirurgiao_barbeiro",
       "nome": "Cirurgião-Barbeiro",
       "pagina": 51,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["medicina", "oficio"],
-      "beneficios_poderes": ["cura_avancada"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "cura",
+        "oficio_barbeiro"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Cura e extração cirúrgica de projéteis/parasitas."
+      "itens": [
+        "Dente falso (p. 227)",
+        "Instrumentos de barbeiro",
+        "Maleta de medicamentos"
+      ],
+      "habilidades_ativas": [
+        {
+          "id": "remover_condicao",
+          "nome": "Remover condição",
+          "custo_pm": 2,
+          "frequencia": "ação completa",
+          "duracao": "instantânea",
+          "resumo": "Remove 1 condição de criatura adjacente; ela perde 1d6 PV."
+        }
+      ],
+      "notas": "Ação completa + 2 PM: remove uma condição de criatura adjacente (ela perde 1d6 PV)."
+    },
+    {
+      "slug": "citadino_abastado",
+      "nome": "Citadino Abastado",
+      "pagina": 51,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "nobreza",
+        "oficio"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Arma, armadura, ferramenta ou vestuário de até T$ 500"
+      ],
+      "notas": "Em cidade grande: gastar T$ 10 × nível para usar um poder de combate, destino ou classe por uma cena."
+    },
+    {
+      "slug": "cocheiro",
+      "nome": "Cocheiro",
+      "pagina": 51,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "adestramento",
+        "pilotagem"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Cavalo ou trobo",
+        "Carroça"
+      ],
+      "efeitos": [
+        {
+          "id": "coch_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "conduzindo_veiculo",
+          "rotulo": "Cocheiro — +2 Defesa (conduzindo veículo)",
+          "pagina": 51
+        },
+        {
+          "id": "coch_res",
+          "alvo": "resistencia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "conduzindo_veiculo",
+          "rotulo": "Cocheiro — +2 em resistências (conduzindo veículo)",
+          "pagina": 51,
+          "resistencia": "todas"
+        }
+      ],
+      "notas": "Conduzindo um veículo, você e o veículo recebem +2 na Defesa e em testes de resistência."
+    },
+    {
+      "slug": "construtor",
+      "nome": "Construtor",
+      "pagina": 51,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "fortitude",
+        "oficio_pedreiro"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Instrumentos de pedreiro ou ferramenta pesada (maça ou lança)"
+      ],
+      "habilidades_ativas": [
+        {
+          "id": "ponto_fraco",
+          "nome": "Ponto fraco",
+          "custo_pm": 2,
+          "duracao": "cena",
+          "resumo": "Você ou aliado em alcance curto ignora 5 pontos de RD de criatura/objeto por uma cena."
+        }
+      ],
+      "notas": "2 PM: você ou aliado ignora 5 pontos de RD de uma criatura ou objeto por uma cena."
+    },
+    {
+      "slug": "contrabandista",
+      "nome": "Contrabandista",
+      "pagina": 52,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "enganacao",
+        "ladinagem"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Arma de fogo ou 10 doses de veneno (total até T$ 500)"
+      ],
+      "efeitos": [
+        {
+          "id": "cont_ocultar",
+          "alvo": "pericia",
+          "op": "soma",
+          "valor": 5,
+          "quando": "sempre",
+          "rotulo": "Contrabandista — +5 Ladinagem para ocultar itens",
+          "pagina": 52,
+          "pericia_slug": "ladinagem",
+          "uso_id": "ocultar"
+        },
+        {
+          "id": "cont_carga",
+          "alvo": "carga_espacos",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Contrabandista — capacidade de carga +2 espaços",
+          "pagina": 52
+        }
+      ],
+      "notas": "+5 em Ladinagem para ocultar itens em si mesmo ou em veículos; carga +2 espaços."
     },
     {
       "slug": "coureiro",
       "nome": "Coureiro",
       "pagina": 52,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["oficio"],
-      "beneficios_poderes": ["melhorar_armadura_leve"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "fortitude",
+        "oficio_coureiro"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Trabalha couro; melhora armaduras leves adicionando +1 Defesa."
+      "itens": [
+        "Faca de corte (adaga com dano de corte)",
+        "Instrumentos de coureiro",
+        "T$ 100 em itens alquímicos"
+      ],
+      "notas": "10 min + T$ 10: armadura de couro ganha +1 Defesa e −2 de penalidade de armadura por 1 dia."
+    },
+    {
+      "slug": "escriba",
+      "nome": "Escriba",
+      "pagina": 52,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "conhecimento",
+        "oficio_escriba"
+      ],
+      "beneficios_poderes": [
+        "lendas_e_historias"
+      ],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Instrumentos de escriba",
+        "Organizador de pergaminhos",
+        "Coleção de livros"
+      ],
+      "notas": "Recebe o poder de bardo Lendas e Histórias; se recebê-lo de novo, +5 ao rolar novamente."
+    },
+    {
+      "slug": "espiao",
+      "nome": "Espião",
+      "pagina": 52,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "enganacao",
+        "ladinagem"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Estojo de disfarces",
+        "Gazua",
+        "Luneta",
+        "Três doses de cosmético"
+      ],
+      "notas": "Escolha uma perícia (exceto Luta ou Pontaria): pode usar Carisma como atributo-chave dela."
     },
     {
       "slug": "ferreiro_militar",
       "nome": "Ferreiro Militar",
       "pagina": 53,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["oficio"],
-      "beneficios_poderes": ["forjar_armas", "forjar_armaduras"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "oficio_armeiro"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Forja armas e armaduras militares; manutenção de equipamento."
+      "itens": [
+        "Instrumentos de armeiro",
+        "Martelo leve (p. 221)"
+      ],
+      "efeitos": [
+        {
+          "id": "ferr_dano",
+          "alvo": "dano",
+          "op": "soma",
+          "valor": 2,
+          "quando": "arma_martelo_marreta",
+          "rotulo": "Ferreiro Militar — +2 dano com martelos e marretas",
+          "pagina": 53
+        }
+      ],
+      "notas": "+2 em rolagens de dano com martelos e marretas de qualquer tipo."
     },
     {
       "slug": "freira",
       "nome": "Freira",
       "pagina": 53,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["religiao", "vontade"],
-      "beneficios_poderes": ["devocao_monastica"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "cura"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Devoção monástica; resistência espiritual."
+      "itens": [
+        "Maleta de medicamentos",
+        "Manto eclesiástico",
+        "Símbolo sagrado"
+      ],
+      "habilidades_ativas": [
+        {
+          "id": "ajuda_inspirada",
+          "nome": "Ajuda inspirada",
+          "custo_pm": 1,
+          "duracao": "instantânea",
+          "resumo": "Aumenta o bônus de ajuda em +1d4."
+        },
+        {
+          "id": "cura_ampliada",
+          "nome": "Cura ampliada",
+          "custo_pm": 1,
+          "duracao": "instantânea",
+          "resumo": "Aumenta um efeito de cura em +1 dado do mesmo tipo."
+        }
+      ],
+      "notas": "1 PM: ajuda +1d4. 1 PM: efeito de cura +1 dado."
     },
     {
       "slug": "goradista",
       "nome": "Goradista",
       "pagina": 53,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["oficio", "diplomacia"],
-      "beneficios_poderes": ["culinaria_gorad"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "oficio_cozinheiro"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Especialista no ingrediente especial Gorad; culinária e negociação."
+      "itens": [
+        "Instrumentos de cozinheiro",
+        "T$ 36 em ingredientes de gorad quente"
+      ],
+      "notas": "Prato especial + T$ 10 de cobertura de gorad: fornece 2 PM temporários por patamar do comensal."
+    },
+    {
+      "slug": "insciente",
+      "nome": "Insciente",
+      "pagina": 53,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Arma simples ou ferramenta de até T$ 100"
+      ],
+      "efeitos": [
+        {
+          "id": "insc_rm",
+          "alvo": "rm",
+          "op": "soma",
+          "valor": 5,
+          "quando": "sempre",
+          "rotulo": "Insciente — resistência a magia +5",
+          "pagina": 53
+        }
+      ],
+      "notas": "Recebe resistência a magia +5."
+    },
+    {
+      "slug": "interrogador",
+      "nome": "Interrogador",
+      "pagina": 54,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "intimidacao",
+        "investigacao"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Um ou mais itens somando T$ 100"
+      ],
+      "efeitos": [
+        {
+          "id": "inter_ameaca",
+          "alvo": "margem_ameaca",
+          "op": "soma",
+          "valor": 1,
+          "quando": "vs_feridos",
+          "rotulo": "Interrogador — +1 margem de ameaça contra criaturas feridas",
+          "pagina": 54
+        }
+      ],
+      "notas": "+1 na margem de ameaça contra criaturas feridas (PV abaixo do total)."
     },
     {
       "slug": "ladrao_de_tumulos",
       "nome": "Ladrão de Túmulos",
       "pagina": 54,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["investigacao", "furtividade"],
-      "beneficios_poderes": ["conhece_armadilhas", "conhece_masmorras"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "ladinagem",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Conhece masmorras e armadilhas; +2 em Reflexos vs armadilhas."
+      "itens": [
+        "Pá (estatísticas de lança)",
+        "Pé de cabra"
+      ],
+      "efeitos": [
+        {
+          "id": "ladtum_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "vs_mortos_vivos",
+          "rotulo": "Ladrão de Túmulos — +2 Defesa contra mortos-vivos",
+          "pagina": 54
+        },
+        {
+          "id": "ladtum_rd",
+          "alvo": "rd",
+          "op": "soma",
+          "valor": 5,
+          "quando": "sempre",
+          "rotulo": "Ladrão de Túmulos — redução de trevas 5",
+          "pagina": 54,
+          "rd_tipo": "trevas"
+        }
+      ],
+      "notas": "+2 na Defesa e em perícias contra mortos-vivos; redução de trevas 5 (se morto-vivo, +1 PV por dado de trevas)."
     },
     {
       "slug": "menestrel",
       "nome": "Menestrel",
       "pagina": 54,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["atuacao"],
-      "beneficios_poderes": ["repertorio_historico"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "atuacao"
+      ],
+      "beneficios_poderes": [
+        "balada_fascinante",
+        "cancao_assustadora",
+        "melodia_curativa"
+      ],
       "troca_pericia_treinada": true,
-      "notas": "Conhecimento de histórias e lendas; +2 em Conhecimento para lore."
+      "itens": [
+        "Instrumento musical de até T$ 35"
+      ],
+      "notas": "Escolhe um poder de Música de bardo: Balada Fascinante, Canção Assustadora ou Melodia Curativa.",
+      "poderes_escolher": 1
+    },
+    {
+      "slug": "mensageiro",
+      "nome": "Mensageiro",
+      "pagina": 52,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": false,
+      "itens": [
+        "Cavalo com sela",
+        "Mochila de aventureiro",
+        "Traje de viajante"
+      ],
+      "efeitos": [
+        {
+          "id": "mens_desl",
+          "alvo": "deslocamento_m",
+          "op": "soma",
+          "valor": 3,
+          "quando": "sempre",
+          "rotulo": "Mensageiro — +3 m de deslocamento",
+          "pagina": 52
+        },
+        {
+          "id": "mens_res",
+          "alvo": "resistencia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Mensageiro — +2 em testes de resistência",
+          "pagina": 52,
+          "resistencia": "todas"
+        }
+      ],
+      "notas": "+3 m no deslocamento e +2 em testes de resistência."
     },
     {
       "slug": "naufrago",
       "nome": "Náufrago",
       "pagina": 54,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["sobrevivencia", "atletismo"],
-      "beneficios_poderes": ["resistencia_maritima"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": false,
+      "itens": [
+        "Arco curto",
+        "20 flechas",
+        "Bola com uma cara pintada"
+      ],
+      "efeitos": [
+        {
+          "id": "nauf_pv",
+          "alvo": "pv_max",
+          "op": "soma",
+          "valor": 5,
+          "quando": "sempre",
+          "rotulo": "Náufrago — +5 PV",
+          "pagina": 54
+        },
+        {
+          "id": "nauf_pm",
+          "alvo": "pm_max",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Náufrago — +2 PM",
+          "pagina": 54
+        }
+      ],
+      "habilidades_ativas": [
+        {
+          "id": "adaptacao",
+          "nome": "Adaptação",
+          "custo_pm": 2,
+          "frequencia": "1×/cena",
+          "duracao": "cena",
+          "resumo": "Treinamento em perícia, proficiência com arma/armadura/escudo ou usar ferramenta no lugar de outra, até o fim da cena."
+        }
+      ],
+      "notas": "+5 PV e +2 PM; 1×/cena, 2 PM para um benefício de adaptação até o fim da cena."
+    },
+    {
+      "slug": "padeiro",
+      "nome": "Padeiro",
+      "pagina": 55,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "oficio_cozinheiro"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Sobrevivência aquática avançada; resistência a condições adversas."
+      "itens": [
+        "Instrumentos de Ofício (cozinheiro)",
+        "Rolo de massa (estatísticas de clava)"
+      ],
+      "efeitos": [
+        {
+          "id": "pad_dano",
+          "alvo": "dano",
+          "op": "soma",
+          "valor": 1,
+          "quando": "arma_impacto",
+          "rotulo": "Padeiro — +1 dano com armas de impacto",
+          "pagina": 55
+        }
+      ],
+      "notas": "+1 em rolagens de dano com armas de impacto; pode substituir Atletismo por Ofício (cozinheiro)."
+    },
+    {
+      "slug": "pedinte",
+      "nome": "Pedinte",
+      "pagina": 55,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": false,
+      "itens": [
+        "Andrajos",
+        "1 bálsamo restaurador",
+        "1 essência de mana"
+      ],
+      "efeitos": [
+        {
+          "id": "ped_eng",
+          "alvo": "pericia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Pedinte — +2 Enganação",
+          "pagina": 55,
+          "pericia_slug": "enganacao"
+        },
+        {
+          "id": "ped_furt",
+          "alvo": "pericia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Pedinte — +2 Furtividade",
+          "pagina": 55,
+          "pericia_slug": "furtividade"
+        }
+      ],
+      "notas": "Ao usar alimento, preparado alquímico ou poção: rola o efeito duas vezes (melhor) ou divide com aliado adjacente."
+    },
+    {
+      "slug": "pescador",
+      "nome": "Pescador",
+      "pagina": 55,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "oficio_pescador",
+        "sobrevivencia"
+      ],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": true,
+      "itens": [
+        "Bolsa de minhocas",
+        "Instrumentos de pescador"
+      ],
+      "efeitos": [
+        {
+          "id": "pesc_init",
+          "alvo": "iniciativa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Pescador — +2 Iniciativa",
+          "pagina": 55
+        }
+      ],
+      "notas": "+2 em Iniciativa e +2 em testes para executar uma ação preparada."
     },
     {
       "slug": "servo",
       "nome": "Servo",
       "pagina": 55,
       "fonte_catalogo": "herois_arton",
-      "beneficios_pericias": ["diplomacia", "intuicao"],
-      "beneficios_poderes": ["serventia"],
+      "beneficio_fixo": true,
+      "beneficios_pericias": [
+        "diplomacia",
+        "oficio_servical"
+      ],
+      "beneficios_poderes": [],
       "troca_pericia_treinada": true,
-      "notas": "Serventia na nobreza; conhecimento de protocolo e hierarquia."
+      "itens": [
+        "Balde e vassoura (estatísticas de bordão)",
+        "Tabardo do patrono"
+      ],
+      "efeitos": [
+        {
+          "id": "serv_dip",
+          "alvo": "pericia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "condicional",
+          "rotulo": "Servo — +2 Diplomacia contra superiores",
+          "pagina": 55,
+          "pericia_slug": "diplomacia",
+          "condicao": "alvo de status superior"
+        },
+        {
+          "id": "serv_eng",
+          "alvo": "pericia",
+          "op": "soma",
+          "valor": 2,
+          "quando": "condicional",
+          "rotulo": "Servo — +2 Enganação contra superiores",
+          "pagina": 55,
+          "pericia_slug": "enganacao",
+          "condicao": "alvo de status superior"
+        }
+      ],
+      "notas": "+2 em Diplomacia e Enganação contra alvos de status superior; pode substituir Nobreza por Ofício (serviçal)."
+    },
+    {
+      "slug": "suporte_de_tropas",
+      "nome": "Suporte de Tropas",
+      "pagina": 55,
+      "fonte_catalogo": "herois_arton",
+      "beneficio_fixo": true,
+      "beneficios_pericias": [],
+      "beneficios_poderes": [],
+      "troca_pericia_treinada": false,
+      "itens": [
+        "Equipamento de viagem",
+        "Instrumentos de ofício",
+        "Maleta de medicamentos"
+      ],
+      "notas": "Bônus que fornece ao ajudar aumenta em +2; flanqueio do grupo passa a conceder +4."
     }
   ]
 }

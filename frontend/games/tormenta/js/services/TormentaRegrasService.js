@@ -131,6 +131,27 @@ class TormentaRegrasService {
         return this._handleJson(res, 'Erro ao carregar origens v1.3');
     }
 
+    async agregarEfeitosFicha(body) {
+        const res = await fetch(window.getApiUrl('/tormenta/regras/efeitos/agregar'), {
+            method: 'POST',
+            headers: { ...this._headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body || {}),
+        });
+        return this._handleJson(res, 'Erro ao agregar efeitos da ficha');
+    }
+
+    async listarReliquias(params = {}) {
+        const q = new URLSearchParams();
+        if (params.q) q.set('q', params.q);
+        if (params.skip != null) q.set('skip', String(params.skip));
+        if (params.limit != null) q.set('limit', String(params.limit));
+        const res = await fetch(
+            `${window.getApiUrl('/tormenta/regras/reliquias')}?${q}`,
+            { headers: this._headers() }
+        );
+        return this._handleJson(res, 'Erro ao carregar relíquias');
+    }
+
     /** Kit inicial v1.3 (p.140) — opções por classe. */
     async obterKitInicial(opts = {}) {
         const q = new URLSearchParams();
@@ -197,6 +218,7 @@ class TormentaRegrasService {
         if (params.q) q.set('q', params.q);
         if (params.skip != null) q.set('skip', String(params.skip));
         if (params.limit != null) q.set('limit', String(params.limit));
+        if (params.suplemento) q.set('suplemento', String(params.suplemento).trim());
         const qs = q.toString();
         const res = await fetch(this._urlEquipamentos() + (qs ? `?${qs}` : ''), { headers: this._headers() });
         return this._handleJson(res, 'Erro ao carregar equipamentos MB');

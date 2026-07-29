@@ -66,10 +66,14 @@
         if (!sel) return;
         const prev = sel.value;
         sel.innerHTML = '<option value="">— Escolha a origem —</option>';
-        ORIGENS_V13.forEach((o) => {
+        const lista = ORIGENS_V13.slice().sort((a, b) =>
+            String(a.nome || '').localeCompare(String(b.nome || ''), 'pt', { sensitivity: 'base' })
+        );
+        lista.forEach((o) => {
             const op = document.createElement('option');
             op.value = o.slug;
-            op.textContent = o.nome;
+            const ha = String(o.fonte_catalogo || '') === 'herois_arton' ? ' (HA)' : '';
+            op.textContent = `${o.nome}${ha}`;
             sel.appendChild(op);
         });
         if (prev) sel.value = prev;
@@ -91,6 +95,102 @@
         }
     }
 
+    function escapeHtml(txt) {
+        return String(txt == null ? '' : txt).replace(
+            /[&<>"']/g,
+            (c) =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]
+        );
+    }
+
+    function propagarBeneficiosOrigem() {
+        if (typeof global.t20AplicarPericiasOrigemBeneficios === 'function') {
+            global.t20AplicarPericiasOrigemBeneficios();
+        }
+        if (global.T20OrigemTrocasFichaV13 && global.T20OrigemTrocasFichaV13.renderUi) {
+            global.T20OrigemTrocasFichaV13.renderUi();
+        }
+        if (typeof global.t20AplicarPoderesAutomaticosNaLista === 'function') {
+            global.t20AplicarPoderesAutomaticosNaLista();
+        }
+        atualizarUiOrigemItens();
+    }
+
+    /**
+     * Origens de Heróis de Arton concedem um benefício único e fixo (livro, p. 46):
+     * nada de "escolha 2". Só há escolha quando `poderes_escolher` limita a lista.
+     */
+    function renderBeneficiosOrigemFixa(host, row) {
+        const pericias = row.beneficios_pericias || [];
+        const poderes = row.beneficios_poderes || [];
+        const qtdEscolher =
+            row.poderes_escolher == null ? poderes.length : Number(row.poderes_escolher) || 0;
+        const poderesAuto = qtdEscolher >= poderes.length ? poderes : [];
+        const poderesOpcao = qtdEscolher >= poderes.length ? [] : poderes;
+
+        const automaticos = [
+            ...pericias.map((p) => `Treinado em ${slugParaLabel(p)}`),
+            ...poderesAuto.map((p) => `Poder: ${slugParaLabel(p)}`),
+        ];
+
+        let html =
+            '<p class="t20-hint" style="margin:0 0 .35rem">Benefício fixo desta origem' +
+            (row.pagina ? ` (Heróis de Arton, p. ${row.pagina})` : '') +
+            ' — aplicado automaticamente:</p>';
+        if (automaticos.length) {
+            html +=
+                '<ul class="t20-origem-fixa-lista">' +
+                automaticos.map((t) => `<li>${escapeHtml(t)}</li>`).join('') +
+                '</ul>';
+        }
+        if (row.notas) {
+            html += `<p class="t20-origem-fixa-nota">${escapeHtml(row.notas)}</p>`;
+        }
+        if (!automaticos.length && !row.notas) {
+            html += '<p class="t20-origem-fixa-nota">Sem perícias treinadas por esta origem.</p>';
+        }
+        if (poderesOpcao.length) {
+            const saved = global.__t20OrigemBeneficios || [];
+            html +=
+                `<p class="t20-hint" style="margin:.5rem 0 .35rem">Escolha <strong>${qtdEscolher}</strong>:</p>` +
+                poderesOpcao
+                    .map((p) => {
+                        const id = `poder:${p}`;
+                        const chk = saved.includes(id) ? 'checked' : '';
+                        return `<label style="display:block;margin:.15rem 0"><input type="checkbox" class="t20-origem-ben-cb" value="${escapeHtml(id)}" ${chk}/> Poder: ${escapeHtml(slugParaLabel(p))}</label>`;
+                    })
+                    .join('');
+        }
+        host.innerHTML = html;
+
+        const fixos = [
+            ...pericias.map((p) => `pericia:${p}`),
+            ...poderesAuto.map((p) => `poder:${p}`),
+        ];
+        const sincronizar = () => {
+            const picks = Array.from(host.querySelectorAll('.t20-origem-ben-cb:checked')).map(
+                (x) => x.value
+            );
+            global.__t20OrigemBeneficios = fixos.concat(picks);
+        };
+        host.querySelectorAll('.t20-origem-ben-cb').forEach((cb) => {
+            cb.addEventListener('change', () => {
+                const picks = Array.from(host.querySelectorAll('.t20-origem-ben-cb:checked'));
+                if (picks.length > qtdEscolher) {
+                    cb.checked = false;
+                    if (typeof Toast !== 'undefined') {
+                        Toast.error(`Escolha no máximo ${qtdEscolher} poder(es) da origem.`);
+                    }
+                    return;
+                }
+                sincronizar();
+                propagarBeneficiosOrigem();
+            });
+        });
+        sincronizar();
+        propagarBeneficiosOrigem();
+    }
+
     function renderBeneficiosOrigem() {
         const host = q('t20OrigemBeneficiosHost');
         const sel = q('f_origem_slug');
@@ -102,6 +202,14 @@
             return;
         }
         host.style.display = '';
+        if (row.beneficio_fixo) {
+            renderBeneficiosOrigemFixa(host, row);
+            if (global.T20EfeitosFicha && global.T20EfeitosFicha.renderPreviewOrigem) {
+                global.T20EfeitosFicha.renderPreviewOrigem(row);
+            }
+            document.dispatchEvent(new CustomEvent('t20:origem-alterada'));
+            return;
+        }
         const opts = [];
         (row.beneficios_pericias || []).forEach((p) => {
             opts.push({ id: `pericia:${p}`, label: `Perícia: ${slugParaLabel(p)}` });
@@ -148,6 +256,10 @@
             });
         });
         atualizarUiOrigemItens();
+        if (global.T20EfeitosFicha && global.T20EfeitosFicha.renderPreviewOrigem) {
+            global.T20EfeitosFicha.renderPreviewOrigem(row);
+        }
+        document.dispatchEvent(new CustomEvent('t20:origem-alterada'));
     }
 
     function classeExigeDevocao() {

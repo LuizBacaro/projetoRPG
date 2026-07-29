@@ -539,7 +539,7 @@ def test_get_regras_origens_herois_arton(client_regras_tormenta):
     )
     assert r.status_code == 200, r.text
     body = r.json()
-    assert len(body["origens"]) == 49  # 35 core + 14 suplemento
+    assert len(body["origens"]) == 65  # 35 core + 30 suplemento HA
     bacharel = next(o for o in body["origens"] if o["slug"] == "bacharel")
     assert bacharel["fonte_catalogo"] == "herois_arton"
     assert bacharel["troca_pericia_treinada"] is True
