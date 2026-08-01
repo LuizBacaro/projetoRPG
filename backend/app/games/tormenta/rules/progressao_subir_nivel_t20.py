@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from app.games.tormenta.rules.beneficios_nivel_t20 import beneficio_nivel
+from app.games.tormenta.rules.beneficios_nivel_t20 import (
+    beneficio_nivel,
+    graduacao_pericias_texto_v13,
+)
 from app.games.tormenta.rules.classes_t20 import classe_por_slug, lista_classes
 from app.games.tormenta.rules.conjuracao_t20 import (
     classe_conjuracao_mb_registrada,
@@ -26,6 +29,10 @@ from app.games.tormenta.rules.magias_preparadas_t20 import (
     classe_usa_limite_preparadas_mb,
     teto_preparadas_mb,
 )
+from app.games.tormenta.rules.pericias_t20 import (
+    bonus_meio_nivel_t20,
+    bonus_treinamento_por_nivel,
+)
 from app.games.tormenta.rules.progressao_pv_t20 import (
     niveis_multiclasse_v13_de_ficha,
     preview_pm_multiclasse_v13,
@@ -36,6 +43,59 @@ from app.games.tormenta.rules.regra_versao_t20 import (
     REGRA_VERSAO_V13,
     regra_versao_de_ficha,
 )
+
+_PERICIAS_NOTA_SUBIR_NIVEL = (
+    "Bônus automático (½ nível + treino). "
+    "Não escolha novas perícias treinadas ao subir de nível."
+)
+
+
+def _campos_pericias_subir_nivel(
+    nivel_atual: int,
+    nivel_alvo: int,
+    *,
+    regra_versao: Optional[str] = None,
+    ben_atual: Optional[Dict[str, Any]] = None,
+    ben_novo: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Deltas de bônus de perícias (HA p.41 / Cap. 2) para o preview de subir nível."""
+    from app.games.tormenta.rules.regra_versao_t20 import normalizar_regra_versao
+
+    rv = normalizar_regra_versao(regra_versao)
+    try:
+        nv0 = max(1, min(40, int(nivel_atual)))
+    except (TypeError, ValueError):
+        nv0 = 1
+    try:
+        nv1 = max(1, min(40, int(nivel_alvo)))
+    except (TypeError, ValueError):
+        nv1 = nv0 + 1
+
+    meio0 = bonus_meio_nivel_t20(nv0)
+    meio1 = bonus_meio_nivel_t20(nv1)
+    treino0 = bonus_treinamento_por_nivel(nv0, rv)
+    treino1 = bonus_treinamento_por_nivel(nv1, rv)
+
+    if rv == REGRA_VERSAO_V13:
+        grad0 = graduacao_pericias_texto_v13(nv0)
+        grad1 = graduacao_pericias_texto_v13(nv1)
+    else:
+        ba = ben_atual if isinstance(ben_atual, dict) else {}
+        bn = ben_novo if isinstance(ben_novo, dict) else {}
+        grad0 = str(ba.get("graduacao_pericias") or f"+{meio0 + treino0}/+{meio0}")
+        grad1 = str(bn.get("graduacao_pericias") or f"+{meio1 + treino1}/+{meio1}")
+
+    return {
+        "bonus_meio_nivel_atual": meio0,
+        "bonus_meio_nivel": meio1,
+        "bonus_treino_atual": treino0,
+        "bonus_treino_novo": treino1,
+        "graduacao_pericias_atual": grad0,
+        "graduacao_pericias_nova": grad1,
+        "pericias_mudou_meio": meio0 != meio1,
+        "pericias_mudou_treino": treino0 != treino1,
+        "pericias_nota": _PERICIAS_NOTA_SUBIR_NIVEL,
+    }
 
 
 def _habilidade_classe_por_nivel(
@@ -240,7 +300,7 @@ def preview_subir_nivel_v13(
 
     hab_txt = _habilidade_classe_por_nivel(slug, nv_classe1, regra_versao=rv)
 
-    return {
+    out = {
         "permitido": True,
         "motivo": "",
         "nivel_atual": max(1, nv_total0),
@@ -259,7 +319,6 @@ def preview_subir_nivel_v13(
         "pa_max_novo": pm_nov,
         "pa_ganho": pa_ganho,
         "beneficio_nivel": ben_nov if ben_nov else None,
-        "graduacao_pericias_nova": str(ben_nov.get("graduacao_pericias", "") or ""),
         "talentos_totais_novo": talentos_nov,
         "talentos_ganho": talentos_ganho,
         "poderes_gerais_totais_novo": talentos_nov,
@@ -267,7 +326,6 @@ def preview_subir_nivel_v13(
         "pontos_habilidade_acumulados": int(
             ben_nov.get("pontos_habilidade_acumulados", 0) or 0
         ),
-        "bonus_meio_nivel": int(ben_nov.get("bonus_meio_nivel", 0) or 0),
         "habilidade_classe": hab_txt,
         "magias_livro_ganho": magias_livro_ganho,
         "magias_livro_max_novo": magias_livro_max_novo,
@@ -278,6 +336,16 @@ def preview_subir_nivel_v13(
         ),
         "avisos": avisos,
     }
+    out.update(
+        _campos_pericias_subir_nivel(
+            max(1, nv_total0),
+            nv_total1,
+            regra_versao=rv,
+            ben_atual=ben_ant,
+            ben_novo=ben_nov,
+        )
+    )
+    return out
 
 
 def preview_subir_nivel_mb(
@@ -477,7 +545,7 @@ def preview_subir_nivel_mb(
 
     hab_txt = _habilidade_classe_por_nivel(slug, nv1, regra_versao=rv)
 
-    return {
+    out = {
         "permitido": True,
         "motivo": "",
         "nivel_atual": nv0,
@@ -492,7 +560,6 @@ def preview_subir_nivel_mb(
         "pa_max_novo": pa_nov,
         "pa_ganho": pa_ganho,
         "beneficio_nivel": ben_nov if ben_nov else None,
-        "graduacao_pericias_nova": str(ben_nov.get("graduacao_pericias", "") or ""),
         "talentos_totais_novo": talentos_nov,
         "talentos_ganho": talentos_ganho,
         "poderes_gerais_totais_novo": talentos_nov if rv == REGRA_VERSAO_V13 else None,
@@ -500,7 +567,6 @@ def preview_subir_nivel_mb(
         "pontos_habilidade_acumulados": int(
             ben_nov.get("pontos_habilidade_acumulados", 0) or 0
         ),
-        "bonus_meio_nivel": int(ben_nov.get("bonus_meio_nivel", 0) or 0),
         "habilidade_classe": hab_txt,
         "magias_livro_ganho": magias_livro_ganho,
         "magias_livro_max_novo": magias_livro_max_novo,
@@ -511,3 +577,13 @@ def preview_subir_nivel_mb(
         ),
         "avisos": avisos,
     }
+    out.update(
+        _campos_pericias_subir_nivel(
+            nv0,
+            nv1,
+            regra_versao=rv,
+            ben_atual=ben_ant,
+            ben_novo=ben_nov,
+        )
+    )
+    return out

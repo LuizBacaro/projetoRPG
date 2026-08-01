@@ -1,0 +1,2303 @@
+{
+  "_meta": {
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf",
+    "metodo": "pdfplumber texto nativo; títulos chars Tormenta20 ~16pt (letter-spacing + gap X); classe por coluna (MID=200) + headers 27pt com sync left no page seguinte após header à direita; gerais/raça/grupo cruzados Tabelas 1-18..1-23; Treinador curated p.18–19",
+    "offset_paginas": "pagina impressa = índice PDF 0-based - 1 (= PDF 1-based - 2)",
+    "confiabilidade": "alta (texto nativo); atribuição de classe média-alta em páginas de transição bicoluna",
+    "treinador_nota": "23 poderes da seção Poder de Treinador. poderes_herois_arton.json tem 20 — preferir cruzar; nomes podem divergir.",
+    "treinador": [
+      {
+        "nome": "Amigo Divino",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Asas Aliadas",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Aumento de Atributo",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Bom Garoto",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Comando Defensivo",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Comandos Distantes",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Conquistar pelos Números",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      },
+      {
+        "nome": "Convocar Enxame",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Coração Grande",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Direcionamento Marcial",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Domador Cativante",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Domador Lendário",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Ensinar Truque",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Investida Conjunta",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.18"
+      },
+      {
+        "nome": "Líder da Matilha",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      },
+      {
+        "nome": "Língua das Criaturas",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      },
+      {
+        "nome": "Mascote",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      },
+      {
+        "nome": "Petisco Merecido",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      },
+      {
+        "nome": "Proteção Fraterna",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      },
+      {
+        "nome": "Trabalho em Equipe",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      },
+      {
+        "nome": "Treinador Eclético",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      },
+      {
+        "nome": "Treino Intensivo",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      },
+      {
+        "nome": "Veterinário de Campo",
+        "classe_exigida": "treinador",
+        "pagina_referencia": "HA p.19"
+      }
+    ],
+    "contagens": {
+      "classe": 289,
+      "combate": 25,
+      "destino": 13,
+      "magia": 14,
+      "tormenta": 6,
+      "raca": 76,
+      "grupo": 20,
+      "treinador_extra": 23
+    },
+    "por_classe": {
+      "arcanista": 20,
+      "barbaro": 20,
+      "bardo": 23,
+      "bucaneiro": 21,
+      "cacador": 20,
+      "cavaleiro": 20,
+      "clerigo": 23,
+      "druida": 23,
+      "guerreiro": 17,
+      "inventor": 20,
+      "ladino": 20,
+      "lutador": 20,
+      "nobre": 20,
+      "paladino": 22
+    }
+  },
+  "classe": [
+    {
+      "nome": "Agrilhoar os Caídos",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Alquimia Arcana",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Apoteose Celestial",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Apoteose Dracônica",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Apoteose Feérica",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Apoteose Rubra",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Arcanista de Linha de Frente",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Asas de Sapo",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Contingência Arcana",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Contramágica Superior",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.54"
+    },
+    {
+      "nome": "Especialista em Invocações",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.55"
+    },
+    {
+      "nome": "Familiar Aprimorado",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.55"
+    },
+    {
+      "nome": "Ingrediente Especial",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.55"
+    },
+    {
+      "nome": "Magia Performática",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.55"
+    },
+    {
+      "nome": "Memória Súbita",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.55"
+    },
+    {
+      "nome": "O Próprio Sangue",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.55"
+    },
+    {
+      "nome": "Raio Dividido",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Sifão de Mana",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Trama Célere",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Transliteração Impossível",
+      "classe_exigida": "arcanista",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Alma Inabalável",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Ampliar Brado",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Arremesso Violento",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Beberrão Selvagem",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Brado Vitorioso",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Brado: Assombroso",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Brado: Retardante",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Brado: Sísmico",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Enigma do Aço",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Espiritualista",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Fúria Bestial",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.56"
+    },
+    {
+      "nome": "Fúria Elemental",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Impiedoso",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Invocar os Ancestrais",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Manifestar Totem",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Recuperação Gutural",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Regeneração Sobrenatural",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Revide",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Rigidez Selvagem",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Sede Sanguinária",
+      "classe_exigida": "barbaro",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Acorde Místico",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Acorde Poderoso",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Adereço Musical",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.57"
+    },
+    {
+      "nome": "Apresentação Impactante",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Balada do Atirador",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Celebridade Artoniana",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Cortejo de Espadas",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Dança Acrobática",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Dançar nas Cordas",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Entrada Triunfal",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Espada Encantada",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "História de Acampamento",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Inspiração Espirituosa",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Inspiração Resoluta",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Inspiração Revigorante",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Magia Performática",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Mago Vermelho",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Música: Marcha Vitoriosa",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Música: Réquiem Sombrio",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Música: Sonata da Distração",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Portas da Fama",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Ressoar",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.58"
+    },
+    {
+      "nome": "Triunfo do Amor",
+      "classe_exigida": "bardo",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Ardil Afiado",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Bloqueio Desconcertante",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Bom de Trago",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Charme Cafajeste",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Cobrir de Pólvora",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Esgrima Sambur",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Estampido Ensurdecedor",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Estocada no Flanco",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Flecheiro",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Gole da Coragem",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Golpe do Predador",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Golpe Humilhante",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.59"
+    },
+    {
+      "nome": "Introdução Calorosa",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.60"
+    },
+    {
+      "nome": "Lobo do Mar",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.60"
+    },
+    {
+      "nome": "Lorotas da",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.60"
+    },
+    {
+      "nome": "Onda de Sangue",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.60"
+    },
+    {
+      "nome": "Passo Das Ondas",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.60"
+    },
+    {
+      "nome": "Pirouette",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.60"
+    },
+    {
+      "nome": "Remise",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.60"
+    },
+    {
+      "nome": "Sucesso Atrai Sucesso",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Terra e do Mar",
+      "classe_exigida": "bucaneiro",
+      "pagina_referencia": "HA p.60"
+    },
+    {
+      "nome": "Armadilha Alquímica",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Avanço do Predador",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Batedor Marcial",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Curandeiro dos Ermos",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Elo Com a Natureza Maior",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Explorador Viajado",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Herói do Povo",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Identificar Presas",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Lâminas Guardiãs",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Lanceiro",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Pega!",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.61"
+    },
+    {
+      "nome": "Primeiro Sangue",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Sequência Dilaceradora",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Sequência do Predador",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Sombra dos Ermos",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Tempestade de Lâminas",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Tiro de Abate",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Tiro Trespassante",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Tocaia Habilidosa",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Último Sangue",
+      "classe_exigida": "cacador",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Armas da Cavalaria",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Cavaleiro Bandido",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Cavaleiro das Paixões",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Cavaleiro Sagrado",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Duelista Escudado",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Duelo Irrecusável",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Grão-Mestre",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Honra Compartilhada",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.62"
+    },
+    {
+      "nome": "Inércia do Aço",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.63"
+    },
+    {
+      "nome": "Investida Convicta",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.63"
+    },
+    {
+      "nome": "Investida Defensiva",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.63"
+    },
+    {
+      "nome": "Mestre das Posturas",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.63"
+    },
+    {
+      "nome": "Paixão: Amor",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Paixão: Honra",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Paixão: Hospitalidade",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Paixão: Lealdade",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Postura de Combate: Armamento Pesado",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Postura de Combate: QUEBRA-MAGIA",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Postura de Combate: Sequência Blindada",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Presença de Muralha",
+      "classe_exigida": "cavaleiro",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Acólito Escudeiro",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Arma Divina",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Banquete selvagem",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Bênção de Batalha",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Canalizar Abençoado",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Canalizar Concentrado",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.64"
+    },
+    {
+      "nome": "Canalizar Poderoso",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Canalizar Profanado",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Ciclo da Vida",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Companheiro Aberrante",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Conversão de Fé",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Dizimar INFIÉIS",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Égide da Fé",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Força da Devoção",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Liturgia Marcial",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Missa: Compartilhar Milagre",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Missa: Imposição da Vontade",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Missa: Mente Abençoada",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Presente dos Deuses",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Punição Divina",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.65"
+    },
+    {
+      "nome": "Representante Divino",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Solo Profanado",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Solo Sagrado",
+      "classe_exigida": "clerigo",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Arma Tradicional",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Auspício D A MADRUGADA",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Auspício D A Meia-Noite",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Auspício do Crepúsculo",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Companheiro Elemental",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Defesa Estratégica",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Determinação Inabalável",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Erupção Elemental",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Estrategista Inspirador",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Executor",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Força da Natureza",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.66"
+    },
+    {
+      "nome": "Forma Aberrante",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Forma de Cardume",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Forma Elemental",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Forma Esquelética",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Forma Vegetal",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Instinto Venenoso",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Metamorfose Instantânea",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Oráculo da Natureza",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Orador dos Elementos",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Proteção Fúngica",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Transformação Repugnante",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Xamã Místico",
+      "classe_exigida": "druida",
+      "pagina_referencia": "HA p.67"
+    },
+    {
+      "nome": "Análise Tática",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Arremesso de Investida",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Bloqueio Brutal",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Corte Ágil",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Criar Oportunidade",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Fender Defesas",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Inércia do Aço",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Investida Ricochete",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Manobra Dupla",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Mente Disciplinada",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.68"
+    },
+    {
+      "nome": "Operações Combinadas",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.69"
+    },
+    {
+      "nome": "Ordens de Engajamento",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.69"
+    },
+    {
+      "nome": "Recuperar Fôlego",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.69"
+    },
+    {
+      "nome": "Resiliência Marcial",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.69"
+    },
+    {
+      "nome": "Soldado de Infantaria",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.69"
+    },
+    {
+      "nome": "Velho de Guerra",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.69"
+    },
+    {
+      "nome": "Xadrez de Batalha",
+      "classe_exigida": "guerreiro",
+      "pagina_referencia": "HA p.69"
+    },
+    {
+      "nome": "Alquimista Exímio",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Alterar Programação",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Aparato Personalizado",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Armadura Avançada",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Armadura Mecanizada",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Artesão Criativo",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Autômato Alquímico",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Autômato Engenhocado",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Catalisador Experimental",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Estilista",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Explicação Científica",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Explorar Fraqueza",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Farmácia Mágica",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Forçar a Calibragem",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.70"
+    },
+    {
+      "nome": "Galvanização",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Gênio Inovador",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Golpe de Gênio",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Infusão Distante",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Oficina Esotérica",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Saraivada Alquímica",
+      "classe_exigida": "inventor",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Ameaça Brutal",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Assassino em Série",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Ataque Furtivo Letal",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Bombardeiro Furtivo",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Chefe de Gangue",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Conhecimento Anatômico",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Enganar os Olhos",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Finta Acrobática",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Improvisação Arcana",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.71"
+    },
+    {
+      "nome": "Investida Rasteira",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Mestre Assassino",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Mestre Envenenador",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Papo Furado",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Precisão Furtiva",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Rei do Crime",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Sabotagem Corrosiva",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Senhor do Submundo",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Truque de Palco",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Truque do Chapéu",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Vestido Para a Ocasião",
+      "classe_exigida": "ladino",
+      "pagina_referencia": "HA p.72"
+    },
+    {
+      "nome": "Aquecimento",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.73"
+    },
+    {
+      "nome": "Caminhar pelas Paredes",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.73"
+    },
+    {
+      "nome": "Caminho Suave",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.73"
+    },
+    {
+      "nome": "Combinação: Boca do Estômago",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.73"
+    },
+    {
+      "nome": "Combinação: Chute Circular",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.73"
+    },
+    {
+      "nome": "Combinação: Chute no Joelho",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.73"
+    },
+    {
+      "nome": "Combinação: Esquiva Técnica",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.73"
+    },
+    {
+      "nome": "Combinação: Quebra-guarda",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.73"
+    },
+    {
+      "nome": "Combinação: Técnica de Sacrifício",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Combinação: Um-Dois",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Corpo Fechado",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Dança Marcial",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Gingado Elusivo",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Invencível",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Jogo de Pernas",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Mestre das Combinações",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Rilhar os Dentes",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Rolamento Escapatório",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Ruas Furiosas",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Sequência Defensiva",
+      "classe_exigida": "lutador",
+      "pagina_referencia": "HA p.74"
+    },
+    {
+      "nome": "Agente de Elite",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Comandante de Campo",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Comitiva",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Discurso de Batalha",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Fofocas da Corte",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Guarda Pessoal",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Hedonismo Aristocrático",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Instigar Violência",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Insuflar Investida",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Legado Mágico",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Líder Enérgico",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Líder Impiedoso",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Linhagem Distinta",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.75"
+    },
+    {
+      "nome": "Ordens Agressivas",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Ordens Encorajadoras",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Palavras de Efeito",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Palavras Ressonantes",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Protocolo Impecável",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Senescal",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Voz Límpida",
+      "classe_exigida": "nobre",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Arma Juramentada",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Arma Sacramentada",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Aura Vingadora",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Bloqueio Divino",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Convicção Heroica",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Escudo Fraterno",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Escudo Sagrado",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Expurgo Sagrado",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.76"
+    },
+    {
+      "nome": "Fulgor Ardente",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Hoste Celestial",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Investida Sagrada",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Julgamento Divino: Desafio",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Julgamento Divino: Proteção",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Julgamento Divino: Redenção",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Julgamento Divino: Retribuição",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Luz Purificadora",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Manto de Batalha",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Paladino do Reino",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Rajada Divina",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Sacrifício",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Sentença Dobrada",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    },
+    {
+      "nome": "Virtude Paladinesca: Paciência",
+      "classe_exigida": "paladino",
+      "pagina_referencia": "HA p.77"
+    }
+  ],
+  "combate": [
+    {
+      "nome": "Arremesso Devastador",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Ataque com o Cabo",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Ataque em Arco",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Bravura Indômita",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Briga de Rua",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Chuva de Golpes",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Catafractário",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Contra-Ataque",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Coragem Aguerrida",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Corte Lacerante",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Defesa Armada",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Encastelado",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "nome": "Escudo Heroico",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Estocada Pungente",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Estudar o Adversário",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Firula Inspiradora",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Matador de Monstros",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Mobilidade",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Na Mosca",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Pancada Estonteante",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Precisão Letal",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Sanguinário",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Sentinela Implacável",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Sequência de Golpes",
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "nome": "Truque da Mão Lesta",
+      "pagina_referencia": "HA p.79"
+    }
+  ],
+  "destino": [
+    {
+      "nome": "Alma Livre",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Andarilho Urbano",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Carícias Revigorantes",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Diligente",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Foco em Habilidade",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Grandão",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Herói dos Sete Instrumentos",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Impostor",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Liderança Inspiradora",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Meditação Autoafirmativa",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Pose Assustadora",
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "nome": "Sedução Lasciva",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Ventriloquismo",
+      "pagina_referencia": "HA p.82"
+    }
+  ],
+  "magia": [
+    {
+      "nome": "Barreira Mística",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Esoterismo",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Explosão Fulgente",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Estilo Esotérico",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Encantar Itens Menores",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Encantar Itens Médios",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Encantar Itens Maiores",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Especialização em Magia",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Gênese Elemental",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Magia Dividida",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Magia Suspensa",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Miasma Tóxico",
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "nome": "Prisão Gélida",
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "nome": "Trovão Retumbante",
+      "pagina_referencia": "HA p.83"
+    }
+  ],
+  "tormenta": [
+    {
+      "nome": "Bolsões Insanos",
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "nome": "Carapaça Corrompida",
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "nome": "Repulsivo",
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "nome": "Secreção Cicatrizante",
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "nome": "Simetria Radial",
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "nome": "Tempo Místico",
+      "pagina_referencia": "HA p.83"
+    }
+  ],
+  "raca": [
+    {
+      "nome": "Ajudante Nato",
+      "raca_exigida": "qareen",
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Amo",
+      "raca_exigida": "qareen",
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Arma Amada",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Arma Natural Aprimorada",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Arma Natural Hábil",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Arquearia Élfica",
+      "raca_exigida": "elfo",
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Arsenal de Lisandra",
+      "raca_exigida": "dahllan",
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Asas de Aço",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Asas Extraplanares",
+      "raca_exigida": "suraggel",
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Atração pela Pólvora",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Camuflagem Mimética",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Canto da Sereia",
+      "raca_exigida": "sereia_tritao",
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Cascos Poderosos",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Chassi Gracioso",
+      "raca_exigida": "golem",
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Citadino",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Comandar Aprimorado",
+      "raca_exigida": "humano",
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Conforto do Aço",
+      "raca_exigida": "anao",
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Constrição Atroz",
+      "raca_exigida": "dahllan",
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Coração de Pedra",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Coro Sibilante",
+      "raca_exigida": "medusa",
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Crescimento Feérico",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Criança da Luz",
+      "raca_exigida": "suraggel",
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Criança das Trevas",
+      "raca_exigida": "suraggel",
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Devoção Iluminada",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.86"
+    },
+    {
+      "nome": "Duas Cabeças",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Dupla Conjuração",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Dupla Inteligência",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Dupla Prontidão",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Duro Como Aço",
+      "raca_exigida": "anao",
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Entre as Pernas",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Escapada Criativa",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Esgrima Élfica",
+      "raca_exigida": "elfo",
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Estilo Clássico",
+      "raca_exigida": "humano",
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Estirpe Arcana",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Exaltação do Rejeitado",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Explosão Óssea",
+      "raca_exigida": "osteon",
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Falatório Criativo",
+      "raca_exigida": "goblin",
+      "pagina_referencia": "HA p.87"
+    },
+    {
+      "nome": "Familiar de <Elemento>",
+      "raca_exigida": "qareen",
+      "pagina_referencia": "HA p.88"
+    },
+    {
+      "nome": "Familiar de Luz",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.88"
+    },
+    {
+      "nome": "Familiar de Trevas",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.88"
+    },
+    {
+      "nome": "Faro Aprimorado",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.88"
+    },
+    {
+      "nome": "Fragrância de Rosas",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.88"
+    },
+    {
+      "nome": "Fúria Aterrorizante",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.88"
+    },
+    {
+      "nome": "Fúria Natural",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.88"
+    },
+    {
+      "nome": "Gavinhas",
+      "raca_exigida": "dahllan",
+      "pagina_referencia": "HA p.88"
+    },
+    {
+      "nome": "Glamour",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.88"
+    },
+    {
+      "nome": "Glamour Maior",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Golpe dos Titãs",
+      "raca_exigida": "galokk",
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Golpe no Joelho",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Grande Marca de Wynna",
+      "raca_exigida": "qareen",
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Herança Erudita",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Lógica Gnômica",
+      "raca_exigida": "kliren",
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Magia Ofídica",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Manipulação Esquelética",
+      "raca_exigida": "osteon",
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Marrada Poderosa",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Meditação Mística",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Olhar Petrificante",
+      "raca_exigida": "medusa",
+      "pagina_referencia": "HA p.89"
+    },
+    {
+      "nome": "Ossos Afiados",
+      "raca_exigida": "osteon",
+      "pagina_referencia": "HA p.90"
+    },
+    {
+      "nome": "Pirata Oceânico",
+      "raca_exigida": "sereia_tritao",
+      "pagina_referencia": "HA p.90"
+    },
+    {
+      "nome": "Programação de Combate",
+      "raca_exigida": "golem",
+      "pagina_referencia": "HA p.90"
+    },
+    {
+      "nome": "Programação Holística",
+      "raca_exigida": "golem",
+      "pagina_referencia": "HA p.90"
+    },
+    {
+      "nome": "Protetor Eterno",
+      "raca_exigida": "minotauro",
+      "pagina_referencia": "HA p.90"
+    },
+    {
+      "nome": "Protetor Táurico",
+      "raca_exigida": "minotauro",
+      "pagina_referencia": "HA p.90"
+    },
+    {
+      "nome": "Quadridestria",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.90"
+    },
+    {
+      "nome": "Quatro Braços",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.91"
+    },
+    {
+      "nome": "Saliva Corrosiva",
+      "raca_exigida": "trog",
+      "pagina_referencia": "HA p.91"
+    },
+    {
+      "nome": "Sangue Mágico",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.91"
+    },
+    {
+      "nome": "Saraivada Florestal",
+      "raca_exigida": "dahllan",
+      "pagina_referencia": "HA p.91"
+    },
+    {
+      "nome": "Soco Foguete",
+      "raca_exigida": "golem",
+      "pagina_referencia": "HA p.91"
+    },
+    {
+      "nome": "Tradição de Ayrelynn",
+      "raca_exigida": "anao",
+      "pagina_referencia": "HA p.91"
+    },
+    {
+      "nome": "Tradição Perdida",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.91"
+    },
+    {
+      "nome": "Tradição Perdida Aprimorada",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Valentia Inata",
+      "raca_exigida": "hynne",
+      "pagina_referencia": "HA p.84"
+    },
+    {
+      "nome": "Veneno Aprimorado",
+      "raca_exigida": "medusa",
+      "pagina_referencia": "HA p.91"
+    },
+    {
+      "nome": "Vigilância Élfica",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.91"
+    },
+    {
+      "nome": "Vitalidade das Fadas",
+      "raca_exigida": null,
+      "pagina_referencia": "HA p.91"
+    }
+  ],
+  "grupo": [
+    {
+      "nome": "Abrir a Guarda",
+      "pagina_referencia": "HA p.92"
+    },
+    {
+      "nome": "Ajuda do Amador",
+      "pagina_referencia": "HA p.92"
+    },
+    {
+      "nome": "Apontar Fraqueza",
+      "pagina_referencia": "HA p.92"
+    },
+    {
+      "nome": "Barragem de Golpes",
+      "pagina_referencia": "HA p.92"
+    },
+    {
+      "nome": "Bode Expiatório",
+      "pagina_referencia": "HA p.93"
+    },
+    {
+      "nome": "Bote Coletivo",
+      "pagina_referencia": "HA p.93"
+    },
+    {
+      "nome": "Conforto Familiar",
+      "pagina_referencia": "HA p.93"
+    },
+    {
+      "nome": "Conselhos Salvadores",
+      "pagina_referencia": "HA p.93"
+    },
+    {
+      "nome": "Corrente de Corpos",
+      "pagina_referencia": "HA p.94"
+    },
+    {
+      "nome": "Defesa do Mártir",
+      "pagina_referencia": "HA p.94"
+    },
+    {
+      "nome": "Dinheiro Atrai Dinheiro",
+      "pagina_referencia": "HA p.94"
+    },
+    {
+      "nome": "Escudo Vivo",
+      "pagina_referencia": "HA p.94"
+    },
+    {
+      "nome": "Espírito de União",
+      "pagina_referencia": "HA p.94"
+    },
+    {
+      "nome": "Exército de Um Grupo Só",
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "nome": "Magia Comunitária",
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "nome": "Mão Amiga",
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "nome": "Parede de Escudos",
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "nome": "Presença Luminosa",
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "nome": "Saúde Coletiva",
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "nome": "Uma Mão Lava a Outra",
+      "pagina_referencia": "HA p.95"
+    }
+  ]
+}

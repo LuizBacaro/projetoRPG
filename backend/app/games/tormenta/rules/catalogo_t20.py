@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -285,52 +284,19 @@ def filtrar_equipamentos_mb(
     return rows[s : s + lim], total
 
 
-def _split_talentos_texto(texto: str) -> List[str]:
-    """Separa nomes de talentos (vírgulas, ponto-e-vírgula, quebras de linha)."""
-    if not texto or not str(texto).strip():
-        return []
-    partes = re.split(r"[,;\n]+", str(texto))
-    return [p.strip() for p in partes if p and len(p.strip()) >= 2]
-
-
 def lista_talentos_mb_catalogo() -> List[Dict[str, Any]]:
-    """Talentos das classes MB + enriquecimento opcional (`talentos_mb_catalogo.json`)."""
-    from app.games.tormenta.rules.classes_t20 import lista_classes_mb
+    """Catálogo canónico de poderes Cap. 2 v1.3 (`talentos_mb_catalogo.json`).
 
+    Não mistura ``talentos_adicionais`` das classes (proficiências / textos de
+    ficha) — o split por vírgula gerava fragmentos falsos (ex.: ``adaga``).
+    """
     json_rows = _carregar_talentos_mb_catalogo_json()
-    meta_by_lower: Dict[str, Dict[str, Any]] = {}
-    for r in json_rows:
-        nk = str(r.get("nome", "")).strip().lower()
-        if nk:
-            meta_by_lower[nk] = r
-
-    seen: set[str] = set()
     out: List[Dict[str, Any]] = []
-    for row in lista_classes_mb():
-        raw = row.get("talentos_adicionais") or ""
-        for nome in _split_talentos_texto(str(raw)):
-            key = nome.lower()
-            if key in seen:
-                continue
-            seen.add(key)
-            item: Dict[str, Any] = {"nome": nome.strip()}
-            meta = meta_by_lower.get(key)
-            if meta:
-                for fld in _TALENT_EXTRA_FIELDS:
-                    if meta.get(fld):
-                        item[fld] = meta[fld]
-            if "secao" not in item:
-                item["secao"] = "Talentos das classes (MB)"
-            if "categoria" not in item:
-                item["categoria"] = "Classe"
-            out.append(item)
-
     for r in json_rows:
-        nk = str(r.get("nome", "")).strip().lower()
-        if not nk or nk in seen:
+        nome = str(r.get("nome", "")).strip()
+        if not nome:
             continue
-        seen.add(nk)
-        item = {"nome": str(r["nome"]).strip()}
+        item: Dict[str, Any] = {"nome": nome}
         for fld in _TALENT_EXTRA_FIELDS:
             if r.get(fld):
                 item[fld] = r[fld]
@@ -442,7 +408,16 @@ def filtrar_talentos_mb(
         rows = [r for r in rows if qn in _haystack_talento_mb(r)]
     cat_f = str(categoria_v13 or "").strip().lower()
     if cat_f:
-        rows = [r for r in rows if str(r.get("categoria_v13") or "") == cat_f]
+        if cat_f == "geral":
+            # Poderes Gerais do livro = combate + destino + magia (não há slug «geral»).
+            _gerais = {"combate", "destino", "magia"}
+            rows = [
+                r
+                for r in rows
+                if str(r.get("categoria_v13") or "").strip().lower() in _gerais
+            ]
+        else:
+            rows = [r for r in rows if str(r.get("categoria_v13") or "") == cat_f]
     raca_f = str(raca or "").strip().lower()
     if raca_f:
         rows = [

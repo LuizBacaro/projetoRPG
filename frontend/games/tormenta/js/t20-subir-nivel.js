@@ -296,9 +296,26 @@
             );
         }
 
-        if (p.graduacao_pericias_nova) {
+        if (p.graduacao_pericias_nova || p.graduacao_pericias_atual) {
             const rotGrad = lv === 'v1.3' ? 'Bônus em perícias' : 'Graduações de perícias';
-            cards.push(cardHtml(rotGrad, `<p><strong>${escHtml(p.graduacao_pericias_nova)}</strong></p>`));
+            const atual = p.graduacao_pericias_atual || '—';
+            const novo = p.graduacao_pericias_nova || '—';
+            const mudou = !!(p.pericias_mudou_meio || p.pericias_mudou_treino);
+            let corpo = mudou
+                ? `<p class="t20-subir-nivel-delta"><strong>${escHtml(atual)}</strong> → <strong>${escHtml(novo)}</strong></p>`
+                : `<p><strong>${escHtml(novo)}</strong></p><p class="t20-hint">Sem mudança neste nível (½ nível e treino iguais).</p>`;
+            if (p.pericias_mudou_meio) {
+                corpo += `<p class="t20-hint">½ nível: ${p.bonus_meio_nivel_atual ?? '—'} → ${p.bonus_meio_nivel ?? '—'}.</p>`;
+            }
+            if (p.pericias_mudou_treino) {
+                const tn = p.bonus_treino_novo;
+                corpo += `<p class="t20-hint">Bônus de treinamento sobe para +${tn} nas perícias treinadas.</p>`;
+            }
+            const nota =
+                p.pericias_nota ||
+                'Bônus automático (½ nível + treino). Não escolha novas perícias treinadas ao subir de nível.';
+            corpo += `<p class="t20-hint">${escHtml(nota)}</p>`;
+            cards.push(cardHtml(rotGrad, corpo));
         }
 
         const magias = [];
@@ -351,6 +368,11 @@
         const ul = q('subirNivelChecklistPos');
         if (!ul) return;
         const items = [];
+        if (isV13()) {
+            items.push(
+                'Perícias: totais atualizados automaticamente na ficha — não marque novas treinadas aqui (use Treinamento em Perícia / INT se precisar).'
+            );
+        }
         if (p && p.talentos_ganho > 0) {
             items.push(isV13() ? 'Escolher o poder geral ganho (modal Poderes).' : 'Escolher o talento ganho.');
         }
@@ -547,6 +569,14 @@
             }
             if (typeof window.atualizarResumoClasseMb === 'function') {
                 window.atualizarResumoClasseMb();
+            }
+            if (typeof window.atualizarMeioNivelColuna === 'function') {
+                window.atualizarMeioNivelColuna();
+            }
+            if (typeof window.atualizarResistenciasTotaisTormenta === 'function') {
+                window.atualizarResistenciasTotaisTormenta(true);
+            } else if (typeof atualizarResistenciasTotaisTormenta === 'function') {
+                atualizarResistenciasTotaisTormenta(true);
             }
             if (typeof Toast !== 'undefined') Toast.success(`Nível ${p.nivel} aplicado (${lv}).`);
             fecharModal();

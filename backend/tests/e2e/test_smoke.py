@@ -68,7 +68,8 @@ def fazer_login(page: Page, email: str = ADMIN_EMAIL, senha: str = ADMIN_PASS):
     hub_dnd = page.locator("#btnHubDnd35")
     hub_dnd.wait_for(state="visible", timeout=15000)
     expect(hub_dnd).to_be_enabled(timeout=30000)
-    hub_dnd.click()
+    # Órbita CSS do hub move o botão continuamente; force evita Timeout «element is not stable».
+    hub_dnd.click(force=True)
     page.wait_for_url(_DASHBOARD_URL_RE, timeout=30000, wait_until="domcontentloaded")
 
 
