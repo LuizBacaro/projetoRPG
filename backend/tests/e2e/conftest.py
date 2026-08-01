@@ -50,5 +50,7 @@ def context(browser_instance: Browser) -> Generator[BrowserContext, None, None]:
 @pytest.fixture(scope="function")
 def page(context: BrowserContext) -> Generator[Page, None, None]:
     p = context.new_page()
+    # Órbita infinita do hub (#btnHubDnd35) impede click «stable»; CSS já respeita isto.
+    p.emulate_media(reduced_motion="reduce")
     yield p
     p.close()

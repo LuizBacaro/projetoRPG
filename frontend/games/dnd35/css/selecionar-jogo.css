@@ -680,6 +680,11 @@ body {
     .hub-satellite:not(:disabled) img {
         animation: none !important;
     }
+
+    /* Sem keyframes: mantém o satélite na posição do slot e direito. */
+    .hub-orbit-counter {
+        transform: translate(-50%, -50%) rotate(calc(-1 * var(--slot-angle)));
+    }
 }
 
 @media (min-width: 720px) {
