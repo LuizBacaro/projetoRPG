@@ -9,6 +9,8 @@
             ? global.T20RegraVersao.SUPLEMENTO_HEROIS_ARTON
             : 'herois_arton';
 
+    const CATEGORIAS_SO_HA = ['raca', 'treinador', 'grupo', 'distincao', 'classe'];
+
     const CATEGORIAS = [
         { slug: '', label: 'Todas as categorias' },
         { slug: 'geral', label: 'Gerais' },
@@ -26,6 +28,15 @@
 
     function q(id) {
         return document.getElementById(id);
+    }
+
+    function categoriaSelecionada() {
+        const cat = q('talentosMbCategoriaV13');
+        return cat ? String(cat.value || '').trim().toLowerCase() : '';
+    }
+
+    function isCategoriaSoHa(slug) {
+        return CATEGORIAS_SO_HA.indexOf(String(slug || '').trim().toLowerCase()) >= 0;
     }
 
     function isV13() {
@@ -130,28 +141,62 @@
         }
     }
 
+    function atualizarHintCategoriaHa() {
+        const hint = q('talentosMbHaBrowseHint');
+        const cat = categoriaSelecionada();
+        const show = isV13() && isCategoriaSoHa(cat) && !isHaAtivo();
+        if (hint) {
+            hint.style.display = show ? '' : 'none';
+            return;
+        }
+        if (!show) return;
+        const host = q('talentosMbControlesV13');
+        if (!host || !host.parentNode) return;
+        const el = document.createElement('p');
+        el.id = 'talentosMbHaBrowseHint';
+        el.className = 't20-hint';
+        el.style.margin = '0.35rem 0 0';
+        el.textContent =
+            'Catálogo Heróis de Arton (consulta). Para vincular à ficha, ative o suplemento HA.';
+        host.parentNode.insertBefore(el, host.nextSibling);
+    }
+
     function atualizarUiModalHa() {
         montarControlesHaModal();
+        atualizarHintCategoriaHa();
         const sub = q('subModalGerenciarTalentos');
         if (sub && isV13() && isHaAtivo()) {
             sub.innerHTML =
-                'Catálogo v1.3 + <strong>Heróis de Arton</strong>. Use categoria ou «só elegíveis» para filtrar. <span class="t20-hint">Esc fecha.</span>';
+                'Catálogo v1.3 + <strong>Heróis de Arton</strong> (classe, gerais, raça, grupo). Use categoria ou «só elegíveis» para filtrar. <span class="t20-hint">Esc fecha.</span>';
         }
     }
 
     function paramsCatalogoPoderes(base) {
         const p = Object.assign({}, base || {});
-        if (isV13()) {
-            const cat = q('talentosMbCategoriaV13');
-            if (cat && cat.value) p.categoria_v13 = cat.value;
-        }
-        if (isHaAtivo()) {
+        const cat = isV13() ? categoriaSelecionada() : '';
+        if (cat) p.categoria_v13 = cat;
+        // Categorias só-HA precisam do merge do suplemento mesmo sem game_suplemento na ficha.
+        if (isHaAtivo() || isCategoriaSoHa(cat)) {
             p.suplemento = SUPLEMENTO_HA;
             if (somenteElegiveisHaAtivo()) {
                 p.limit = Math.max(Number(p.limit) || 25, 200);
             }
         }
         return p;
+    }
+
+    function mensagemCatalogoVazio(categoria, totalApi) {
+        const cat = String(categoria || '').trim().toLowerCase();
+        if (cat === 'distincao') {
+            return 'Nenhum poder de Distinção no catálogo ainda (HA).';
+        }
+        if (totalApi === 0 && isCategoriaSoHa(cat)) {
+            return 'Nenhum poder nesta categoria HA. Confira o filtro ou a busca.';
+        }
+        if (totalApi === 0) {
+            return 'Nenhum poder nesta categoria.';
+        }
+        return 'Nenhum poder elegível com os filtros atuais (raça/classe da ficha).';
     }
 
     function posProcessarItensCatalogo(itens) {
@@ -232,6 +277,7 @@
         if (global.__t20PoderesV13ModalBound) return;
         global.__t20PoderesV13ModalBound = true;
         q('talentosMbCategoriaV13')?.addEventListener('change', () => {
+            atualizarHintCategoriaHa();
             if (typeof global.carregarTalCatalogoTormenta === 'function') {
                 global.carregarTalCatalogoTormenta(true);
             }
@@ -294,7 +340,10 @@
         validarAntesDeAdicionar,
         coletarNomesPoderesFicha,
         isHaAtivo,
+        isCategoriaSoHa,
+        mensagemCatalogoVazio,
         CATEGORIAS,
+        CATEGORIAS_SO_HA,
         SUPLEMENTO_HA,
     };
 })(typeof window !== 'undefined' ? window : globalThis);

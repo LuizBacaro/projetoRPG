@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from types import SimpleNamespace
 
 import pytest
@@ -31,14 +32,24 @@ def client_regras_tormenta():
 def test_lista_poderes_herois_arton_minimo_viavel() -> None:
     rows = lista_poderes_herois_arton()
     slugs = {r["slug"] for r in rows}
+    cats = Counter(r.get("categoria_v13") for r in rows)
     treinador = [r for r in rows if r.get("categoria_v13") == "treinador"]
-    assert len(rows) >= 25
+    assert len(rows) >= 400, len(rows)
     assert len(treinador) >= 20
+    assert cats.get("classe", 0) >= 250
+    assert cats.get("combate", 0) >= 20
+    assert cats.get("destino", 0) >= 10
+    assert cats.get("magia", 0) >= 10
+    assert cats.get("tormenta", 0) >= 5
+    assert cats.get("raca", 0) >= 70
+    assert cats.get("grupo", 0) >= 15
     assert "amigo_divino" in slugs
     assert "aumento_de_atributo" in slugs
     assert "coracao_grande" in slugs
     assert "eco_arcano" in slugs
     assert "chuva_de_golpes" in slugs
+    assert poder_por_slug("chuva_de_golpes")["categoria_v13"] == "combate"
+    assert poder_por_slug("escudo_heroico")["categoria_v13"] == "combate"
 
 
 def test_poder_por_slug_amigo_divino() -> None:
@@ -80,6 +91,51 @@ def test_get_poderes_sem_suplemento_nao_inclui_ha(client_regras_tormenta) -> Non
     slugs = {it.get("slug") for it in r.json()["itens"]}
     assert "amigo_divino" not in slugs
     assert "eco_arcano" not in slugs
+
+
+def test_filtrar_talentos_raca_exige_suplemento() -> None:
+    from app.games.tormenta.rules.catalogo_t20 import filtrar_talentos_mb
+
+    _, total_sem = filtrar_talentos_mb(
+        None, 0, 50, categoria_v13="raca", suplemento=None
+    )
+    _, total_ha = filtrar_talentos_mb(
+        None, 0, 50, categoria_v13="raca", suplemento="herois_arton"
+    )
+    assert total_sem == 0
+    assert total_ha >= 70
+
+
+def test_filtrar_talentos_geral_combate_destino_magia() -> None:
+    from app.games.tormenta.rules.catalogo_t20 import filtrar_talentos_mb
+
+    rows, total = filtrar_talentos_mb(
+        None, 0, 200, categoria_v13="geral", suplemento=None
+    )
+    assert total >= 60  # 40 combate + 20 destino + 8 magia
+    cats = {str(r.get("categoria_v13")) for r in rows}
+    assert cats <= {"combate", "destino", "magia"}
+    assert "combate" in cats
+
+    _, total_ha = filtrar_talentos_mb(
+        None, 0, 200, categoria_v13="geral", suplemento="herois_arton"
+    )
+    assert total_ha >= total
+
+
+def test_get_poderes_raca_com_suplemento(client_regras_tormenta) -> None:
+    r = client_regras_tormenta.get(
+        "/api/v1/tormenta/regras/poderes",
+        params={
+            "suplemento": "herois_arton",
+            "categoria_v13": "raca",
+            "limit": 50,
+        },
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["total"] >= 70
+    assert all(it.get("categoria_v13") == "raca" for it in body["itens"])
 
 
 def test_get_poderes_raca_eiradaan(client_regras_tormenta) -> None:
@@ -125,7 +181,10 @@ def test_poderes_disponiveis_ficha_filtra_classe_treinador() -> None:
     }
     slugs = {r["slug"] for r in poderes_disponiveis_ficha(ficha)}
     assert "amigo_divino" in slugs
-    assert "chuva_de_golpes" not in slugs
+    # Chuva de Golpes é poder geral de combate (disponível a qualquer HA).
+    assert "chuva_de_golpes" in slugs
+    # Poder de classe de outra classe permanece fora.
+    assert "arma_juramentada" not in slugs
 
 
 def test_poderes_disponiveis_variante_treinador_prefixo() -> None:

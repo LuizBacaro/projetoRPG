@@ -1287,6 +1287,63 @@ def test_subir_nivel_preview_e_aplicar_mago(tormenta_personagens_db):
     assert res["personagem"]["ficha_json"].get("habilidade_classe_mb")
 
 
+def test_subir_nivel_v13_nao_altera_pericias_treinadas(tormenta_personagens_db):
+    """Apply sobe nível sem comprar/marcar novas perícias treinadas (HA p.41)."""
+    SessionLocal, u1, *_ = tormenta_personagens_db
+    client = _build_client(SessionLocal, _usuario(u1))
+    pericias = [
+        {"nome": "Luta", "slug": "luta", "treinado": True},
+        {"nome": "Fortitude", "slug": "fortitude", "treinado": True},
+        {"nome": "Diplomacia", "slug": "diplomacia", "treinado": False},
+    ]
+    rid_resp = client.post(
+        "/api/v1/tormenta/personagens",
+        json=_t20_post_jogador_v13_json(
+            nome="PerNv",
+            nivel=1,
+            pv_max=20,
+            pv_atual=20,
+            ficha_json={
+                "tormenta_classe_mb_slug": "guerreiro",
+                "origem_slug": "acolito",
+                "origem_beneficios": ["pericia:cura", "poder:medicina"],
+                "multiclasse_v13": [{"slug": "guerreiro", "nivel": 1}],
+                "cadastro_dashboard": True,
+                "pericias": pericias,
+            },
+        ),
+    )
+    assert rid_resp.status_code == 201, rid_resp.text
+    rid = rid_resp.json()["id"]
+    antes = [
+        (p.get("slug") or p.get("nome"), bool(p.get("treinado")))
+        for p in (rid_resp.json().get("ficha_json") or {}).get("pericias") or []
+    ]
+
+    prev = client.get(
+        f"/api/v1/tormenta/personagens/{rid}/subir-nivel-preview",
+        params={"nivel_alvo": 2, "classe_slug": "guerreiro"},
+    )
+    assert prev.status_code == 200, prev.text
+    body = prev.json()
+    assert body["graduacao_pericias_atual"] == "+2/+0"
+    assert body["graduacao_pericias_nova"] == "+3/+1"
+    assert body["pericias_mudou_meio"] is True
+
+    aplic = client.post(
+        f"/api/v1/tormenta/personagens/{rid}/subir-nivel",
+        json={"aplicar_ganhos_vida": True, "classe_slug": "guerreiro"},
+    )
+    assert aplic.status_code == 200, aplic.text
+    depois = [
+        (p.get("slug") or p.get("nome"), bool(p.get("treinado")))
+        for p in (aplic.json()["personagem"].get("ficha_json") or {}).get("pericias")
+        or []
+    ]
+    assert aplic.json()["personagem"]["nivel"] == 2
+    assert depois == antes
+
+
 def test_subir_nivel_v13_multiclasse_nova_classe(tormenta_personagens_db):
     SessionLocal, u1, *_ = tormenta_personagens_db
     client = _build_client(SessionLocal, _usuario(u1))

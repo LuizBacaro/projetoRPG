@@ -25,6 +25,14 @@ preservadas apenas como legado para depuração e migração histórica.
     compatibilidade com o resto do código.
   - Metadados por item: `slug`, `nome`, `categoria_v13`, `prerequisitos`,
     `descricao_resumo` (curta), `pagina_referencia`, `fonte_catalogo`.
+  - **Não** inclui proficiências de classe (`talentos_adicionais` em
+    `classes_mb.json`) — essas strings ficam só na ficha de classe.
+- `poderes_herois_arton.json`
+  - Catálogo completo Heróis de Arton v1.1: Treinador + poderes de classe
+    (p.54–77), gerais (p.78–83), raça (p.84–91), grupo (p.92–97).
+  - Build: `scripts/build_poderes_herois_arton_catalogo.py` a partir de
+    `_ha_poderes_extract_raw.json` (extração local do PDF).
+  - API: `GET /tormenta/regras/poderes?suplemento=herois_arton`.
 - `itens_superiores_v13.json`
   - Tabelas 3-7 / 3-8 / 3-9 (melhorias + materiais especiais).
   - API: `GET /tormenta/regras/itens-superiores`.

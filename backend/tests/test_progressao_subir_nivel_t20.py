@@ -104,3 +104,60 @@ def test_preview_subir_nivel_v13_sobe_classe_existente():
     assert p["classe_nova_multiclasse"] is False
     assert p["pa_ganho"] == 6
     assert p["pa_max_novo"] == 27
+
+
+def test_preview_v13_pericias_1_para_2_delta_meio():
+    """Tabela 1-4: nv1 +2/+0 → nv2 +3/+1 (½ nível sobe; treino permanece +2)."""
+    p = preview_subir_nivel_v13(
+        nivel_personagem=1,
+        classe_alvo_slug="guerreiro",
+        ficha_json={
+            "regra_versao": "v13",
+            "tormenta_classe_mb_slug": "guerreiro",
+            "multiclasse_v13": [{"slug": "guerreiro", "nivel": 1}],
+        },
+        for_valor=0,
+        des_valor=0,
+        con_valor=0,
+        int_valor=0,
+        sab_valor=0,
+        car_valor=0,
+    )
+    assert p["permitido"] is True
+    assert p["graduacao_pericias_atual"] == "+2/+0"
+    assert p["graduacao_pericias_nova"] == "+3/+1"
+    assert p["bonus_meio_nivel_atual"] == 0
+    assert p["bonus_meio_nivel"] == 1
+    assert p["bonus_treino_atual"] == 2
+    assert p["bonus_treino_novo"] == 2
+    assert p["pericias_mudou_meio"] is True
+    assert p["pericias_mudou_treino"] is False
+    assert "automático" in (p.get("pericias_nota") or "").lower()
+
+
+def test_preview_v13_pericias_6_para_7_salto_treino():
+    """No 7º nível o treino sobe +2→+4; meio permanece 3 → +7/+3."""
+    p = preview_subir_nivel_v13(
+        nivel_personagem=6,
+        classe_alvo_slug="guerreiro",
+        ficha_json={
+            "regra_versao": "v13",
+            "tormenta_classe_mb_slug": "guerreiro",
+            "multiclasse_v13": [{"slug": "guerreiro", "nivel": 6}],
+        },
+        for_valor=0,
+        des_valor=0,
+        con_valor=0,
+        int_valor=0,
+        sab_valor=0,
+        car_valor=0,
+    )
+    assert p["permitido"] is True
+    assert p["graduacao_pericias_atual"] == "+5/+3"
+    assert p["graduacao_pericias_nova"] == "+7/+3"
+    assert p["bonus_meio_nivel_atual"] == 3
+    assert p["bonus_meio_nivel"] == 3
+    assert p["bonus_treino_atual"] == 2
+    assert p["bonus_treino_novo"] == 4
+    assert p["pericias_mudou_meio"] is False
+    assert p["pericias_mudou_treino"] is True

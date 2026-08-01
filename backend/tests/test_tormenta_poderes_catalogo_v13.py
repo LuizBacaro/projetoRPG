@@ -51,6 +51,28 @@ def test_catalogo_poderes_v13_volume_e_amostras():
         assert amostra in nomes, amostra
 
 
+def test_lista_talentos_mb_sem_fragmentos_de_proficiencia():
+    """Catálogo runtime = JSON Cap. 2; sem split de talentos_adicionais (adaga/machado)."""
+    from app.games.tormenta.rules.catalogo_t20 import lista_talentos_mb_catalogo
+
+    rows = lista_talentos_mb_catalogo()
+    assert len(rows) == 162
+    nomes = {str(r.get("nome") or "").strip().lower() for r in rows}
+    for bad in (
+        "adaga",
+        "machado)",
+        "bordão",
+        "dardo",
+        "funda",
+        "usar armas (clava",
+        "médias e pesadas)",
+        "shuriken)",
+    ):
+        assert bad not in nomes, bad
+    assert not any(n.startswith("usar armas") for n in nomes)
+    assert not any(n.startswith("usar armaduras") for n in nomes)
+
+
 def test_categoria_v13_combate():
     assert (
         categoria_v13_de_item({"categoria": "Combate", "secao": "Ataque"}) == "combate"
