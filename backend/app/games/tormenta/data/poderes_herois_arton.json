@@ -1,289 +1,2746 @@
 {
   "_meta": {
-    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Capítulo 1 p.16–21, p.56–77, p.78–95",
-    "nota": "Catálogo HA-4: 20 poderes Treinador + raça/classe. Não reproduz texto longo."
+    "fonte": "T20-Herois-de-Arton-v1-1.pdf — Cap. 1 (Treinador p.16–21; poderes p.54–97)",
+    "nota": "Catálogo completo HA: Treinador + classe + gerais + raça + grupo. Metadados curtos; textos longos ficam no livro. Totais: {'classe': 293, 'combate': 25, 'destino': 13, 'grupo': 20, 'magia': 14, 'raca': 79, 'tormenta': 6, 'treinador': 30} (n=480).",
+    "build": "scripts/build_poderes_herois_arton_catalogo.py"
   },
   "poderes": [
     {
-      "slug": "amigo_divino",
-      "nome": "Amigo Divino",
+      "slug": "acorde_mistico",
+      "nome": "Acorde Místico",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Melhor Amigo pode ser espírito ou construto celestial.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "bardo"
     },
     {
-      "slug": "bom_garoto",
-      "nome": "Bom Garoto",
+      "slug": "acorde_poderoso",
+      "nome": "Acorde Poderoso",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Melhor Amigo ganha +2 em testes de perícia baseados em Carisma.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "bardo"
     },
     {
-      "slug": "coracao_grande",
-      "nome": "Coração Grande",
+      "slug": "acolito_escudeiro",
+      "nome": "Acólito Escudeiro",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Pode ter um Melhor Amigo adicional.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "clerigo"
     },
     {
-      "slug": "ensinar_truque",
-      "nome": "Ensinar Truque",
+      "slug": "adereco_musical",
+      "nome": "Adereço Musical",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Melhor Amigo aprende um truque adicional.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "bardo"
     },
     {
-      "slug": "comando_defensivo",
-      "nome": "Comando Defensivo",
+      "slug": "agente_de_elite",
+      "nome": "Agente de Elite",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
-      "custo_pm": 2,
-      "descricao_resumo": "Melhor Amigo usa ação de proteção como reação (2 PM).",
-      "pagina_referencia": "HA p.20"
-    },
-    {
-      "slug": "domador_cativante",
-      "nome": "Domador Cativante",
-      "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "+2 em testes de Adestramento para domar criaturas.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
     },
     {
-      "slug": "investida_conjunta",
-      "nome": "Investida Conjunta",
+      "slug": "agrilhoar_os_caidos",
+      "nome": "Agrilhoar os Caídos",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
-      "custo_pm": 2,
-      "descricao_resumo": "Você e Melhor Amigo fazem investida coordenada (2 PM).",
-      "pagina_referencia": "HA p.20"
-    },
-    {
-      "slug": "direcionamento_marcial",
-      "nome": "Direcionamento Marcial",
-      "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
-      "custo_pm": 2,
-      "descricao_resumo": "Direcionar soma Carisma em ataques do Melhor Amigo (2 PM).",
-      "pagina_referencia": "HA p.20"
-    },
-    {
-      "slug": "asas_aliadas",
-      "nome": "Asas Aliadas",
-      "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Melhor Amigo alado ganha deslocamento de voo.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
     },
     {
-      "slug": "domador_lendario",
-      "nome": "Domador Lendário",
+      "slug": "alma_inabalavel",
+      "nome": "Alma Inabalável",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Domar Criatura pode afetar criaturas de ND até metade do seu nível.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
     },
     {
-      "slug": "comandos_distantes",
-      "nome": "Comandos Distantes",
+      "slug": "alquimia_arcana",
+      "nome": "Alquimia Arcana",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
-      "custo_pm": 1,
-      "descricao_resumo": "Comandos ao Melhor Amigo funcionam em alcance médio (1 PM).",
-      "pagina_referencia": "HA p.20"
-    },
-    {
-      "slug": "convocar_enxame",
-      "nome": "Convocar Enxame",
-      "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
-      "custo_pm": 4,
-      "descricao_resumo": "Convoca enxame de criaturas pequenas por uma cena (4 PM).",
-      "pagina_referencia": "HA p.20"
-    },
-    {
-      "slug": "aumento_de_atributo",
-      "nome": "Aumento de Atributo",
-      "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Melhor Amigo recebe +1 em Força, Destreza ou Sabedoria (escolher ao aprender).",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
     },
     {
-      "slug": "comando_ofensivo",
-      "nome": "Comando Ofensivo",
+      "slug": "alquimista_eximio",
+      "nome": "Alquimista Exímio",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
-      "custo_pm": 2,
-      "descricao_resumo": "Melhor Amigo realiza um ataque como reação ao seu comando (2 PM).",
-      "pagina_referencia": "HA p.20"
-    },
-    {
-      "slug": "proteger_o_amigo",
-      "nome": "Proteger o Amigo",
-      "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
-      "custo_pm": 2,
-      "descricao_resumo": "Intercepta um ataque contra o Melhor Amigo como reação (2 PM).",
-      "pagina_referencia": "HA p.20"
-    },
-    {
-      "slug": "amigo_fiel",
-      "nome": "Amigo Fiel",
-      "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
-      "custo_pm": 1,
-      "descricao_resumo": "Melhor Amigo pode rerrolar um teste de resistência 1× por cena (1 PM).",
-      "pagina_referencia": "HA p.20"
-    },
-    {
-      "slug": "mestre_das_feras",
-      "nome": "Mestre das Feras",
-      "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "+2 em testes de Adestramento para Domar Criatura.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
     },
     {
-      "slug": "treino_rigoroso",
-      "nome": "Treino Rigoroso",
+      "slug": "alterar_programacao",
+      "nome": "Alterar Programação",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Melhor Amigo recebe +1 PV por nível de Treinador.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
     },
     {
-      "slug": "comunicacao_silenciosa",
-      "nome": "Comunicação Silenciosa",
+      "slug": "ameaca_brutal",
+      "nome": "Ameaça Brutal",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
-      "custo_pm": 1,
-      "descricao_resumo": "Comandos ao Melhor Amigo não exigem gestos nem palavras (1 PM).",
-      "pagina_referencia": "HA p.20"
-    },
-    {
-      "slug": "parceiro_veterano",
-      "nome": "Parceiro Veterano",
-      "fonte_catalogo": "herois_arton",
-      "categoria_v13": "treinador",
-      "classe_exigida": "treinador",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Melhor Amigo aumenta uma categoria de dano de armas naturais.",
-      "pagina_referencia": "HA p.20"
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "ladino"
     },
     {
-      "slug": "eco_arcano",
-      "nome": "Eco Arcano",
+      "slug": "ampliar_brado",
+      "nome": "Ampliar Brado",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "raca",
-      "raca_exigida": "eiradaan",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Eiradaan: uma magia arcana de 1º círculo como habilidade racial.",
-      "pagina_referencia": "HA p.8"
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
     },
     {
-      "slug": "forca_titanica",
-      "nome": "Força Titânica",
+      "slug": "analise_tatica",
+      "nome": "Análise Tática",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "raca",
-      "raca_exigida": "galokk",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Galokk: +1 em testes de Força e dano corpo a corpo.",
-      "pagina_referencia": "HA p.13"
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
     },
     {
-      "slug": "ambicao_herdada",
-      "nome": "Ambição Herdada",
+      "slug": "aparato_personalizado",
+      "nome": "Aparato Personalizado",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "raca",
-      "raca_exigida": "meio_elfo",
+      "categoria_v13": "classe",
       "custo_pm": 0,
-      "descricao_resumo": "Meio-Elfo: escolhe 1 poder geral ou único de origem ao criar o personagem.",
-      "pagina_referencia": "HA p.14"
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "apoteose_celestial",
+      "nome": "Apoteose Celestial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "apoteose_draconica",
+      "nome": "Apoteose Dracônica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "apoteose_feerica",
+      "nome": "Apoteose Feérica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "apoteose_rubra",
+      "nome": "Apoteose Rubra",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "apresentacao_impactante",
+      "nome": "Apresentação Impactante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "aquecimento",
+      "nome": "Aquecimento",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.73",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "arcanista_de_linha_de_frente",
+      "nome": "Arcanista de Linha de Frente",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "ardil_afiado",
+      "nome": "Ardil Afiado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "arma_divina",
+      "nome": "Arma Divina",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "arma_juramentada",
+      "nome": "Arma Juramentada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "paladino",
+      "descricao_resumo": "Arma preferida recebe melhoria mágica.",
+      "prerequisitos": "Devoto"
+    },
+    {
+      "slug": "arma_sacramentada",
+      "nome": "Arma Sacramentada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "arma_tradicional",
+      "nome": "Arma Tradicional",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "armadilha_alquimica",
+      "nome": "Armadilha Alquímica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "armadura_avancada",
+      "nome": "Armadura Avançada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "armadura_mecanizada",
+      "nome": "Armadura Mecanizada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "armas_da_cavalaria",
+      "nome": "Armas da Cavalaria",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "arremesso_de_investida",
+      "nome": "Arremesso de Investida",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "arremesso_violento",
+      "nome": "Arremesso Violento",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "artesao_criativo",
+      "nome": "Artesão Criativo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "asas_de_sapo",
+      "nome": "Asas de Sapo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "assassino_em_serie",
+      "nome": "Assassino em Série",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "ataque_furtivo_letal",
+      "nome": "Ataque Furtivo Letal",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "aura_vingadora",
+      "nome": "Aura Vingadora",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "auspicio_d_a_madrugada",
+      "nome": "Auspício D A MADRUGADA",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "auspicio_d_a_meia_noite",
+      "nome": "Auspício D A Meia-Noite",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "auspicio_do_crepusculo",
+      "nome": "Auspício do Crepúsculo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "automato_alquimico",
+      "nome": "Autômato Alquímico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "automato_engenhocado",
+      "nome": "Autômato Engenhocado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "avanco_do_predador",
+      "nome": "Avanço do Predador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "balada_do_atirador",
+      "nome": "Balada do Atirador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "banquete_selvagem",
+      "nome": "Banquete selvagem",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "batedor_marcial",
+      "nome": "Batedor Marcial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "beberrao_selvagem",
+      "nome": "Beberrão Selvagem",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "bloqueio_brutal",
+      "nome": "Bloqueio Brutal",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "bloqueio_desconcertante",
+      "nome": "Bloqueio Desconcertante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "bloqueio_divino",
+      "nome": "Bloqueio Divino",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "bom_de_trago",
+      "nome": "Bom de Trago",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "bombardeiro_furtivo",
+      "nome": "Bombardeiro Furtivo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "brado_vitorioso",
+      "nome": "Brado Vitorioso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "brado_assombroso",
+      "nome": "Brado: Assombroso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "brado_retardante",
+      "nome": "Brado: Retardante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "brado_sismico",
+      "nome": "Brado: Sísmico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "bencao_de_batalha",
+      "nome": "Bênção de Batalha",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "caminhar_pelas_paredes",
+      "nome": "Caminhar pelas Paredes",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.73",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "caminho_suave",
+      "nome": "Caminho Suave",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.73",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "canalizar_abencoado",
+      "nome": "Canalizar Abençoado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "canalizar_concentrado",
+      "nome": "Canalizar Concentrado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "canalizar_poderoso",
+      "nome": "Canalizar Poderoso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "canalizar_profanado",
+      "nome": "Canalizar Profanado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "catalisador_experimental",
+      "nome": "Catalisador Experimental",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "cavaleiro_bandido",
+      "nome": "Cavaleiro Bandido",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "cavaleiro_das_paixoes",
+      "nome": "Cavaleiro das Paixões",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "cavaleiro_sagrado",
+      "nome": "Cavaleiro Sagrado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "celebridade_artoniana",
+      "nome": "Celebridade Artoniana",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "charme_cafajeste",
+      "nome": "Charme Cafajeste",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "chefe_de_gangue",
+      "nome": "Chefe de Gangue",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "ciclo_da_vida",
+      "nome": "Ciclo da Vida",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "cobrir_de_polvora",
+      "nome": "Cobrir de Pólvora",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "comandante_de_campo",
+      "nome": "Comandante de Campo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "combinacao_boca_do_estomago",
+      "nome": "Combinação: Boca do Estômago",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.73",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "combinacao_chute_circular",
+      "nome": "Combinação: Chute Circular",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.73",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "combinacao_chute_no_joelho",
+      "nome": "Combinação: Chute no Joelho",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.73",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "combinacao_esquiva_tecnica",
+      "nome": "Combinação: Esquiva Técnica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.73",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "combinacao_quebra_guarda",
+      "nome": "Combinação: Quebra-guarda",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.73",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "combinacao_tecnica_de_sacrificio",
+      "nome": "Combinação: Técnica de Sacrifício",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "combinacao_um_dois",
+      "nome": "Combinação: Um-Dois",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "comitiva",
+      "nome": "Comitiva",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "companheiro_aberrante",
+      "nome": "Companheiro Aberrante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "companheiro_elemental",
+      "nome": "Companheiro Elemental",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "conhecimento_anatomico",
+      "nome": "Conhecimento Anatômico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "contingencia_arcana",
+      "nome": "Contingência Arcana",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "contramagica_superior",
+      "nome": "Contramágica Superior",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.54",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "conversao_de_fe",
+      "nome": "Conversão de Fé",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "conviccao_heroica",
+      "nome": "Convicção Heroica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "corpo_fechado",
+      "nome": "Corpo Fechado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "corte_agil",
+      "nome": "Corte Ágil",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "cortejo_de_espadas",
+      "nome": "Cortejo de Espadas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "criar_oportunidade",
+      "nome": "Criar Oportunidade",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "curandeiro_dos_ermos",
+      "nome": "Curandeiro dos Ermos",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "danca_acrobatica",
+      "nome": "Dança Acrobática",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "danca_marcial",
+      "nome": "Dança Marcial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "dancar_nas_cordas",
+      "nome": "Dançar nas Cordas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "defesa_estrategica",
+      "nome": "Defesa Estratégica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "defesa_estrategica_guerreiro",
+      "nome": "Defesa Estratégica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "determinacao_inabalavel",
+      "nome": "Determinação Inabalável",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "determinacao_inabalavel_guerreiro",
+      "nome": "Determinação Inabalável",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "discurso_de_batalha",
+      "nome": "Discurso de Batalha",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "dizimar_infieis",
+      "nome": "Dizimar INFIÉIS",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "duelista_escudado",
+      "nome": "Duelista Escudado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "duelo_irrecusavel",
+      "nome": "Duelo Irrecusável",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "elo_com_a_natureza_maior",
+      "nome": "Elo Com a Natureza Maior",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "enganar_os_olhos",
+      "nome": "Enganar os Olhos",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "enigma_do_aco",
+      "nome": "Enigma do Aço",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "entrada_triunfal",
+      "nome": "Entrada Triunfal",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "erupcao_elemental",
+      "nome": "Erupção Elemental",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "escudo_fraterno",
+      "nome": "Escudo Fraterno",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "escudo_sagrado",
+      "nome": "Escudo Sagrado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "esgrima_sambur",
+      "nome": "Esgrima Sambur",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "espada_encantada",
+      "nome": "Espada Encantada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "especialista_em_invocacoes",
+      "nome": "Especialista em Invocações",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.55",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "espiritualista",
+      "nome": "Espiritualista",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "estampido_ensurdecedor",
+      "nome": "Estampido Ensurdecedor",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "estilista",
+      "nome": "Estilista",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "estocada_no_flanco",
+      "nome": "Estocada no Flanco",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "estrategista_inspirador",
+      "nome": "Estrategista Inspirador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "estrategista_inspirador_guerreiro",
+      "nome": "Estrategista Inspirador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "executor",
+      "nome": "Executor",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "executor_guerreiro",
+      "nome": "Executor",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "explicacao_cientifica",
+      "nome": "Explicação Científica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "explorador_viajado",
+      "nome": "Explorador Viajado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "explorar_fraqueza",
+      "nome": "Explorar Fraqueza",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "expurgo_sagrado",
+      "nome": "Expurgo Sagrado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "familiar_aprimorado",
+      "nome": "Familiar Aprimorado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.55",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "farmacia_magica",
+      "nome": "Farmácia Mágica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "fender_defesas",
+      "nome": "Fender Defesas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "finta_acrobatica",
+      "nome": "Finta Acrobática",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "flecheiro",
+      "nome": "Flecheiro",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "fofocas_da_corte",
+      "nome": "Fofocas da Corte",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "forma_aberrante",
+      "nome": "Forma Aberrante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "forma_de_cardume",
+      "nome": "Forma de Cardume",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "forma_elemental",
+      "nome": "Forma Elemental",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "forma_esqueletica",
+      "nome": "Forma Esquelética",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "forma_vegetal",
+      "nome": "Forma Vegetal",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "forca_da_devocao",
+      "nome": "Força da Devoção",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "forca_da_natureza",
+      "nome": "Força da Natureza",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "forcar_a_calibragem",
+      "nome": "Forçar a Calibragem",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.70",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "fulgor_ardente",
+      "nome": "Fulgor Ardente",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "furia_bestial",
+      "nome": "Fúria Bestial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "furia_elemental",
+      "nome": "Fúria Elemental",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "galvanizacao",
+      "nome": "Galvanização",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "gingado_elusivo",
+      "nome": "Gingado Elusivo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "gole_da_coragem",
+      "nome": "Gole da Coragem",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "golpe_de_genio",
+      "nome": "Golpe de Gênio",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "golpe_do_predador",
+      "nome": "Golpe do Predador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "golpe_humilhante",
+      "nome": "Golpe Humilhante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "grao_mestre",
+      "nome": "Grão-Mestre",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "guarda_pessoal",
+      "nome": "Guarda Pessoal",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "genio_inovador",
+      "nome": "Gênio Inovador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "hedonismo_aristocratico",
+      "nome": "Hedonismo Aristocrático",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "heroi_do_povo",
+      "nome": "Herói do Povo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "historia_de_acampamento",
+      "nome": "História de Acampamento",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "honra_compartilhada",
+      "nome": "Honra Compartilhada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "hoste_celestial",
+      "nome": "Hoste Celestial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "identificar_presas",
+      "nome": "Identificar Presas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "impiedoso",
+      "nome": "Impiedoso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "improvisacao_arcana",
+      "nome": "Improvisação Arcana",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "infusao_distante",
+      "nome": "Infusão Distante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "ingrediente_especial",
+      "nome": "Ingrediente Especial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.55",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "inspiracao_espirituosa",
+      "nome": "Inspiração Espirituosa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "inspiracao_resoluta",
+      "nome": "Inspiração Resoluta",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "inspiracao_revigorante",
+      "nome": "Inspiração Revigorante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "instigar_violencia",
+      "nome": "Instigar Violência",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "instinto_venenoso",
+      "nome": "Instinto Venenoso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "insuflar_investida",
+      "nome": "Insuflar Investida",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "introducao_calorosa",
+      "nome": "Introdução Calorosa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.60",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "invencivel",
+      "nome": "Invencível",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "investida_convicta",
+      "nome": "Investida Convicta",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.63",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "investida_defensiva",
+      "nome": "Investida Defensiva",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.63",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "investida_rasteira",
+      "nome": "Investida Rasteira",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "investida_ricochete",
+      "nome": "Investida Ricochete",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "investida_sagrada",
+      "nome": "Investida Sagrada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "invocar_os_ancestrais",
+      "nome": "Invocar os Ancestrais",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "inercia_do_aco",
+      "nome": "Inércia do Aço",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.63",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "inercia_do_aco_guerreiro",
+      "nome": "Inércia do Aço",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "jogo_de_pernas",
+      "nome": "Jogo de Pernas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "julgamento_divino_desafio",
+      "nome": "Julgamento Divino: Desafio",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "julgamento_divino_protecao",
+      "nome": "Julgamento Divino: Proteção",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "julgamento_divino_redencao",
+      "nome": "Julgamento Divino: Redenção",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "julgamento_divino_retribuicao",
+      "nome": "Julgamento Divino: Retribuição",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "lanceiro",
+      "nome": "Lanceiro",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "legado_magico",
+      "nome": "Legado Mágico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "linhagem_distinta",
+      "nome": "Linhagem Distinta",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "liturgia_marcial",
+      "nome": "Liturgia Marcial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "lobo_do_mar",
+      "nome": "Lobo do Mar",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.60",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "lorotas_da",
+      "nome": "Lorotas da",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.60",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "luz_purificadora",
+      "nome": "Luz Purificadora",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "laminas_guardias",
+      "nome": "Lâminas Guardiãs",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "lider_energico",
+      "nome": "Líder Enérgico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "lider_impiedoso",
+      "nome": "Líder Impiedoso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.75",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "magia_performatica",
+      "nome": "Magia Performática",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.55",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "magia_performatica_bardo",
+      "nome": "Magia Performática",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "mago_vermelho",
+      "nome": "Mago Vermelho",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "manifestar_totem",
+      "nome": "Manifestar Totem",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "manobra_dupla",
+      "nome": "Manobra Dupla",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "manto_de_batalha",
+      "nome": "Manto de Batalha",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "memoria_subita",
+      "nome": "Memória Súbita",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.55",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "mente_disciplinada",
+      "nome": "Mente Disciplinada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.68",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "mestre_assassino",
+      "nome": "Mestre Assassino",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "mestre_das_combinacoes",
+      "nome": "Mestre das Combinações",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "mestre_das_posturas",
+      "nome": "Mestre das Posturas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.63",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "mestre_envenenador",
+      "nome": "Mestre Envenenador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "metamorfose_instantanea",
+      "nome": "Metamorfose Instantânea",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "missa_compartilhar_milagre",
+      "nome": "Missa: Compartilhar Milagre",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "missa_imposicao_da_vontade",
+      "nome": "Missa: Imposição da Vontade",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "missa_mente_abencoada",
+      "nome": "Missa: Mente Abençoada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "musica_marcha_vitoriosa",
+      "nome": "Música: Marcha Vitoriosa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "musica_requiem_sombrio",
+      "nome": "Música: Réquiem Sombrio",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "musica_sonata_da_distracao",
+      "nome": "Música: Sonata da Distração",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "o_proprio_sangue",
+      "nome": "O Próprio Sangue",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.55",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "oficina_esoterica",
+      "nome": "Oficina Esotérica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "onda_de_sangue",
+      "nome": "Onda de Sangue",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.60",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "operacoes_combinadas",
+      "nome": "Operações Combinadas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.69",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "orador_dos_elementos",
+      "nome": "Orador dos Elementos",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "ordens_agressivas",
+      "nome": "Ordens Agressivas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "nobre",
+      "descricao_resumo": "Gritar Ordens soma bônus no 1º dano dos aliados."
+    },
+    {
+      "slug": "ordens_de_engajamento",
+      "nome": "Ordens de Engajamento",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.69",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "ordens_encorajadoras",
+      "nome": "Ordens Encorajadoras",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "oraculo_da_natureza",
+      "nome": "Oráculo da Natureza",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "paixao_amor",
+      "nome": "Paixão: Amor",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "paixao_honra",
+      "nome": "Paixão: Honra",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "paixao_hospitalidade",
+      "nome": "Paixão: Hospitalidade",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "paixao_lealdade",
+      "nome": "Paixão: Lealdade",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "paladino_do_reino",
+      "nome": "Paladino do Reino",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "palavras_de_efeito",
+      "nome": "Palavras de Efeito",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "palavras_ressonantes",
+      "nome": "Palavras Ressonantes",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "papo_furado",
+      "nome": "Papo Furado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "passo_das_ondas",
+      "nome": "Passo Das Ondas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.60",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "pega",
+      "nome": "Pega!",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "pirouette",
+      "nome": "Pirouette",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.60",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "portas_da_fama",
+      "nome": "Portas da Fama",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "postura_de_combate_armamento_pesado",
+      "nome": "Postura de Combate: Armamento Pesado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "postura_de_combate_quebra_magia",
+      "nome": "Postura de Combate: QUEBRA-MAGIA",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "postura_de_combate_sequencia_blindada",
+      "nome": "Postura de Combate: Sequência Blindada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "precisao_furtiva",
+      "nome": "Precisão Furtiva",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "presente_dos_deuses",
+      "nome": "Presente dos Deuses",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "presenca_de_muralha",
+      "nome": "Presença de Muralha",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.64",
+      "classe_exigida": "cavaleiro"
+    },
+    {
+      "slug": "primeiro_sangue",
+      "nome": "Primeiro Sangue",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "protecao_fungica",
+      "nome": "Proteção Fúngica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "protocolo_impecavel",
+      "nome": "Protocolo Impecável",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "punicao_divina",
+      "nome": "Punição Divina",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "raio_dividido",
+      "nome": "Raio Dividido",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "rajada_divina",
+      "nome": "Rajada Divina",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "recuperar_folego",
+      "nome": "Recuperar Fôlego",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.69",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "recuperacao_gutural",
+      "nome": "Recuperação Gutural",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "regeneracao_sobrenatural",
+      "nome": "Regeneração Sobrenatural",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "rei_do_crime",
+      "nome": "Rei do Crime",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "remise",
+      "nome": "Remise",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.60",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "representante_divino",
+      "nome": "Representante Divino",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "resiliencia_marcial",
+      "nome": "Resiliência Marcial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.69",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "ressoar",
+      "nome": "Ressoar",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.58",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "revide",
+      "nome": "Revide",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "rigidez_selvagem",
+      "nome": "Rigidez Selvagem",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "rilhar_os_dentes",
+      "nome": "Rilhar os Dentes",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "rolamento_escapatorio",
+      "nome": "Rolamento Escapatório",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "ruas_furiosas",
+      "nome": "Ruas Furiosas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "sabotagem_corrosiva",
+      "nome": "Sabotagem Corrosiva",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "sacrificio",
+      "nome": "Sacrifício",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "saraivada_alquimica",
+      "nome": "Saraivada Alquímica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.71",
+      "classe_exigida": "inventor"
+    },
+    {
+      "slug": "sede_sanguinaria",
+      "nome": "Sede Sanguinária",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.57",
+      "classe_exigida": "barbaro"
+    },
+    {
+      "slug": "senescal",
+      "nome": "Senescal",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "nobre",
+      "descricao_resumo": "+1/patamar em testes de domínio/negócio.",
+      "prerequisitos": "5º nível nobre"
+    },
+    {
+      "slug": "senhor_do_submundo",
+      "nome": "Senhor do Submundo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "sentenca_dobrada",
+      "nome": "Sentença Dobrada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "sequencia_defensiva",
+      "nome": "Sequência Defensiva",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.74",
+      "classe_exigida": "lutador"
+    },
+    {
+      "slug": "sequencia_dilaceradora",
+      "nome": "Sequência Dilaceradora",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "sequencia_do_predador",
+      "nome": "Sequência do Predador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "sifao_de_mana",
+      "nome": "Sifão de Mana",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "soldado_de_infantaria",
+      "nome": "Soldado de Infantaria",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.69",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "solo_profanado",
+      "nome": "Solo Profanado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "solo_sagrado",
+      "nome": "Solo Sagrado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.66",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "sombra_dos_ermos",
+      "nome": "Sombra dos Ermos",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "sucesso_atrai_sucesso",
+      "nome": "Sucesso Atrai Sucesso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.61",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "tempestade_de_laminas",
+      "nome": "Tempestade de Lâminas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "terra_e_do_mar",
+      "nome": "Terra e do Mar",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.60",
+      "classe_exigida": "bucaneiro"
+    },
+    {
+      "slug": "tiro_de_abate",
+      "nome": "Tiro de Abate",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "tiro_trespassante",
+      "nome": "Tiro Trespassante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "tocaia_habilidosa",
+      "nome": "Tocaia Habilidosa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "trama_celere",
+      "nome": "Trama Célere",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "transformacao_repugnante",
+      "nome": "Transformação Repugnante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "transliteracao_impossivel",
+      "nome": "Transliteração Impossível",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.56",
+      "classe_exigida": "arcanista"
+    },
+    {
+      "slug": "triunfo_do_amor",
+      "nome": "Triunfo do Amor",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.59",
+      "classe_exigida": "bardo"
+    },
+    {
+      "slug": "truque_de_palco",
+      "nome": "Truque de Palco",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "truque_do_chapeu",
+      "nome": "Truque do Chapéu",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "velho_de_guerra",
+      "nome": "Velho de Guerra",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.69",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "vestido_para_a_ocasiao",
+      "nome": "Vestido Para a Ocasião",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.72",
+      "classe_exigida": "ladino"
+    },
+    {
+      "slug": "virtude_paladinesca_paciencia",
+      "nome": "Virtude Paladinesca: Paciência",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.77",
+      "classe_exigida": "paladino"
+    },
+    {
+      "slug": "voz_limpida",
+      "nome": "Voz Límpida",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.76",
+      "classe_exigida": "nobre"
+    },
+    {
+      "slug": "xadrez_de_batalha",
+      "nome": "Xadrez de Batalha",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.69",
+      "classe_exigida": "guerreiro"
+    },
+    {
+      "slug": "xama_mistico",
+      "nome": "Xamã Místico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.67",
+      "classe_exigida": "druida"
+    },
+    {
+      "slug": "egide_da_fe",
+      "nome": "Égide da Fé",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.65",
+      "classe_exigida": "clerigo"
+    },
+    {
+      "slug": "ultimo_sangue",
+      "nome": "Último Sangue",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "classe",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.62",
+      "classe_exigida": "cacador"
+    },
+    {
+      "slug": "arremesso_devastador",
+      "nome": "Arremesso Devastador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "slug": "ataque_com_o_cabo",
+      "nome": "Ataque com o Cabo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "slug": "ataque_em_arco",
+      "nome": "Ataque em Arco",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "slug": "bravura_indomita",
+      "nome": "Bravura Indômita",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.78",
+      "descricao_resumo": "Adjacente a ≥2 inimigos: +2 ataque e margem.",
+      "prerequisitos": "Vontade"
+    },
+    {
+      "slug": "briga_de_rua",
+      "nome": "Briga de Rua",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "slug": "catafractario",
+      "nome": "Catafractário",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.78"
     },
     {
       "slug": "chuva_de_golpes",
       "nome": "Chuva de Golpes",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "classe",
-      "classe_exigida": "guerreiro",
+      "categoria_v13": "combate",
       "custo_pm": 2,
-      "descricao_resumo": "Guerreiro: dois ataques com arma leve na mão secundária (2 PM).",
-      "pagina_referencia": "HA p.68"
+      "pagina_referencia": "HA p.78",
+      "descricao_resumo": "Dois ataques com arma leve na mão secundária (2 PM)."
     },
     {
-      "slug": "escudo_heroico",
-      "nome": "Escudo Heroico",
+      "slug": "contra_ataque",
+      "nome": "Contra-Ataque",
       "fonte_catalogo": "herois_arton",
-      "categoria_v13": "classe",
-      "classe_exigida": "guerreiro",
-      "custo_pm": 2,
-      "descricao_resumo": "Guerreiro: arremessa escudo como ataque à distância (2 PM).",
-      "pagina_referencia": "HA p.68"
-    },
-    {
-      "slug": "precisao_letal",
-      "nome": "Precisão Letal",
       "categoria_v13": "combate",
       "custo_pm": 0,
-      "pagina_referencia": "HA p.79",
-      "prerequisitos": "11º nível",
-      "descricao_resumo": "Margem de ameaça +1.",
+      "pagina_referencia": "HA p.78"
+    },
+    {
+      "slug": "coragem_aguerida",
+      "nome": "Coragem Aguerrida",
       "fonte_catalogo": "herois_arton",
-      "efeitos": [
-        {
-          "id": "prec_ameaca",
-          "alvo": "margem_ameaca",
-          "op": "soma",
-          "valor": 1,
-          "quando": "sempre",
-          "rotulo": "Precisão Letal — margem ameaça +1",
-          "pagina": 79
-        }
-      ]
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.78",
+      "descricao_resumo": "≤½ PV: +2 perícias e Defesa.",
+      "prerequisitos": "Vontade"
+    },
+    {
+      "slug": "corte_lacerante",
+      "nome": "Corte Lacerante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.78"
     },
     {
       "slug": "defesa_armada",
       "nome": "Defesa Armada",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "combate",
       "custo_pm": 0,
-      "pagina_referencia": "HA p.79",
-      "prerequisitos": "Estilo de Duas Mãos",
+      "pagina_referencia": "HA p.78",
       "descricao_resumo": "Arma 2 mãos: +2 Defesa e Fortitude.",
-      "fonte_catalogo": "herois_arton",
+      "prerequisitos": "Estilo de Duas Mãos",
       "efeitos": [
         {
           "id": "da_def",
@@ -307,54 +2764,197 @@
       ]
     },
     {
-      "slug": "bravura_indomita",
-      "nome": "Bravura Indômita",
+      "slug": "encastelado",
+      "nome": "Encastelado",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "combate",
       "custo_pm": 0,
-      "pagina_referencia": "HA p.78",
-      "prerequisitos": "Vontade",
-      "descricao_resumo": "Adjacente a ≥2 inimigos: +2 ataque e margem.",
-      "fonte_catalogo": "herois_arton"
+      "pagina_referencia": "HA p.78"
     },
     {
-      "slug": "coragem_aguerida",
-      "nome": "Coragem Aguerrida",
+      "slug": "escudo_heroico",
+      "nome": "Escudo Heroico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 2,
+      "pagina_referencia": "HA p.79",
+      "descricao_resumo": "Arremessa escudo como ataque à distância (2 PM)."
+    },
+    {
+      "slug": "estocada_pungente",
+      "nome": "Estocada Pungente",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "combate",
       "custo_pm": 0,
-      "pagina_referencia": "HA p.79",
-      "prerequisitos": "Vontade",
-      "descricao_resumo": "≤½ PV: +2 perícias e Defesa.",
-      "fonte_catalogo": "herois_arton"
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "slug": "estudar_o_adversario",
+      "nome": "Estudar o Adversário",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "slug": "firula_inspiradora",
+      "nome": "Firula Inspiradora",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "slug": "matador_de_monstros",
+      "nome": "Matador de Monstros",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79"
     },
     {
       "slug": "mobilidade",
       "nome": "Mobilidade",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "combate",
       "custo_pm": 0,
       "pagina_referencia": "HA p.79",
-      "prerequisitos": "Esquiva",
       "descricao_resumo": "Movimentar ≥6 m: +2 ataque e Defesa.",
-      "fonte_catalogo": "herois_arton"
+      "prerequisitos": "Esquiva"
     },
     {
-      "slug": "escudo_heroico_geral",
-      "nome": "Escudo Heroico",
+      "slug": "na_mosca",
+      "nome": "Na Mosca",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "combate",
-      "custo_pm": 1,
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "slug": "pancada_estonteante",
+      "nome": "Pancada Estonteante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 2,
       "pagina_referencia": "HA p.79",
-      "prerequisitos": "Ataque com Escudo",
-      "descricao_resumo": "Empunhar/soltar escudo ação livre; arremesso.",
-      "fonte_catalogo": "herois_arton"
+      "descricao_resumo": "2 PM + impacto → desprevenido 1 rodada.",
+      "prerequisitos": "Luta"
+    },
+    {
+      "slug": "precisao_letal",
+      "nome": "Precisão Letal",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79",
+      "descricao_resumo": "Margem de ameaça +1.",
+      "prerequisitos": "11º nível",
+      "efeitos": [
+        {
+          "id": "prec_ameaca",
+          "alvo": "margem_ameaca",
+          "op": "soma",
+          "valor": 1,
+          "quando": "sempre",
+          "rotulo": "Precisão Letal — margem ameaça +1",
+          "pagina": 79
+        }
+      ]
+    },
+    {
+      "slug": "sanguinario",
+      "nome": "Sanguinário",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "slug": "sentinela_implacavel",
+      "nome": "Sentinela Implacável",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "slug": "sequencia_de_golpes",
+      "nome": "Sequência de Golpes",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "slug": "truque_da_mao_lesta",
+      "nome": "Truque da Mão Lesta",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "combate",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.79"
+    },
+    {
+      "slug": "alma_livre",
+      "nome": "Alma Livre",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "slug": "andarilho_urbano",
+      "nome": "Andarilho Urbano",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80",
+      "descricao_resumo": "Em cidade: +2 Defesa, Enganação, Investigação.",
+      "efeitos": [
+        {
+          "id": "au_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "em_cidade",
+          "rotulo": "Andarilho Urbano — +2 Defesa (em cidade)",
+          "pagina": 80
+        }
+      ]
+    },
+    {
+      "slug": "caricias_revigorantes",
+      "nome": "Carícias Revigorantes",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "slug": "diligente",
+      "nome": "Diligente",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "slug": "foco_habilidade",
+      "nome": "Foco em Habilidade",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80",
+      "descricao_resumo": "CD de 1 habilidade +2 (não magias)."
     },
     {
       "slug": "grandao",
       "nome": "Grandão",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "destino",
       "custo_pm": 0,
       "pagina_referencia": "HA p.80",
-      "prerequisitos": "Con 2",
       "descricao_resumo": "Conta 1 tamanho maior; carga +5.",
-      "fonte_catalogo": "herois_arton",
+      "prerequisitos": "Con 2",
       "efeitos": [
         {
           "id": "grand_carga",
@@ -370,30 +2970,45 @@
     {
       "slug": "heroi_sete_instrumentos",
       "nome": "Herói dos Sete Instrumentos",
-      "categoria_v13": "destino",
-      "custo_pm": 0,
-      "pagina_referencia": "HA p.81",
-      "descricao_resumo": "+1 em perícias não treinadas (escala com instrumentos).",
-      "fonte_catalogo": "herois_arton"
-    },
-    {
-      "slug": "foco_habilidade",
-      "nome": "Foco em Habilidade",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "destino",
       "custo_pm": 0,
       "pagina_referencia": "HA p.80",
-      "descricao_resumo": "CD de 1 habilidade +2 (não magias).",
-      "fonte_catalogo": "herois_arton"
+      "descricao_resumo": "+1 em perícias não treinadas (escala com instrumentos)."
+    },
+    {
+      "slug": "impostor",
+      "nome": "Impostor",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "slug": "lideranca_inspiradora",
+      "nome": "Liderança Inspiradora",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80"
+    },
+    {
+      "slug": "meditacao_autoafirmativa",
+      "nome": "Meditação Autoafirmativa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.80"
     },
     {
       "slug": "pose_assustadora",
       "nome": "Pose Assustadora",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "destino",
       "custo_pm": 1,
-      "pagina_referencia": "HA p.81",
-      "prerequisitos": "Car 1, Intimidação",
+      "pagina_referencia": "HA p.80",
       "descricao_resumo": "+2 Intimidação; 1 PM assustar.",
-      "fonte_catalogo": "herois_arton",
+      "prerequisitos": "Car 1, Intimidação",
       "efeitos": [
         {
           "id": "pose_int",
@@ -408,86 +3023,360 @@
       ]
     },
     {
-      "slug": "andarilho_urbano",
-      "nome": "Andarilho Urbano",
+      "slug": "seducao_lasciva",
+      "nome": "Sedução Lasciva",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "destino",
       "custo_pm": 0,
-      "pagina_referencia": "HA p.80",
-      "descricao_resumo": "Em cidade: +2 Defesa, Enganação, Investigação.",
-      "fonte_catalogo": "herois_arton",
-      "efeitos": [
-        {
-          "id": "au_def",
-          "alvo": "defesa",
-          "op": "soma",
-          "valor": 2,
-          "quando": "em_cidade",
-          "rotulo": "Andarilho Urbano — +2 Defesa (em cidade)",
-          "pagina": 80
-        }
-      ]
+      "pagina_referencia": "HA p.82"
     },
     {
-      "slug": "bolsoes_insanos",
-      "nome": "Bolsões Insanos",
-      "categoria_v13": "tormenta",
-      "custo_pm": 0,
-      "pagina_referencia": "HA p.83",
-      "descricao_resumo": "Carga +2; +5 Ladinagem ocultar nesses espaços.",
+      "slug": "ventriloquismo",
+      "nome": "Ventriloquismo",
       "fonte_catalogo": "herois_arton",
-      "efeitos": [
-        {
-          "id": "bols_carga",
-          "alvo": "carga_espacos",
-          "op": "soma",
-          "valor": 2,
-          "quando": "sempre",
-          "rotulo": "Bolsões Insanos — carga +2",
-          "pagina": 83
-        }
-      ]
+      "categoria_v13": "destino",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
     },
     {
-      "slug": "carapaca_corrompida",
-      "nome": "Carapaça Corrompida",
-      "categoria_v13": "tormenta",
-      "custo_pm": 0,
-      "pagina_referencia": "HA p.83",
-      "prerequisitos": "Carapaça",
-      "descricao_resumo": "RD 1 (+1 por outros poderes Tormenta).",
+      "slug": "abrir_a_guarda",
+      "nome": "Abrir a Guarda",
       "fonte_catalogo": "herois_arton",
-      "efeitos": [
-        {
-          "id": "carap_rd",
-          "alvo": "rd",
-          "rd_tipo": "todos",
-          "op": "soma",
-          "valor": 1,
-          "quando": "sempre",
-          "rotulo": "Carapaça Corrompida — RD 1",
-          "pagina": 83
-        }
-      ]
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.92"
     },
     {
-      "slug": "simetria_radial",
-      "nome": "Simetria Radial",
-      "categoria_v13": "tormenta",
+      "slug": "ajuda_do_amador",
+      "nome": "Ajuda do Amador",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
       "custo_pm": 0,
-      "pagina_referencia": "HA p.83",
-      "prerequisitos": "4 poderes Tormenta",
-      "descricao_resumo": "Não flanqueado/caído; +5 vs agarrar.",
-      "fonte_catalogo": "herois_arton"
+      "pagina_referencia": "HA p.92"
+    },
+    {
+      "slug": "apontar_fraqueza",
+      "nome": "Apontar Fraqueza",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.92"
+    },
+    {
+      "slug": "barragem_de_golpes",
+      "nome": "Barragem de Golpes",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.92"
+    },
+    {
+      "slug": "bode_expiatorio",
+      "nome": "Bode Expiatório",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.93"
+    },
+    {
+      "slug": "bote_coletivo",
+      "nome": "Bote Coletivo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.93"
+    },
+    {
+      "slug": "conforto_familiar",
+      "nome": "Conforto Familiar",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.93"
+    },
+    {
+      "slug": "conselhos_salvadores",
+      "nome": "Conselhos Salvadores",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.93"
+    },
+    {
+      "slug": "corrente_de_corpos",
+      "nome": "Corrente de Corpos",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.94"
+    },
+    {
+      "slug": "defesa_do_martir",
+      "nome": "Defesa do Mártir",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 2,
+      "pagina_referencia": "HA p.94",
+      "descricao_resumo": "1×/rod sofrer dano no lugar de aliado."
+    },
+    {
+      "slug": "dinheiro_atrai_dinheiro",
+      "nome": "Dinheiro Atrai Dinheiro",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.94"
+    },
+    {
+      "slug": "escudo_vivo",
+      "nome": "Escudo Vivo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.94"
+    },
+    {
+      "slug": "espirito_de_uniao",
+      "nome": "Espírito de União",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.94"
+    },
+    {
+      "slug": "exercito_de_um_grupo_so",
+      "nome": "Exército de Um Grupo Só",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "slug": "magia_comunitaria",
+      "nome": "Magia Comunitária",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "slug": "mao_amiga",
+      "nome": "Mão Amiga",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "slug": "parede_de_escudos",
+      "nome": "Parede de Escudos",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.95",
+      "descricao_resumo": "Escudos adjacentes: +5 Defesa, RD 5."
+    },
+    {
+      "slug": "presenca_luminosa",
+      "nome": "Presença Luminosa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "slug": "saude_coletiva",
+      "nome": "Saúde Coletiva",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.95",
+      "descricao_resumo": "Cura em aliado com poder: +2 PV/dado."
+    },
+    {
+      "slug": "uma_mao_lava_a_outra",
+      "nome": "Uma Mão Lava a Outra",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "grupo",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.95"
+    },
+    {
+      "slug": "barreira_mistica",
+      "nome": "Barreira Mística",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "encantar_itens_maiores",
+      "nome": "Encantar Itens Maiores",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "encantar_itens_menores",
+      "nome": "Encantar Itens Menores",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "encantar_itens_medios",
+      "nome": "Encantar Itens Médios",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "esoterismo",
+      "nome": "Esoterismo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "especializacao_em_magia",
+      "nome": "Especialização em Magia",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "estilo_esoterico",
+      "nome": "Estilo Esotérico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "explosao_fulgente",
+      "nome": "Explosão Fulgente",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "genese_elemental",
+      "nome": "Gênese Elemental",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "magia_dividida",
+      "nome": "Magia Dividida",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "magia_suspensa",
+      "nome": "Magia Suspensa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "miasma_toxico",
+      "nome": "Miasma Tóxico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.82"
+    },
+    {
+      "slug": "prisao_gelida",
+      "nome": "Prisão Gélida",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "slug": "trovao_retumbante",
+      "nome": "Trovão Retumbante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "magia",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "slug": "ajudante_nato",
+      "nome": "Ajudante Nato",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "raca_exigida": "qareen"
+    },
+    {
+      "slug": "ambicao_herdada",
+      "nome": "Ambição Herdada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.14",
+      "raca_exigida": "meio_elfo",
+      "descricao_resumo": "Meio-Elfo: escolhe 1 poder geral ou único de origem ao criar o personagem."
+    },
+    {
+      "slug": "amo",
+      "nome": "Amo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "raca_exigida": "qareen"
+    },
+    {
+      "slug": "arma_amada",
+      "nome": "Arma Amada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "raca_exigida": "anao"
+    },
+    {
+      "slug": "arma_natural_aprimorada",
+      "nome": "Arma Natural Aprimorada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "prerequisitos": "Pré-requisito: raça elegível (ver HA Tabela 1-22)."
+    },
+    {
+      "slug": "arma_natural_habil",
+      "nome": "Arma Natural Hábil",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "prerequisitos": "Pré-requisito: raça elegível (ver HA Tabela 1-22)."
     },
     {
       "slug": "arquearia_elfica",
       "nome": "Arquearia Élfica",
+      "fonte_catalogo": "herois_arton",
       "categoria_v13": "raca",
-      "raca_exigida": "elfo",
       "custo_pm": 0,
       "pagina_referencia": "HA p.84",
+      "raca_exigida": "elfo",
       "descricao_resumo": "Arcos = simples; +2 dano com arcos.",
-      "fonte_catalogo": "herois_arton",
       "efeitos": [
         {
           "id": "arc_elf_dano",
@@ -502,14 +3391,23 @@
       ]
     },
     {
+      "slug": "arsenal_de_lisandra",
+      "nome": "Arsenal de Lisandra",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "raca_exigida": "dahllan"
+    },
+    {
       "slug": "asas_de_aco",
       "nome": "Asas de Aço",
-      "categoria_v13": "raca",
-      "raca_exigida": "suraggel",
-      "custo_pm": 1,
-      "pagina_referencia": "HA p.85",
-      "descricao_resumo": "+2 Defesa; asas como arma; ataque extra 1 PM.",
       "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 1,
+      "pagina_referencia": "HA p.84",
+      "raca_exigida": "suraggel",
+      "descricao_resumo": "+2 Defesa; asas como arma; ataque extra 1 PM.",
       "efeitos": [
         {
           "id": "asas_def",
@@ -523,45 +3421,24 @@
       ]
     },
     {
-      "slug": "coracao_de_pedra",
-      "nome": "Coração de Pedra",
-      "categoria_v13": "raca",
-      "raca_exigida": "anao",
-      "custo_pm": 0,
-      "pagina_referencia": "HA p.86",
-      "descricao_resumo": "+1 PV/nível; imune petrificação.",
+      "slug": "asas_extraplanares",
+      "nome": "Asas Extraplanares",
       "fonte_catalogo": "herois_arton",
-      "efeitos": [
-        {
-          "id": "cor_ped_pv",
-          "alvo": "pv_max",
-          "op": "soma",
-          "valor": 1,
-          "quando": "sempre",
-          "rotulo": "Coração de Pedra — +1 PV/nível (fixo +1 aqui)",
-          "pagina": 86
-        }
-      ]
-    },
-    {
-      "slug": "citadino",
-      "nome": "Citadino",
       "categoria_v13": "raca",
-      "raca_exigida": "humano",
       "custo_pm": 0,
-      "pagina_referencia": "HA p.86",
-      "descricao_resumo": "+2 perícias Carisma (exceto Adestramento).",
-      "fonte_catalogo": "herois_arton"
+      "pagina_referencia": "HA p.84",
+      "raca_exigida": "suraggel"
     },
     {
       "slug": "atracao_polvora",
       "nome": "Atração pela Pólvora",
-      "categoria_v13": "raca",
-      "raca_exigida": "humano",
-      "custo_pm": 0,
-      "pagina_referencia": "HA p.85",
-      "descricao_resumo": "+1 ataque / +2 dano armas de fogo.",
       "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "raca_exigida": "anao",
+      "descricao_resumo": "+1 ataque / +2 dano armas de fogo.",
+      "prerequisitos": "Raças: anao, goblin, kliren",
       "efeitos": [
         {
           "id": "polv_atq",
@@ -586,77 +3463,1015 @@
       ]
     },
     {
-      "slug": "parede_de_escudos",
-      "nome": "Parede de Escudos",
-      "categoria_v13": "grupo",
-      "custo_pm": 0,
-      "pagina_referencia": "HA p.94",
-      "descricao_resumo": "Escudos adjacentes: +5 Defesa, RD 5.",
+      "slug": "camuflagem_mimetica",
+      "nome": "Camuflagem Mimética",
       "fonte_catalogo": "herois_arton",
-      "requer_aliado_mesmo_poder": true
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "sereia_tritao"
     },
     {
-      "slug": "saude_coletiva",
-      "nome": "Saúde Coletiva",
-      "categoria_v13": "grupo",
-      "custo_pm": 0,
-      "pagina_referencia": "HA p.95",
-      "descricao_resumo": "Cura em aliado com poder: +2 PV/dado.",
+      "slug": "canto_da_sereia",
+      "nome": "Canto da Sereia",
       "fonte_catalogo": "herois_arton",
-      "requer_aliado_mesmo_poder": true
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "sereia_tritao"
     },
     {
-      "slug": "defesa_do_martir",
-      "nome": "Defesa do Mártir",
-      "categoria_v13": "grupo",
+      "slug": "cascos_poderosos",
+      "nome": "Cascos Poderosos",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "minotauro",
+      "prerequisitos": "Raças: minotauro, satiro"
+    },
+    {
+      "slug": "chassi_gracioso",
+      "nome": "Chassi Gracioso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "golem"
+    },
+    {
+      "slug": "citadino",
+      "nome": "Citadino",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "humano",
+      "descricao_resumo": "+2 perícias Carisma (exceto Adestramento).",
+      "prerequisitos": "Raças: humano, hynne, meio_elfo"
+    },
+    {
+      "slug": "comandar_aprimorado",
+      "nome": "Comandar Aprimorado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "humano"
+    },
+    {
+      "slug": "conforto_do_aco",
+      "nome": "Conforto do Aço",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "anao"
+    },
+    {
+      "slug": "constricao_atroz",
+      "nome": "Constrição Atroz",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "dahllan"
+    },
+    {
+      "slug": "coracao_de_pedra",
+      "nome": "Coração de Pedra",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "anao",
+      "descricao_resumo": "+1 PV/nível; imune petrificação.",
+      "efeitos": [
+        {
+          "id": "cor_ped_pv",
+          "alvo": "pv_max",
+          "op": "soma",
+          "valor": 1,
+          "quando": "sempre",
+          "rotulo": "Coração de Pedra — +1 PV/nível (fixo +1 aqui)",
+          "pagina": 86
+        }
+      ]
+    },
+    {
+      "slug": "coro_sibilante",
+      "nome": "Coro Sibilante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "medusa"
+    },
+    {
+      "slug": "crescimento_feerico",
+      "nome": "Crescimento Feérico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "duende",
+      "prerequisitos": "Raças: duende, silfide"
+    },
+    {
+      "slug": "crianca_da_luz",
+      "nome": "Criança da Luz",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "suraggel"
+    },
+    {
+      "slug": "crianca_das_trevas",
+      "nome": "Criança das Trevas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "suraggel"
+    },
+    {
+      "slug": "devocao_iluminada",
+      "nome": "Devoção Iluminada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.86",
+      "raca_exigida": "suraggel"
+    },
+    {
+      "slug": "duas_cabecas",
+      "nome": "Duas Cabeças",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "prerequisitos": "Pré-requisito: raça elegível (ver HA Tabela 1-22)."
+    },
+    {
+      "slug": "dupla_conjuracao",
+      "nome": "Dupla Conjuração",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "prerequisitos": "Pré-requisito: raça elegível (ver HA Tabela 1-22)."
+    },
+    {
+      "slug": "dupla_inteligencia",
+      "nome": "Dupla Inteligência",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "prerequisitos": "Pré-requisito: raça elegível (ver HA Tabela 1-22)."
+    },
+    {
+      "slug": "dupla_prontidao",
+      "nome": "Dupla Prontidão",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "prerequisitos": "Pré-requisito: raça elegível (ver HA Tabela 1-22)."
+    },
+    {
+      "slug": "duro_como_aco",
+      "nome": "Duro Como Aço",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "raca_exigida": "anao"
+    },
+    {
+      "slug": "eco_arcano",
+      "nome": "Eco Arcano",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.8",
+      "raca_exigida": "eiradaan",
+      "descricao_resumo": "Eiradaan: uma magia arcana de 1º círculo como habilidade racial."
+    },
+    {
+      "slug": "entre_as_pernas",
+      "nome": "Entre as Pernas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "raca_exigida": "goblin",
+      "prerequisitos": "Raças: goblin, hynne"
+    },
+    {
+      "slug": "escapada_criativa",
+      "nome": "Escapada Criativa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "raca_exigida": "goblin",
+      "prerequisitos": "Raças: goblin, meio_elfo"
+    },
+    {
+      "slug": "esgrima_elfica",
+      "nome": "Esgrima Élfica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "raca_exigida": "elfo"
+    },
+    {
+      "slug": "estilo_classico",
+      "nome": "Estilo Clássico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "raca_exigida": "humano"
+    },
+    {
+      "slug": "estirpe_arcana",
+      "nome": "Estirpe Arcana",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "raca_exigida": "eiradaan",
+      "prerequisitos": "Raças: eiradaan, elfo"
+    },
+    {
+      "slug": "exaltacao_do_rejeitado",
+      "nome": "Exaltação do Rejeitado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "prerequisitos": "Pré-requisito: raça elegível (ver HA Tabela 1-22)."
+    },
+    {
+      "slug": "explosao_ossea",
+      "nome": "Explosão Óssea",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "raca_exigida": "osteon"
+    },
+    {
+      "slug": "falatorio_criativo",
+      "nome": "Falatório Criativo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.87",
+      "raca_exigida": "goblin"
+    },
+    {
+      "slug": "familiar_de_elemento",
+      "nome": "Familiar de <Elemento>",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.88",
+      "raca_exigida": "qareen"
+    },
+    {
+      "slug": "familiar_de_luz",
+      "nome": "Familiar de Luz",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.88",
+      "raca_exigida": "qareen",
+      "prerequisitos": "Raças: qareen, suraggel"
+    },
+    {
+      "slug": "familiar_de_trevas",
+      "nome": "Familiar de Trevas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.88",
+      "raca_exigida": "qareen",
+      "prerequisitos": "Raças: qareen, suraggel"
+    },
+    {
+      "slug": "faro_aprimorado",
+      "nome": "Faro Aprimorado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.88",
+      "raca_exigida": "minotauro"
+    },
+    {
+      "slug": "forca_titanica",
+      "nome": "Força Titânica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.13",
+      "raca_exigida": "galokk",
+      "descricao_resumo": "Galokk: +1 em testes de Força e dano corpo a corpo."
+    },
+    {
+      "slug": "fragrancia_de_rosas",
+      "nome": "Fragrância de Rosas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.88",
+      "raca_exigida": "dahllan",
+      "prerequisitos": "Raças: dahllan, duende"
+    },
+    {
+      "slug": "furia_aterrorizante",
+      "nome": "Fúria Aterrorizante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.88",
+      "raca_exigida": "galokk"
+    },
+    {
+      "slug": "furia_natural",
+      "nome": "Fúria Natural",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.88",
+      "raca_exigida": "minotauro"
+    },
+    {
+      "slug": "gavinhas",
+      "nome": "Gavinhas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.88",
+      "raca_exigida": "dahllan"
+    },
+    {
+      "slug": "glamour",
+      "nome": "Glamour",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.88",
+      "raca_exigida": "duende",
+      "prerequisitos": "Raças: duende, eiradaan, silfide"
+    },
+    {
+      "slug": "glamour_maior",
+      "nome": "Glamour Maior",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "duende",
+      "prerequisitos": "Raças: duende, eiradaan, silfide"
+    },
+    {
+      "slug": "golpe_dos_titas",
+      "nome": "Golpe dos Titãs",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "galokk"
+    },
+    {
+      "slug": "golpe_no_joelho",
+      "nome": "Golpe no Joelho",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "goblin",
+      "prerequisitos": "Raças: goblin, hynne"
+    },
+    {
+      "slug": "grande_marca_de_wynna",
+      "nome": "Grande Marca de Wynna",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "qareen"
+    },
+    {
+      "slug": "heranca_erudita",
+      "nome": "Herança Erudita",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "eiradaan",
+      "prerequisitos": "Raças: eiradaan, elfo"
+    },
+    {
+      "slug": "logica_gnomica",
+      "nome": "Lógica Gnômica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "kliren"
+    },
+    {
+      "slug": "magia_ofidica",
+      "nome": "Magia Ofídica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "medusa"
+    },
+    {
+      "slug": "manipulacao_esqueletica",
+      "nome": "Manipulação Esquelética",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "osteon"
+    },
+    {
+      "slug": "marrada_poderosa",
+      "nome": "Marrada Poderosa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "minotauro",
+      "prerequisitos": "Raças: minotauro, satiro"
+    },
+    {
+      "slug": "meditacao_mistica",
+      "nome": "Meditação Mística",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "eiradaan",
+      "prerequisitos": "Raças: eiradaan, elfo"
+    },
+    {
+      "slug": "olhar_petrificante",
+      "nome": "Olhar Petrificante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.89",
+      "raca_exigida": "medusa"
+    },
+    {
+      "slug": "ossos_afiados",
+      "nome": "Ossos Afiados",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.90",
+      "raca_exigida": "osteon"
+    },
+    {
+      "slug": "pirata_oceanico",
+      "nome": "Pirata Oceânico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.90",
+      "raca_exigida": "sereia_tritao"
+    },
+    {
+      "slug": "programacao_de_combate",
+      "nome": "Programação de Combate",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.90",
+      "raca_exigida": "golem"
+    },
+    {
+      "slug": "programacao_holistica",
+      "nome": "Programação Holística",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.90",
+      "raca_exigida": "golem"
+    },
+    {
+      "slug": "protetor_eterno",
+      "nome": "Protetor Eterno",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.90",
+      "raca_exigida": "minotauro"
+    },
+    {
+      "slug": "protetor_taurico",
+      "nome": "Protetor Táurico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.90",
+      "raca_exigida": "minotauro"
+    },
+    {
+      "slug": "quadridestria",
+      "nome": "Quadridestria",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.90",
+      "prerequisitos": "Pré-requisito: raça elegível (ver HA Tabela 1-22)."
+    },
+    {
+      "slug": "quatro_bracos",
+      "nome": "Quatro Braços",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "prerequisitos": "Pré-requisito: raça elegível (ver HA Tabela 1-22)."
+    },
+    {
+      "slug": "saliva_corrosiva",
+      "nome": "Saliva Corrosiva",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "raca_exigida": "trog"
+    },
+    {
+      "slug": "sangue_magico",
+      "nome": "Sangue Mágico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "raca_exigida": "eiradaan",
+      "prerequisitos": "Raças: eiradaan, qareen, silfide"
+    },
+    {
+      "slug": "saraivada_florestal",
+      "nome": "Saraivada Florestal",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "raca_exigida": "dahllan"
+    },
+    {
+      "slug": "soco_foguete",
+      "nome": "Soco Foguete",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "raca_exigida": "golem"
+    },
+    {
+      "slug": "tradicao_de_ayrelynn",
+      "nome": "Tradição de Ayrelynn",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "raca_exigida": "anao"
+    },
+    {
+      "slug": "tradicao_perdida",
+      "nome": "Tradição Perdida",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "raca_exigida": "trog"
+    },
+    {
+      "slug": "tradicao_perdida_aprimorada",
+      "nome": "Tradição Perdida Aprimorada",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "raca_exigida": "trog"
+    },
+    {
+      "slug": "valentia_inata",
+      "nome": "Valentia Inata",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.84",
+      "raca_exigida": "hynne"
+    },
+    {
+      "slug": "veneno_aprimorado",
+      "nome": "Veneno Aprimorado",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "raca_exigida": "medusa"
+    },
+    {
+      "slug": "vigilancia_elfica",
+      "nome": "Vigilância Élfica",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "raca_exigida": "elfo",
+      "prerequisitos": "Raças: elfo, meio_elfo"
+    },
+    {
+      "slug": "vitalidade_das_fadas",
+      "nome": "Vitalidade das Fadas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "raca",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.91",
+      "raca_exigida": "dahllan",
+      "prerequisitos": "Raças: dahllan, duende, satiro, silfide"
+    },
+    {
+      "slug": "bolsoes_insanos",
+      "nome": "Bolsões Insanos",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "tormenta",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83",
+      "descricao_resumo": "Carga +2; +5 Ladinagem ocultar nesses espaços.",
+      "efeitos": [
+        {
+          "id": "bols_carga",
+          "alvo": "carga_espacos",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Bolsões Insanos — carga +2",
+          "pagina": 83
+        }
+      ]
+    },
+    {
+      "slug": "carapaca_corrompida",
+      "nome": "Carapaça Corrompida",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "tormenta",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83",
+      "descricao_resumo": "RD 1 (+1 por outros poderes Tormenta).",
+      "prerequisitos": "Carapaça",
+      "efeitos": [
+        {
+          "id": "carap_rd",
+          "alvo": "rd",
+          "rd_tipo": "todos",
+          "op": "soma",
+          "valor": 1,
+          "quando": "sempre",
+          "rotulo": "Carapaça Corrompida — RD 1",
+          "pagina": 83
+        }
+      ]
+    },
+    {
+      "slug": "repulsivo",
+      "nome": "Repulsivo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "tormenta",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "slug": "secrecao_cicatrizante",
+      "nome": "Secreção Cicatrizante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "tormenta",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "slug": "simetria_radial",
+      "nome": "Simetria Radial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "tormenta",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83",
+      "descricao_resumo": "Não flanqueado/caído; +5 vs agarrar.",
+      "prerequisitos": "4 poderes Tormenta"
+    },
+    {
+      "slug": "tempo_mistico",
+      "nome": "Tempo Místico",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "tormenta",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.83"
+    },
+    {
+      "slug": "amigo_divino",
+      "nome": "Amigo Divino",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo pode ser espírito ou construto celestial."
+    },
+    {
+      "slug": "amigo_fiel",
+      "nome": "Amigo Fiel",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 1,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo pode rerrolar um teste de resistência 1× por cena (1 PM)."
+    },
+    {
+      "slug": "asas_aliadas",
+      "nome": "Asas Aliadas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo alado ganha deslocamento de voo."
+    },
+    {
+      "slug": "aumento_de_atributo",
+      "nome": "Aumento de Atributo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo recebe +1 em Força, Destreza ou Sabedoria (escolher ao aprender)."
+    },
+    {
+      "slug": "bom_garoto",
+      "nome": "Bom Garoto",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo ganha +2 em testes de perícia baseados em Carisma."
+    },
+    {
+      "slug": "comando_defensivo",
+      "nome": "Comando Defensivo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
       "custo_pm": 2,
-      "pagina_referencia": "HA p.94",
-      "descricao_resumo": "1×/rod sofrer dano no lugar de aliado.",
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo usa ação de proteção como reação (2 PM)."
+    },
+    {
+      "slug": "comando_ofensivo",
+      "nome": "Comando Ofensivo",
       "fonte_catalogo": "herois_arton",
-      "requer_aliado_mesmo_poder": true
-    },
-    {
-      "slug": "pancada_estonteante",
-      "nome": "Pancada Estonteante",
-      "categoria_v13": "classe",
-      "classe_exigida": "guerreiro",
+      "categoria_v13": "treinador",
       "custo_pm": 2,
-      "pagina_referencia": "HA p.68",
-      "prerequisitos": "Luta",
-      "descricao_resumo": "2 PM + impacto → desprevenido 1 rodada.",
-      "fonte_catalogo": "herois_arton"
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo realiza um ataque como reação ao seu comando (2 PM)."
     },
     {
-      "slug": "arma_juramentada",
-      "nome": "Arma Juramentada",
-      "categoria_v13": "classe",
-      "classe_exigida": "paladino",
-      "custo_pm": 0,
-      "pagina_referencia": "HA p.76",
-      "prerequisitos": "Devoto",
-      "descricao_resumo": "Arma preferida recebe melhoria mágica.",
-      "fonte_catalogo": "herois_arton"
+      "slug": "comandos_distantes",
+      "nome": "Comandos Distantes",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 1,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Comandos ao Melhor Amigo funcionam em alcance médio (1 PM)."
     },
     {
-      "slug": "senescal",
-      "nome": "Senescal",
-      "categoria_v13": "classe",
-      "classe_exigida": "nobre",
-      "custo_pm": 0,
-      "pagina_referencia": "HA p.76",
-      "prerequisitos": "5º nível nobre",
-      "descricao_resumo": "+1/patamar em testes de domínio/negócio.",
-      "fonte_catalogo": "herois_arton"
+      "slug": "comunicacao_silenciosa",
+      "nome": "Comunicação Silenciosa",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 1,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Comandos ao Melhor Amigo não exigem gestos nem palavras (1 PM)."
     },
     {
-      "slug": "ordens_agressivas",
-      "nome": "Ordens Agressivas",
-      "categoria_v13": "classe",
-      "classe_exigida": "cavaleiro",
+      "slug": "conquistar_pelos_numeros",
+      "nome": "Conquistar pelos Números",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
       "custo_pm": 0,
-      "pagina_referencia": "HA p.62",
-      "descricao_resumo": "Gritar Ordens soma bônus no 1º dano dos aliados.",
-      "fonte_catalogo": "herois_arton"
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
+    },
+    {
+      "slug": "convocar_enxame",
+      "nome": "Convocar Enxame",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 4,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Convoca enxame de criaturas pequenas por uma cena (4 PM)."
+    },
+    {
+      "slug": "coracao_grande",
+      "nome": "Coração Grande",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Pode ter um Melhor Amigo adicional."
+    },
+    {
+      "slug": "direcionamento_marcial",
+      "nome": "Direcionamento Marcial",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 2,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Direcionar soma Carisma em ataques do Melhor Amigo (2 PM)."
+    },
+    {
+      "slug": "domador_cativante",
+      "nome": "Domador Cativante",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "+2 em testes de Adestramento para domar criaturas."
+    },
+    {
+      "slug": "domador_lendario",
+      "nome": "Domador Lendário",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Domar Criatura pode afetar criaturas de ND até metade do seu nível."
+    },
+    {
+      "slug": "ensinar_truque",
+      "nome": "Ensinar Truque",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo aprende um truque adicional."
+    },
+    {
+      "slug": "investida_conjunta",
+      "nome": "Investida Conjunta",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 2,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Você e Melhor Amigo fazem investida coordenada (2 PM)."
+    },
+    {
+      "slug": "lider_da_matilha",
+      "nome": "Líder da Matilha",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
+    },
+    {
+      "slug": "lingua_das_criaturas",
+      "nome": "Língua das Criaturas",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
+    },
+    {
+      "slug": "mascote",
+      "nome": "Mascote",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
+    },
+    {
+      "slug": "mestre_das_feras",
+      "nome": "Mestre das Feras",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "+2 em testes de Adestramento para Domar Criatura."
+    },
+    {
+      "slug": "parceiro_veterano",
+      "nome": "Parceiro Veterano",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo aumenta uma categoria de dano de armas naturais."
+    },
+    {
+      "slug": "petisco_merecido",
+      "nome": "Petisco Merecido",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
+    },
+    {
+      "slug": "proteger_o_amigo",
+      "nome": "Proteger o Amigo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 2,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Intercepta um ataque contra o Melhor Amigo como reação (2 PM)."
+    },
+    {
+      "slug": "protecao_fraterna",
+      "nome": "Proteção Fraterna",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
+    },
+    {
+      "slug": "trabalho_em_equipe",
+      "nome": "Trabalho em Equipe",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
+    },
+    {
+      "slug": "treinador_ecletico",
+      "nome": "Treinador Eclético",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
+    },
+    {
+      "slug": "treino_intensivo",
+      "nome": "Treino Intensivo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
+    },
+    {
+      "slug": "treino_rigoroso",
+      "nome": "Treino Rigoroso",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.20",
+      "classe_exigida": "treinador",
+      "descricao_resumo": "Melhor Amigo recebe +1 PV por nível de Treinador."
+    },
+    {
+      "slug": "veterinario_de_campo",
+      "nome": "Veterinário de Campo",
+      "fonte_catalogo": "herois_arton",
+      "categoria_v13": "treinador",
+      "custo_pm": 0,
+      "pagina_referencia": "HA p.19",
+      "classe_exigida": "treinador"
     }
   ]
 }
