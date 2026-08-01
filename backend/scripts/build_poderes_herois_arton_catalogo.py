@@ -241,6 +241,11 @@ def _item(
         item["prerequisitos"] = prerequisitos
     elif leg.get("prerequisitos"):
         item["prerequisitos"] = str(leg["prerequisitos"])
+    # Preservar efeitos estruturados (motor efeitos_ficha_t20) e flags do legado HA-4.
+    if isinstance(leg.get("efeitos"), list) and leg["efeitos"]:
+        item["efeitos"] = list(leg["efeitos"])
+    if leg.get("requer_aliado_mesmo_poder"):
+        item["requer_aliado_mesmo_poder"] = True
     return item
 
 

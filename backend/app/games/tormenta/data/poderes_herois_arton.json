@@ -2740,7 +2740,28 @@
       "custo_pm": 0,
       "pagina_referencia": "HA p.78",
       "descricao_resumo": "Arma 2 mãos: +2 Defesa e Fortitude.",
-      "prerequisitos": "Estilo de Duas Mãos"
+      "prerequisitos": "Estilo de Duas Mãos",
+      "efeitos": [
+        {
+          "id": "da_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "arma_duas_maos",
+          "rotulo": "Defesa Armada — +2 Defesa (arma 2 mãos)",
+          "pagina": 79
+        },
+        {
+          "id": "da_fort",
+          "alvo": "resistencia",
+          "resistencia": "fortitude",
+          "op": "soma",
+          "valor": 2,
+          "quando": "arma_duas_maos",
+          "rotulo": "Defesa Armada — +2 Fortitude",
+          "pagina": 79
+        }
+      ]
     },
     {
       "slug": "encastelado",
@@ -2827,7 +2848,18 @@
       "custo_pm": 0,
       "pagina_referencia": "HA p.79",
       "descricao_resumo": "Margem de ameaça +1.",
-      "prerequisitos": "11º nível"
+      "prerequisitos": "11º nível",
+      "efeitos": [
+        {
+          "id": "prec_ameaca",
+          "alvo": "margem_ameaca",
+          "op": "soma",
+          "valor": 1,
+          "quando": "sempre",
+          "rotulo": "Precisão Letal — margem ameaça +1",
+          "pagina": 79
+        }
+      ]
     },
     {
       "slug": "sanguinario",
@@ -2876,7 +2908,18 @@
       "categoria_v13": "destino",
       "custo_pm": 0,
       "pagina_referencia": "HA p.80",
-      "descricao_resumo": "Em cidade: +2 Defesa, Enganação, Investigação."
+      "descricao_resumo": "Em cidade: +2 Defesa, Enganação, Investigação.",
+      "efeitos": [
+        {
+          "id": "au_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "em_cidade",
+          "rotulo": "Andarilho Urbano — +2 Defesa (em cidade)",
+          "pagina": 80
+        }
+      ]
     },
     {
       "slug": "caricias_revigorantes",
@@ -2911,7 +2954,18 @@
       "custo_pm": 0,
       "pagina_referencia": "HA p.80",
       "descricao_resumo": "Conta 1 tamanho maior; carga +5.",
-      "prerequisitos": "Con 2"
+      "prerequisitos": "Con 2",
+      "efeitos": [
+        {
+          "id": "grand_carga",
+          "alvo": "carga_espacos",
+          "op": "soma",
+          "valor": 5,
+          "quando": "sempre",
+          "rotulo": "Grandão — carga +5 espaços",
+          "pagina": 80
+        }
+      ]
     },
     {
       "slug": "heroi_sete_instrumentos",
@@ -2954,7 +3008,19 @@
       "custo_pm": 1,
       "pagina_referencia": "HA p.80",
       "descricao_resumo": "+2 Intimidação; 1 PM assustar.",
-      "prerequisitos": "Car 1, Intimidação"
+      "prerequisitos": "Car 1, Intimidação",
+      "efeitos": [
+        {
+          "id": "pose_int",
+          "alvo": "pericia",
+          "pericia_slug": "intimidacao",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Pose Assustadora — +2 Intimidação",
+          "pagina": 81
+        }
+      ]
     },
     {
       "slug": "seducao_lasciva",
@@ -3310,7 +3376,19 @@
       "custo_pm": 0,
       "pagina_referencia": "HA p.84",
       "raca_exigida": "elfo",
-      "descricao_resumo": "Arcos = simples; +2 dano com arcos."
+      "descricao_resumo": "Arcos = simples; +2 dano com arcos.",
+      "efeitos": [
+        {
+          "id": "arc_elf_dano",
+          "alvo": "dano",
+          "op": "soma",
+          "valor": 2,
+          "quando": "condicional",
+          "condicao": "arco",
+          "rotulo": "Arquearia Élfica — +2 dano arcos",
+          "pagina": 84
+        }
+      ]
     },
     {
       "slug": "arsenal_de_lisandra",
@@ -3329,7 +3407,18 @@
       "custo_pm": 1,
       "pagina_referencia": "HA p.84",
       "raca_exigida": "suraggel",
-      "descricao_resumo": "+2 Defesa; asas como arma; ataque extra 1 PM."
+      "descricao_resumo": "+2 Defesa; asas como arma; ataque extra 1 PM.",
+      "efeitos": [
+        {
+          "id": "asas_def",
+          "alvo": "defesa",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Asas de Aço — +2 Defesa",
+          "pagina": 85
+        }
+      ]
     },
     {
       "slug": "asas_extraplanares",
@@ -3349,7 +3438,29 @@
       "pagina_referencia": "HA p.84",
       "raca_exigida": "anao",
       "descricao_resumo": "+1 ataque / +2 dano armas de fogo.",
-      "prerequisitos": "Raças: anao, goblin, kliren"
+      "prerequisitos": "Raças: anao, goblin, kliren",
+      "efeitos": [
+        {
+          "id": "polv_atq",
+          "alvo": "ataque",
+          "op": "soma",
+          "valor": 1,
+          "quando": "condicional",
+          "condicao": "arma fogo",
+          "rotulo": "Atração Pólvora — +1 ataque (fogo)",
+          "pagina": 85
+        },
+        {
+          "id": "polv_dano",
+          "alvo": "dano",
+          "op": "soma",
+          "valor": 2,
+          "quando": "condicional",
+          "condicao": "arma fogo",
+          "rotulo": "Atração Pólvora — +2 dano (fogo)",
+          "pagina": 85
+        }
+      ]
     },
     {
       "slug": "camuflagem_mimetica",
@@ -3434,7 +3545,18 @@
       "custo_pm": 0,
       "pagina_referencia": "HA p.86",
       "raca_exigida": "anao",
-      "descricao_resumo": "+1 PV/nível; imune petrificação."
+      "descricao_resumo": "+1 PV/nível; imune petrificação.",
+      "efeitos": [
+        {
+          "id": "cor_ped_pv",
+          "alvo": "pv_max",
+          "op": "soma",
+          "valor": 1,
+          "quando": "sempre",
+          "rotulo": "Coração de Pedra — +1 PV/nível (fixo +1 aqui)",
+          "pagina": 86
+        }
+      ]
     },
     {
       "slug": "coro_sibilante",
@@ -3992,7 +4114,18 @@
       "categoria_v13": "tormenta",
       "custo_pm": 0,
       "pagina_referencia": "HA p.83",
-      "descricao_resumo": "Carga +2; +5 Ladinagem ocultar nesses espaços."
+      "descricao_resumo": "Carga +2; +5 Ladinagem ocultar nesses espaços.",
+      "efeitos": [
+        {
+          "id": "bols_carga",
+          "alvo": "carga_espacos",
+          "op": "soma",
+          "valor": 2,
+          "quando": "sempre",
+          "rotulo": "Bolsões Insanos — carga +2",
+          "pagina": 83
+        }
+      ]
     },
     {
       "slug": "carapaca_corrompida",
@@ -4002,7 +4135,19 @@
       "custo_pm": 0,
       "pagina_referencia": "HA p.83",
       "descricao_resumo": "RD 1 (+1 por outros poderes Tormenta).",
-      "prerequisitos": "Carapaça"
+      "prerequisitos": "Carapaça",
+      "efeitos": [
+        {
+          "id": "carap_rd",
+          "alvo": "rd",
+          "rd_tipo": "todos",
+          "op": "soma",
+          "valor": 1,
+          "quando": "sempre",
+          "rotulo": "Carapaça Corrompida — RD 1",
+          "pagina": 83
+        }
+      ]
     },
     {
       "slug": "repulsivo",
